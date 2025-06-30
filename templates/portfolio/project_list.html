@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}Projects - Fatemeh NGP{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1>My Projects</h1>
+        <p>A collection of my work and contributions</p>
+    </div>
+</section>
+
+<section class="projects-section">
+    <div class="container">
+        <div class="projects-grid">
+            {% for project in projects %}
+            <div class="project-card">
+                {% if project.image %}
+                <div class="project-image">
+                    <img src="{{ project.image.url }}" alt="{{ project.title }}">
+                </div>
+                {% endif %}
+                <div class="project-content">
+                    <h3>{{ project.title }}</h3>
+                    <p>{{ project.short_description }}</p>
+                    <div class="project-tech">
+                        {% for tech in project.technologies.all %}
+                        <span class="tech-tag">{{ tech.name }}</span>
+                        {% endfor %}
+                    </div>
+                    <div class="project-links">
+                        <a href="{% url 'project_detail' project.pk %}" class="btn btn-small">View Details</a>
+                        {% if project.live_url %}
+                        <a href="{{ project.live_url }}" class="btn btn-small btn-secondary" target="_blank">
+                            <i class="fas fa-external-link-alt"></i> Live Demo
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p class="no-content">No projects yet. Add some through the admin panel!</p>
+            {% endfor %}
+        </div>
+        
+        {% if is_paginated %}
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-small">&larr; Previous</a>
+            {% endif %}
+            
+            <span class="page-info">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </span>
+            
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" class="btn btn-small">Next &rarr;</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
