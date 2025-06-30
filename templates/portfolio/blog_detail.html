@@ -1,0 +1,500 @@
+<!-- templates/portfolio/blog_detail.html -->
+{% extends 'base.html' %}
+
+{% block title %}{{ post.title }} - Fatemeh NGP{% endblock %}
+
+{% block description %}{{ post.excerpt|default:post.content|truncatewords:25 }}{% endblock %}
+
+{% block content %}
+<article class="blog-post">
+    <div class="container">
+        <!-- Post Header -->
+        <header class="post-header">
+            <div class="post-meta">
+                <span class="post-date">
+                    <i class="fas fa-calendar-alt"></i>
+                    {{ post.created_at|date:"F d, Y" }}
+                </span>
+                {% if post.category %}
+                    <span class="post-category">
+                        <i class="fas fa-tag"></i>
+                        {{ post.category }}
+                    </span>
+                {% endif %}
+                <span class="reading-time">
+                    <i class="fas fa-clock"></i>
+                    {{ post.reading_time }} min read
+                </span>
+            </div>
+            
+            <h1 class="post-title">{{ post.title }}</h1>
+            
+            {% if post.excerpt %}
+                <p class="post-excerpt">{{ post.excerpt }}</p>
+            {% endif %}
+            
+            {% if post.featured_image %}
+                <div class="post-image">
+                    <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" loading="lazy">
+                </div>
+            {% endif %}
+        </header>
+
+        <!-- Post Content -->
+        <div class="post-content">
+            <div class="content-wrapper">
+                {{ post.content|safe }}
+            </div>
+            
+            <!-- Tags -->
+            {% if post.tags.all %}
+                <div class="post-tags">
+                    <h4>Tags:</h4>
+                    <div class="tags-list">
+                        {% for tag in post.tags.all %}
+                            <span class="tag">{{ tag.name }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Post Footer -->
+        <footer class="post-footer">
+            <div class="author-info">
+                <div class="author-avatar">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="author-details">
+                    <h4>Fatemeh NGP</h4>
+                    <p>Full-stack developer passionate about creating innovative web solutions</p>
+                </div>
+            </div>
+            
+            <div class="post-actions">
+                <a href="{% url 'blog_list' %}" class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Blog
+                </a>
+                
+                <div class="share-buttons">
+                    <span>Share:</span>
+                    <a href="https://twitter.com/intent/tweet?text={{ post.title }}&url={{ request.build_absolute_uri }}" 
+                       target="_blank" 
+                       rel="noopener noreferrer"
+                       class="share-btn twitter"
+                       aria-label="Share on Twitter">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.build_absolute_uri }}" 
+                       target="_blank" 
+                       rel="noopener noreferrer"
+                       class="share-btn linkedin"
+                       aria-label="Share on LinkedIn">
+                        <i class="fab fa-linkedin"></i>
+                    </a>
+                    <a href="mailto:?subject={{ post.title }}&body=Check out this blog post: {{ request.build_absolute_uri }}" 
+                       class="share-btn email"
+                       aria-label="Share via Email">
+                        <i class="fas fa-envelope"></i>
+                    </a>
+                </div>
+            </div>
+        </footer>
+
+        <!-- Related Posts -->
+        {% if related_posts %}
+            <section class="related-posts">
+                <h3>Related Posts</h3>
+                <div class="related-grid">
+                    {% for related_post in related_posts %}
+                        <article class="related-card">
+                            {% if related_post.featured_image %}
+                                <div class="related-image">
+                                    <img src="{{ related_post.featured_image.url }}" alt="{{ related_post.title }}" loading="lazy">
+                                </div>
+                            {% endif %}
+                            <div class="related-content">
+                                <h4>
+                                    <a href="{% url 'blog_detail' related_post.slug %}">{{ related_post.title }}</a>
+                                </h4>
+                                <p class="related-date">{{ related_post.created_at|date:"M d, Y" }}</p>
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
+            </section>
+        {% endif %}
+    </div>
+</article>
+
+<style>
+.blog-post {
+    padding: 80px 0;
+    min-height: 70vh;
+}
+
+.post-header {
+    max-width: 800px;
+    margin: 0 auto 3rem;
+    text-align: center;
+}
+
+.post-meta {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+    color: var(--text-muted, #666);
+    flex-wrap: wrap;
+}
+
+.post-meta i {
+    margin-right: 0.5rem;
+}
+
+.post-category {
+    background: var(--accent-color, #007bff);
+    color: white;
+    padding: 0.3rem 0.7rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+}
+
+.post-title {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: var(--primary-color, #333);
+    line-height: 1.2;
+}
+
+.post-excerpt {
+    font-size: 1.2rem;
+    color: var(--text-muted, #666);
+    line-height: 1.5;
+    margin-bottom: 2rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.post-image {
+    margin-top: 2rem;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+.post-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.post-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.content-wrapper {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: var(--text-color, #333);
+}
+
+.content-wrapper h2,
+.content-wrapper h3,
+.content-wrapper h4 {
+    margin: 2rem 0 1rem;
+    color: var(--primary-color, #333);
+}
+
+.content-wrapper h2 {
+    font-size: 1.8rem;
+    border-bottom: 2px solid var(--accent-color, #007bff);
+    padding-bottom: 0.5rem;
+}
+
+.content-wrapper h3 {
+    font-size: 1.5rem;
+}
+
+.content-wrapper h4 {
+    font-size: 1.3rem;
+}
+
+.content-wrapper p {
+    margin-bottom: 1.5rem;
+}
+
+.content-wrapper ul,
+.content-wrapper ol {
+    margin-bottom: 1.5rem;
+    padding-left: 2rem;
+}
+
+.content-wrapper li {
+    margin-bottom: 0.5rem;
+}
+
+.content-wrapper blockquote {
+    border-left: 4px solid var(--accent-color, #007bff);
+    margin: 2rem 0;
+    padding: 1rem 2rem;
+    background: #f8f9fa;
+    font-style: italic;
+}
+
+.content-wrapper code {
+    background: #f8f9fa;
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+}
+
+.content-wrapper pre {
+    background: #2d3748;
+    color: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 2rem 0;
+}
+
+.content-wrapper pre code {
+    background: none;
+    padding: 0;
+    color: inherit;
+}
+
+.post-tags {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid #eee;
+}
+
+.post-tags h4 {
+    margin-bottom: 1rem;
+    color: var(--primary-color, #333);
+}
+
+.tags-list {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.tag {
+    background: #f8f9fa;
+    color: #495057;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    transition: background-color 0.3s ease;
+}
+
+.tag:hover {
+    background: var(--accent-color, #007bff);
+    color: white;
+}
+
+.post-footer {
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 2px solid #eee;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.author-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.author-avatar {
+    font-size: 3rem;
+    color: var(--accent-color, #007bff);
+}
+
+.author-details h4 {
+    margin: 0 0 0.5rem;
+    color: var(--primary-color, #333);
+}
+
+.author-details p {
+    margin: 0;
+    color: var(--text-muted, #666);
+}
+
+.post-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.back-btn {
+    color: var(--accent-color, #007bff);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.back-btn:hover {
+    color: var(--primary-color, #333);
+}
+
+.back-btn i {
+    margin-right: 0.5rem;
+}
+
+.share-buttons {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.share-buttons span {
+    font-weight: 500;
+    color: var(--text-muted, #666);
+}
+
+.share-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    text-decoration: none;
+    color: white;
+    transition: transform 0.3s ease;
+}
+
+.share-btn:hover {
+    transform: translateY(-2px);
+}
+
+.share-btn.twitter {
+    background: #1da1f2;
+}
+
+.share-btn.linkedin {
+    background: #0077b5;
+}
+
+.share-btn.email {
+    background: #666;
+}
+
+.related-posts {
+    margin-top: 4rem;
+    padding-top: 3rem;
+    border-top: 2px solid #eee;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.related-posts h3 {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: var(--primary-color, #333);
+    font-size: 1.8rem;
+}
+
+.related-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.related-card {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.related-card:hover {
+    transform: translateY(-3px);
+}
+
+.related-image {
+    height: 150px;
+    overflow: hidden;
+}
+
+.related-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.related-content {
+    padding: 1rem;
+}
+
+.related-content h4 {
+    margin: 0 0 0.5rem;
+}
+
+.related-content h4 a {
+    color: var(--primary-color, #333);
+    text-decoration: none;
+    font-size: 1rem;
+    line-height: 1.3;
+    transition: color 0.3s ease;
+}
+
+.related-content h4 a:hover {
+    color: var(--accent-color, #007bff);
+}
+
+.related-date {
+    font-size: 0.9rem;
+    color: var(--text-muted, #666);
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .post-title {
+        font-size: 2rem;
+    }
+    
+    .post-meta {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .content-wrapper {
+        font-size: 1rem;
+    }
+    
+    .author-info {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .post-actions {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+    }
+    
+    .share-buttons {
+        justify-content: center;
+    }
+}
+</style>
+{% endblock %}
