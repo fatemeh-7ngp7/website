@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}About - Fatemeh NGP{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div class="container">
+        <h1>About Me</h1>
+        <p>Get to know more about my background and skills</p>
+    </div>
+</section>
+
+<section class="about-content">
+    <div class="container">
+        <div class="about-grid">
+            <div class="about-text">
+                <h2>Hello! I'm Fatemeh Najafgholipour</h2>
+                <p>I'm a passionate back-end developer with experience in building modern web applications. I love creating solutions that combine great user experience with clean, maintainable code.</p>
+                
+                <p>My journey in programming started when I met my husband. Since then, I've worked on various projects ranging from small business websites to complex web applications.</p>
+                
+                <p>When I'm not coding, you can find me learning or travelling. I believe in continuous learning and staying up-to-date with the latest technologies and best practices.</p>
+                
+                <div class="about-stats">
+                    <div class="stat">
+                        <h3>{{ skills.count }}+</h3>
+                        <p>Technologies</p>
+                    </div>
+                    <div class="stat">
+                        <h3>1+</h3>
+                        <p>Years Experience</p>
+                    </div>
+                    <div class="stat">
+                        <h3>7+</h3>
+                        <p>Projects Completed</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="skills-section">
+                <h3>Technical Skills</h3>
+                {% regroup skills by category as skill_groups %}
+                {% for group in skill_groups %}
+                <div class="skill-category">
+                    <h4>{{ group.grouper|title }}</h4>
+                    <div class="skills-list">
+                        {% for skill in group.list %}
+                        <div class="skill-item">
+                            <span class="skill-name">{{ skill.name }}</span>
+                            <span class="skill-level skill-{{ skill.level }}">{{ skill.get_level_display }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
