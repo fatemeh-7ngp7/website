@@ -1,0 +1,726 @@
+<!-- templates/portfolio/code_sample_detail.html -->
+{% extends 'base.html' %}
+
+{% block title %}{{ sample.title }} - Code Sample - Fatemeh NGP{% endblock %}
+
+{% block description %}{{ sample.description|truncatewords:25 }}{% endblock %}
+
+{% block content %}
+<section class="code-detail-section">
+    <div class="container">
+        <!-- Header -->
+        <header class="code-header">
+            <div class="breadcrumb">
+                <a href="{% url 'code_sample_list' %}">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Code Samples
+                </a>
+            </div>
+
+            <div class="code-title-section">
+                <h1 class="code-title">{{ sample.title }}</h1>
+                <p class="code-description">{{ sample.description }}</p>
+            </div>
+
+            <div class="code-meta-bar">
+                <div class="meta-left">
+                    <span class="language-tag {{ sample.language|lower }}">
+                        <i class="fas fa-code"></i>
+                        {{ sample.language }}
+                    </span>
+                    {% if sample.difficulty %}
+                        <span class="difficulty-tag difficulty-{{ sample.difficulty|lower }}">
+                            <i class="fas fa-signal"></i>
+                            {{ sample.difficulty }}
+                        </span>
+                    {% endif %}
+                    <span class="date-tag">
+                        <i class="fas fa-calendar-alt"></i>
+                        {{ sample.created_at|date:"F d, Y" }}
+                    </span>
+                </div>
+
+                <div class="meta-right">
+                    {% if sample.github_url %}
+                        <a href="{{ sample.github_url }}"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="action-btn github-btn">
+                            <i class="fab fa-github"></i>
+                            View on GitHub
+                        </a>
+                    {% endif %}
+                    <button class="action-btn copy-btn" onclick="copyCode()">
+                        <i class="fas fa-copy"></i>
+                        Copy Code
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Code Display -->
+        <div class="code-container">
+            <div class="code-toolbar">
+                <div class="code-info">
+                    <span class="filename">
+                        <i class="fas fa-file-code"></i>
+                        {{ sample.filename|default:"code."|add:sample.language|lower }}
+                    </span>
+                    {% if sample.lines_of_code %}
+                        <span class="line-count">{{ sample.lines_of_code }} lines</span>
+                    {% endif %}
+                </div>
+                <div class="toolbar-actions">
+                    <button class="toolbar-btn" onclick="toggleLineNumbers()" title="Toggle Line Numbers">
+                        <i class="fas fa-list-ol"></i>
+                    </button>
+                    <button class="toolbar-btn" onclick="toggleFullscreen()" title="Fullscreen">
+                        <i class="fas fa-expand"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="code-block" id="code-block">
+                <pre><code class="language-{{ sample.language|lower }}" id="code-content">{{ sample.code }}</code></pre>
+            </div>
+        </div>
+
+        <!-- Additional Information -->
+        <div class="info-grid">
+            <!-- Algorithm Complexity -->
+            {% if sample.complexity %}
+                <div class="info-card">
+                    <h3><i class="fas fa-brain"></i> Complexity</h3>
+                    <div class="complexity-info">
+                        <span class="complexity-value">O({{ sample.complexity }})</span>
+                        <p>Time complexity analysis</p>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Usage Instructions -->
+            {% if sample.usage_instructions %}
+                <div class="info-card">
+                    <h3><i class="fas fa-play"></i> How to Use</h3>
+                    <div class="usage-content">
+                        {{ sample.usage_instructions|safe }}
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Dependencies -->
+            {% if sample.dependencies %}
+                <div class="info-card">
+                    <h3><i class="fas fa-puzzle-piece"></i> Dependencies</h3>
+                    <div class="dependencies-list">
+                        {% for dep in sample.dependencies.all %}
+                            <span class="dependency-tag">{{ dep.name }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Tags -->
+            {% if sample.get_tags_list %}
+                <div class="info-card">
+                    <h3><i class="fas fa-tags"></i> Tags</h3>
+                    <div class="tags-list">
+                        {% for tag in sample.get_tags_list %}
+                            <span class="tag">{{ tag.name }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Explanation -->
+        {% if sample.explanation %}
+            <div class="explanation-section">
+                <h2><i class="fas fa-lightbulb"></i> Code Explanation</h2>
+                <div class="explanation-content">
+                    {{ sample.explanation|safe }}
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Example Usage -->
+        {% if sample.example_usage %}
+            <div class="example-section">
+                <h2><i class="fas fa-terminal"></i> Example Usage</h2>
+                <div class="example-code">
+                    <pre><code class="language-{{ sample.language|lower }}">{{ sample.example_usage }}</code></pre>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Related Samples -->
+        {% if related_samples %}
+            <div class="related-section">
+                <h2><i class="fas fa-link"></i> Related Code Samples</h2>
+                <div class="related-grid">
+                    {% for related in related_samples %}
+                        <div class="related-card">
+                            <div class="related-header">
+                                <h4>
+                                    <a href="{% url 'code_sample_detail' related.slug %}">{{ related.title }}</a>
+                                </h4>
+                                <span class="related-language">{{ related.language }}</span>
+                            </div>
+                            <p class="related-description">{{ related.description|truncatewords:15 }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<style>
+.code-detail-section {
+    padding: 80px 0;
+    min-height: 70vh;
+}
+
+.breadcrumb {
+    margin-bottom: 2rem;
+}
+
+.breadcrumb a {
+    color: var(--accent-color, #007bff);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.breadcrumb a:hover {
+    color: var(--primary-color, #333);
+}
+
+.breadcrumb i {
+    margin-right: 0.5rem;
+}
+
+.code-title-section {
+    margin-bottom: 2rem;
+}
+
+.code-title {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: var(--primary-color, #333);
+}
+
+.code-description {
+    font-size: 1.2rem;
+    color: var(--text-muted, #666);
+    line-height: 1.6;
+    max-width: 800px;
+}
+
+.code-meta-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+
+.meta-left {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.meta-right {
+    display: flex;
+    gap: 1rem;
+}
+
+.language-tag,
+.difficulty-tag,
+.date-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.language-tag {
+    background: var(--accent-color, #007bff);
+    color: white;
+}
+
+.language-tag.python { background: #3776ab; }
+.language-tag.javascript { background: #f7df1e; color: #333; }
+.language-tag.html-css { background: #e34f26; }
+.language-tag.django { background: #092e20; }
+
+.difficulty-tag {
+    color: white;
+}
+
+.difficulty-beginner { background: #28a745; }
+.difficulty-intermediate { background: #ffc107; color: #333; }
+.difficulty-advanced { background: #dc3545; }
+
+.date-tag {
+    background: #6c757d;
+    color: white;
+}
+
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.github-btn {
+    background: #333;
+    color: white;
+}
+
+.copy-btn {
+    background: var(--accent-color, #007bff);
+    color: white;
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.code-container {
+    margin-bottom: 3rem;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.code-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background: #2d3748;
+    color: white;
+}
+
+.code-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.filename {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'Courier New', monospace;
+    font-weight: 500;
+}
+
+.line-count {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.toolbar-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.toolbar-btn {
+    background: none;
+    border: none;
+    color: white;
+    padding: 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.toolbar-btn:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+.code-block {
+    background: #1a202c;
+    overflow-x: auto;
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.code-block pre {
+    margin: 0;
+    padding: 1.5rem;
+    background: none;
+}
+
+.code-block code {
+    color: #e2e8f0;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    background: none;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.info-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border: 1px solid #e9ecef;
+}
+
+.info-card h3 {
+    margin: 0 0 1rem;
+    color: var(--primary-color, #333);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.2rem;
+}
+
+.complexity-info {
+    text-align: center;
+}
+
+.complexity-value {
+    display: inline-block;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--accent-color, #007bff);
+    background: #f8f9fa;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+}
+
+.usage-content {
+    line-height: 1.6;
+}
+
+.dependencies-list,
+.tags-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.dependency-tag,
+.tag {
+    background: #e9ecef;
+    color: #495057;
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.dependency-tag {
+    background: #d4edda;
+    color: #155724;
+}
+
+.explanation-section,
+.example-section,
+.related-section {
+    margin-bottom: 3rem;
+}
+
+.explanation-section h2,
+.example-section h2,
+.related-section h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--primary-color, #333);
+    margin-bottom: 1.5rem;
+    font-size: 1.8rem;
+}
+
+.explanation-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border: 1px solid #e9ecef;
+    line-height: 1.7;
+}
+
+.example-code {
+    background: #1a202c;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.example-code pre {
+    margin: 0;
+    padding: 1.5rem;
+    overflow-x: auto;
+}
+
+.example-code code {
+    color: #e2e8f0;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.related-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.related-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border: 1px solid #e9ecef;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.related-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.related-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.related-header h4 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.related-header a {
+    color: var(--primary-color, #333);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.related-header a:hover {
+    color: var(--accent-color, #007bff);
+}
+
+.related-language {
+    background: var(--accent-color, #007bff);
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.related-description {
+    color: var(--text-muted, #666);
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .code-title {
+        font-size: 2rem;
+    }
+
+    .code-meta-bar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .meta-right {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .info-grid,
+    .related-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .code-toolbar {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+
+    .toolbar-actions {
+        align-self: flex-end;
+    }
+}
+
+@media (max-width: 480px) {
+    .code-detail-section {
+        padding: 40px 0;
+    }
+
+    .code-title {
+        font-size: 1.8rem;
+    }
+
+    .meta-left {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .action-btn {
+        font-size: 0.9rem;
+        padding: 0.4rem 0.8rem;
+    }
+}
+</style>
+
+<script>
+function copyCode() {
+    const codeContent = document.getElementById('code-content');
+    const textArea = document.createElement('textarea');
+    textArea.value = codeContent.textContent;
+    document.body.appendChild(textArea);
+    textArea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textArea);
+
+    // Update button text temporarily
+    const copyBtn = document.querySelector('.copy-btn');
+    const originalHTML = copyBtn.innerHTML;
+    copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+    copyBtn.style.background = '#28a745';
+
+    setTimeout(() => {
+        copyBtn.innerHTML = originalHTML;
+        copyBtn.style.background = '';
+    }, 2000);
+}
+
+function toggleLineNumbers() {
+    const codeBlock = document.getElementById('code-block');
+    const pre = codeBlock.querySelector('pre');
+
+    if (pre.style.counterReset) {
+        // Remove line numbers
+        pre.style.counterReset = '';
+        pre.style.paddingLeft = '1.5rem';
+        const code = pre.querySelector('code');
+        code.style.counterIncrement = '';
+        code.style.display = '';
+
+        // Remove line number styling
+        const lines = code.textContent.split('\n');
+        code.innerHTML = lines.join('\n');
+    } else {
+        // Add line numbers
+        pre.style.counterReset = 'line';
+        pre.style.paddingLeft = '3.5rem';
+        const code = pre.querySelector('code');
+        code.style.counterIncrement = 'line';
+        code.style.display = 'block';
+
+        // Add line number styling
+        const lines = code.textContent.split('\n');
+        const numberedLines = lines.map(line =>
+            `<span class="line-number">${line}</span>`
+        ).join('\n');
+        code.innerHTML = numberedLines;
+
+        // Add CSS for line numbers
+        const style = document.createElement('style');
+        style.textContent = `
+            .line-number::before {
+                counter-increment: line;
+                content: counter(line);
+                position: absolute;
+                left: 1rem;
+                color: #718096;
+                font-size: 0.8rem;
+                text-align: right;
+                width: 2rem;
+            }
+            .line-number {
+                position: relative;
+                padding-left: 1rem;
+                display: block;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+}
+
+function toggleFullscreen() {
+    const codeContainer = document.querySelector('.code-container');
+    const toggleBtn = document.querySelector('[onclick="toggleFullscreen()"]');
+
+    if (codeContainer.classList.contains('fullscreen')) {
+        // Exit fullscreen
+        codeContainer.classList.remove('fullscreen');
+        toggleBtn.innerHTML = '<i class="fas fa-expand"></i>';
+        toggleBtn.title = 'Fullscreen';
+        document.body.style.overflow = '';
+    } else {
+        // Enter fullscreen
+        codeContainer.classList.add('fullscreen');
+        toggleBtn.innerHTML = '<i class="fas fa-compress"></i>';
+        toggleBtn.title = 'Exit Fullscreen';
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+// Add fullscreen styles
+const fullscreenStyle = document.createElement('style');
+fullscreenStyle.textContent = `
+    .code-container.fullscreen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 9999;
+        margin: 0;
+        border-radius: 0;
+    }
+
+    .code-container.fullscreen .code-block {
+        max-height: calc(100vh - 60px);
+    }
+`;
+document.head.appendChild(fullscreenStyle);
+
+// Close fullscreen on Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        const codeContainer = document.querySelector('.code-container');
+        if (codeContainer.classList.contains('fullscreen')) {
+            toggleFullscreen();
+        }
+    }
+});
+</script>
+{% endblock %}

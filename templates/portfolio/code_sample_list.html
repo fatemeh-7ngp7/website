@@ -1,0 +1,553 @@
+<!-- templates/portfolio/code_sample_list.html -->
+{% extends 'base.html' %}
+
+{% block title %}Code Samples - Fatemeh NGP{% endblock %}
+
+{% block description %}Browse my code samples and snippets showcasing various programming languages and techniques{% endblock %}
+
+{% block content %}
+<section class="code-samples-section">
+    <div class="container">
+        <div class="section-header">
+            <h1>Code Samples</h1>
+            <p>A collection of code snippets, algorithms, and programming solutions</p>
+        </div>
+
+        <!-- Filter Tabs -->
+        <div class="filter-tabs">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="python">Python</button>
+            <button class="filter-btn" data-filter="javascript">JavaScript</button>
+            <button class="filter-btn" data-filter="html-css">HTML/CSS</button>
+            <button class="filter-btn" data-filter="django">Django</button>
+            <button class="filter-btn" data-filter="algorithms">Algorithms</button>
+        </div>
+
+        {% if code_sample_list %}
+            <div class="code-grid" id="code-grid">
+                {% for sample in code_sample_list %}
+                    <div class="code-card" data-category="{{ sample.language|lower }}">
+                        <div class="code-header">
+                            <div class="code-info">
+                                <h3 class="code-title">
+                                    <a href="{% url 'code_sample_detail' sample.slug %}">{{ sample.title }}</a>
+                                </h3>
+                                <div class="code-meta">
+                                    <span class="language-tag {{ sample.language|lower }}">
+                                        <i class="fas fa-code"></i>
+                                        {{ sample.language }}
+                                    </span>
+                                    <span class="date-tag">
+                                        <i class="fas fa-calendar-alt"></i>
+                                        {{ sample.created_at|date:"M d, Y" }}
+                                    </span>
+                                    {% if sample.difficulty %}
+                                        <span class="difficulty-tag difficulty-{{ sample.difficulty|lower }}">
+                                            <i class="fas fa-signal"></i>
+                                            {{ sample.difficulty }}
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="code-actions">
+                                <a href="{% url 'code_sample_detail' sample.slug %}"
+                                   class="view-btn"
+                                   title="View Code">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                {% if sample.github_url %}
+                                    <a href="{{ sample.github_url }}"
+                                       target="_blank"
+                                       rel="noopener noreferrer"
+                                       class="github-btn"
+                                       title="View on GitHub">
+                                        <i class="fab fa-github"></i>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="code-description">
+                            <p>{{ sample.description|truncatewords:20 }}</p>
+                        </div>
+
+                        <div class="code-preview">
+                            <pre><code class="language-{{ sample.language|lower }}">{{ sample.code|truncatechars:200 }}{% if sample.code|length > 200 %}...{% endif %}</code></pre>
+                        </div>
+
+                        {% if sample.get_tags_list %}
+                            <div class="code-tags">
+                                {% for tag in sample.get_tags_list %}
+                                    <span class="tag">{{ tag.name }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        <div class="code-footer">
+                            <div class="stats">
+                                {% if sample.lines_of_code %}
+                                    <span class="stat">
+                                        <i class="fas fa-list-ol"></i>
+                                        {{ sample.lines_of_code }} lines
+                                    </span>
+                                {% endif %}
+                                {% if sample.complexity %}
+                                    <span class="stat">
+                                        <i class="fas fa-brain"></i>
+                                        O({{ sample.complexity }})
+                                    </span>
+                                {% endif %}
+                            </div>
+                            <a href="{% url 'code_sample_detail' sample.slug %}" class="read-more">
+                                View Details <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if is_paginated %}
+                <div class="pagination-wrapper">
+                    <nav aria-label="Code samples pagination">
+                        <ul class="pagination">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1" aria-label="First">
+                                        <i class="fas fa-angle-double-left"></i>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                                        <i class="fas fa-angle-left"></i>
+                                    </a>
+                                </li>
+                            {% endif %}
+
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ num }}</span>
+                                    </li>
+                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                                        <i class="fas fa-angle-right"></i>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Last">
+                                        <i class="fas fa-angle-double-right"></i>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-code"></i>
+                </div>
+                <h3>No Code Samples Yet</h3>
+                <p>I'm working on adding some interesting code samples. Check back soon!</p>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<style>
+.code-samples-section {
+    padding: 80px 0;
+    min-height: 70vh;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.section-header h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: var(--primary-color, #333);
+}
+
+.section-header p {
+    font-size: 1.2rem;
+    color: var(--text-muted, #666);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.filter-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    padding: 0.5rem 1.5rem;
+    border: 2px solid var(--accent-color, #007bff);
+    background: transparent;
+    color: var(--accent-color, #007bff);
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.filter-btn:hover,
+.filter-btn.active {
+    background: var(--accent-color, #007bff);
+    color: white;
+}
+
+.code-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.code-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid #e9ecef;
+}
+
+.code-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 1.5rem 1.5rem 1rem;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.code-title {
+    margin: 0 0 0.5rem;
+    font-size: 1.3rem;
+}
+
+.code-title a {
+    color: var(--primary-color, #333);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.code-title a:hover {
+    color: var(--accent-color, #007bff);
+}
+
+.code-meta {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.language-tag,
+.date-tag,
+.difficulty-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.language-tag {
+    background: var(--accent-color, #007bff);
+    color: white;
+}
+
+.language-tag.python { background: #3776ab; }
+.language-tag.javascript { background: #f7df1e; color: #333; }
+.language-tag.html-css { background: #e34f26; }
+.language-tag.django { background: #092e20; }
+
+.date-tag {
+    background: #6c757d;
+    color: white;
+}
+
+.difficulty-tag {
+    color: white;
+}
+
+.difficulty-beginner { background: #28a745; }
+.difficulty-intermediate { background: #ffc107; color: #333; }
+.difficulty-advanced { background: #dc3545; }
+
+.code-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.view-btn,
+.github-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 35px;
+    height: 35px;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.view-btn {
+    background: var(--accent-color, #007bff);
+    color: white;
+}
+
+.github-btn {
+    background: #333;
+    color: white;
+}
+
+.view-btn:hover,
+.github-btn:hover {
+    transform: scale(1.1);
+}
+
+.code-description {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.code-description p {
+    margin: 0;
+    color: var(--text-muted, #666);
+    line-height: 1.5;
+}
+
+.code-preview {
+    padding: 1rem;
+    background: #2d3748;
+    overflow-x: auto;
+}
+
+.code-preview pre {
+    margin: 0;
+    background: none;
+    padding: 0;
+}
+
+.code-preview code {
+    color: #e2e8f0;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    background: none;
+}
+
+.code-tags {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #f0f0f0;
+}
+
+.tag {
+    display: inline-block;
+    background: #e9ecef;
+    color: #495057;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    margin-right: 0.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.code-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+}
+
+.stats {
+    display: flex;
+    gap: 1rem;
+}
+
+.stat {
+    font-size: 0.8rem;
+    color: var(--text-muted, #666);
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.read-more {
+    color: var(--accent-color, #007bff);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+}
+
+.read-more:hover {
+    color: var(--primary-color, #333);
+}
+
+.read-more i {
+    margin-left: 0.25rem;
+    transition: transform 0.3s ease;
+}
+
+.read-more:hover i {
+    transform: translateX(3px);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--text-muted, #666);
+}
+
+.empty-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.empty-state h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: var(--primary-color, #333);
+}
+
+.pagination-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 3rem;
+}
+
+.pagination {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    gap: 0.5rem;
+}
+
+.page-item {
+    display: flex;
+}
+
+.page-link {
+    padding: 0.5rem 0.75rem;
+    text-decoration: none;
+    color: var(--accent-color, #007bff);
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.page-link:hover {
+    background-color: var(--accent-color, #007bff);
+    color: white;
+}
+
+.page-item.active .page-link {
+    background-color: var(--accent-color, #007bff);
+    color: white;
+    border-color: var(--accent-color, #007bff);
+}
+
+@media (max-width: 768px) {
+    .code-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .section-header h1 {
+        font-size: 2rem;
+    }
+
+    .code-header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .code-actions {
+        align-self: flex-end;
+    }
+
+    .code-footer {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+    }
+
+    .stats {
+        justify-content: center;
+    }
+}
+
+/* Filter Animation */
+.code-card.hidden {
+    display: none;
+}
+
+.code-card.show {
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+
+<script>
+// Filter functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const codeCards = document.querySelectorAll('.code-card');
+
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const filter = this.getAttribute('data-filter');
+
+            // Update active button
+            filterBtns.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+
+            // Filter cards
+            codeCards.forEach(card => {
+                if (filter === 'all' || card.getAttribute('data-category').includes(filter)) {
+                    card.classList.remove('hidden');
+                    card.classList.add('show');
+                } else {
+                    card.classList.add('hidden');
+                    card.classList.remove('show');
+                }
+            });
+        });
+    });
+});
+</script>
+{% endblock %}
