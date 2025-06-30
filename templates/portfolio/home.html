@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Fatemeh NGP - Backend Developer{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-content">
+        <div class="hero-text">
+            <h1 class="hero-title">
+                Hi, I'm <span class="highlight">Fatemeh Najafgholipour</span>
+            </h1>
+            <p class="hero-subtitle">Backend Developer</p>
+            <p class="hero-description">
+                I build modern web applications with clean code and great user experiences.
+                Passionate about Python, Django, Rest and creating solutions that matter.
+            </p>
+            <div class="hero-buttons">
+                <a href="{% url 'project_list' %}" class="btn btn-primary">View My Work</a>
+                <a href="{% url 'contact' %}" class="btn btn-secondary">Get In Touch</a>
+            </div>
+        </div>
+        <div class="hero-image">
+            <div class="profile-circle">
+                <img src="{% static 'images/profile.jpg' %}" alt="Your Name" onerror="this.style.display='none'">
+            </div>
+        </div>
+    </div>
+    <div class="scroll-indicator">
+        <i class="fas fa-chevron-down"></i>
+    </div>
+</section>
+
+<section class="featured-projects">
+    <div class="container">
+        <h2 class="section-title">Featured Projects</h2>
+        <div class="projects-grid">
+            {% for project in featured_projects %}
+            <div class="project-card">
+                {% if project.image %}
+                <div class="project-image">
+                    <img src="{{ project.image.url }}" alt="{{ project.title }}">
+                </div>
+                {% endif %}
+                <div class="project-content">
+                    <h3>{{ project.title }}</h3>
+                    <p>{{ project.short_description }}</p>
+                    <div class="project-tech">
+                        {% for tech in project.technologies.all|slice:":3" %}
+                        <span class="tech-tag">{{ tech.name }}</span>
+                        {% endfor %}
+                    </div>
+                    <div class="project-links">
+                        {% if project.live_url %}
+                        <a href="{{ project.live_url }}" class="btn btn-small" target="_blank">
+                            <i class="fas fa-external-link-alt"></i> Live Demo
+                        </a>
+                        {% endif %}
+                        {% if project.github_url %}
+                        <a href="{{ project.github_url }}" class="btn btn-small btn-secondary" target="_blank">
+                            <i class="fab fa-github"></i> Code
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p class="no-content">No featured projects yet. Add some through the admin panel!</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{% if recent_posts %}
+<section class="recent-posts">
+    <div class="container">
+        <h2 class="section-title">Latest Blog Posts</h2>
+        <div class="posts-grid">
+            {% for post in recent_posts %}
+            <article class="post-card">
+                <h3><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h3>
+                <p>{{ post.excerpt }}</p>
+                <div class="post-meta">
+                    <time>{{ post.created_date|date:"M d, Y" }}</time>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}
