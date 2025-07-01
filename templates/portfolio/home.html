@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load i18n %}
 
 {% block title %}Fatemeh NGP - Backend Developer{% endblock %}
 
@@ -8,16 +9,18 @@
     <div class="hero-content">
         <div class="hero-text">
             <h1 class="hero-title">
-                Hi, I'm <span class="highlight">Fatemeh Najafgholipour</span>
+                {% blocktrans %}Hi, I'm <span class="highlight">Fatemeh Najafgholipour</span>{% endblocktrans %}
             </h1>
-            <p class="hero-subtitle">Backend Developer</p>
+            <p class="hero-subtitle">{% trans "Backend Developer" %}</p>
             <p class="hero-description">
+                {% blocktrans %}
                 I build modern web applications with clean code and great user experiences.
                 Passionate about Python, Django, Rest and creating solutions that matter.
+                {% endblocktrans %}
             </p>
             <div class="hero-buttons">
-                <a href="{% url 'project_list' %}" class="btn btn-primary">View My Work</a>
-                <a href="{% url 'contact' %}" class="btn btn-secondary">Get In Touch</a>
+                <a href="{% url 'project_list' %}" class="btn btn-primary">{% trans "View My Work" %}</a>
+                <a href="{% url 'contact' %}" class="btn btn-secondary">{% trans "Get In Touch" %}</a>
             </div>
         </div>
         <div class="hero-image">
@@ -33,7 +36,7 @@
 
 <section class="featured-projects">
     <div class="container">
-        <h2 class="section-title">Featured Projects</h2>
+        <h2 class="section-title">{% trans "Featured Projects" %}</h2>
         <div class="projects-grid">
             {% for project in featured_projects %}
             <div class="project-card">
@@ -65,7 +68,7 @@
                 </div>
             </div>
             {% empty %}
-            <p class="no-content">No featured projects yet. Add some through the admin panel!</p>
+            <p class="no-content">{% trans "No featured projects yet. Add some through the admin panel!" %}</p>
             {% endfor %}
         </div>
     </div>
@@ -74,7 +77,7 @@
 {% if recent_posts %}
 <section class="recent-posts">
     <div class="container">
-        <h2 class="section-title">Latest Blog Posts</h2>
+        <h2 class="section-title">{% trans "Latest Blog Posts" %}</h2>
         <div class="posts-grid">
             {% for post in recent_posts %}
             <article class="post-card">
