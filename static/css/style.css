@@ -504,3 +504,148 @@ body {
 .skill-advanced { background: var(--success-color); color: white; }
 .skill-expert { background: var(--primary-color); color: white; }
 
+/* Add this to your existing CSS file (static/css/style.css) */
+
+/* Language Switcher Styles */
+.language-switcher {
+    position: relative;
+    margin-left: 20px;
+}
+
+.language-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.language-btn {
+    background: none;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    min-width: 100px;
+    justify-content: space-between;
+}
+
+.language-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.language-options {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: #fff;
+    min-width: 120px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.language-options.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.language-form {
+    margin: 0;
+    padding: 0;
+    border: none;
+}
+
+.language-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px 16px;
+    background: none;
+    border: none;
+    color: #333;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s ease;
+    text-align: left;
+}
+
+.language-option:hover {
+    background: #f5f5f5;
+}
+
+.language-option.active {
+    background: #007bff;
+    color: #fff;
+}
+
+.language-option .flag {
+    font-size: 16px;
+}
+
+/* RTL Support */
+[dir="rtl"] .language-switcher {
+    margin-left: 0;
+    margin-right: 20px;
+}
+
+[dir="rtl"] .language-options {
+    right: auto;
+    left: 0;
+}
+
+[dir="rtl"] .language-option {
+    text-align: right;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .language-switcher {
+        margin: 10px 0;
+        width: 100%;
+    }
+
+    .language-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .language-options {
+        position: static;
+        width: 100%;
+        box-shadow: none;
+        border: 1px solid #ddd;
+        margin-top: 5px;
+    }
+
+    .nav-menu .language-switcher {
+        order: 999;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        padding-top: 10px;
+        margin-top: 10px;
+    }
+}
+
+/* Dark theme adjustments (if you have a dark theme) */
+.dark-theme .language-options {
+    background: #2c3e50;
+}
+
+.dark-theme .language-option {
+    color: #fff;
+}
+
+.dark-theme .language-option:hover {
+    background: #34495e;
+}
