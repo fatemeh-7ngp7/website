@@ -520,7 +520,7 @@ body {
 .language-btn {
     background: none;
     border: 1px solid rgba(255, 255, 255, 0.2);
-    color: #fff;
+    color: #333;
     padding: 8px 12px;
     border-radius: 5px;
     cursor: pointer;
@@ -649,3 +649,5 @@ body {
 .dark-theme .language-option:hover {
     background: #34495e;
 }
+
+
