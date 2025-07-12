@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-gp=dk3wdyo#hw#u^vp0@w7%b0j1w0d7xg#ct7gmjyfic=w+330
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["www.ngpdev.website", "ngpdev.website", "localhost"]
+ALLOWED_HOSTS = ["www.ngpdev.website", "ngpdev.website", "localhost", '127.0.0.1']
 
 
 # Application definition
