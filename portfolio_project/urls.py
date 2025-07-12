@@ -20,6 +20,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.conf.urls.i18n import i18n_patterns
 
+
 # URLs that don't need language prefix
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,7 +30,7 @@ urlpatterns = [
 # URLs that will have language prefix (e.g., /en/, /fa/)
 urlpatterns += i18n_patterns(
     path('', include('portfolio.urls')),
-    prefix_default_language=False  # Don't add /en/ for English
+    prefix_default_language=True  # Don't add /en/ for English
 )
 
 # Serve media files during development

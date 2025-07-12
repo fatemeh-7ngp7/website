@@ -42,6 +42,8 @@
     
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-fast: all 0.15s ease-in-out;
+
+    --font-family-fa: 'Samim', 'Tahoma', sans-serif;
 }
 
 body {
@@ -504,8 +506,6 @@ body {
 .skill-advanced { background: var(--success-color); color: white; }
 .skill-expert { background: var(--primary-color); color: white; }
 
-/* Add this to your existing CSS file (static/css/style.css) */
-
 /* Language Switcher Styles */
 .language-switcher {
     position: relative;
@@ -650,4 +650,33 @@ body {
     background: #34495e;
 }
 
+/* Regular weight */
+@font-face {
+  font-family: 'Samim';
+  src: url('fonts/Samim-Medium.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
 
+/* Bold weight */
+@font-face {
+  font-family: 'Samim';
+  src: url('fonts/Samim-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Apply to all Persian content */
+.persian-text,
+[lang="fa"] {
+  font-family: var(--font-family-fa);
+  direction: rtl;
+  text-align: right;
+}
+
+/* Use a single rule for RTL content */
+[dir="rtl"] {
+  font-family: var(--font-family-fa);
+}
