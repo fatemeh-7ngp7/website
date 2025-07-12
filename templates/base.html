@@ -66,7 +66,7 @@
                         {% for language in languages %}
                             <form action="{% url 'set_language' %}" method="post" class="language-form">
                                 {% csrf_token %}
-                                <input name="next" type="hidden" value="{{ request.get_full_path|slice:"3:" }}">
+                                <input name="next" type="hidden" value="{{ request.get_full_path }}">
                                 <input name="language" type="hidden" value="{{ language.code }}">
                                 <button type="submit" class="language-option {% if language.code == LANGUAGE_CODE %}active{% endif %}">
                                     {% if language.code == 'fa' %}

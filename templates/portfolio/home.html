@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'base.html' %}  <!-- home.html -->
 {% load static %}
 {% load i18n %}
 
@@ -13,10 +13,8 @@
             </h1>
             <p class="hero-subtitle">{% trans "Backend Developer" %}</p>
             <p class="hero-description">
-                {% blocktrans %}
-                I build modern web applications with clean code and great user experiences.
-                Passionate about Python, Django, Rest and creating solutions that matter.
-                {% endblocktrans %}
+                {% trans "I build modern web applications with clean code and great user experiences." %}
+                {% trans "Passionate about Python, Django, Rest and creating solutions that matter." %}
             </p>
             <div class="hero-buttons">
                 <a href="{% url 'project_list' %}" class="btn btn-primary">{% trans "View My Work" %}</a>

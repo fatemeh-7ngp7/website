@@ -1,5 +1,6 @@
 <!-- templates/portfolio/blog_list.html -->
 {% extends 'base.html' %}
+{% load i18n %}
 
 {% block title %}Blog - Fatemeh NGP{% endblock %}
 
@@ -9,8 +10,8 @@
 <section class="blog-section">
     <div class="container">
         <div class="section-header">
-            <h1>My Blog</h1>
-            <p>Thoughts, tutorials, and insights on web development and technology</p>
+            <h1>{% trans "My Blog" %}</h1>
+            <p>{% trans "Thoughts, tutorials, and insights on web development and technology" %}</p>
         </div>
 
         {% if blog_list %}

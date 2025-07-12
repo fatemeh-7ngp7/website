@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-01 06:58-0700\n"
+"POT-Creation-Date: 2025-07-07 05:48-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1265,50 +1265,6 @@ msgstr "بلاگ"
 msgid "Contact"
 msgstr "تماس"
 
-#: .\templates\base.html:50
-msgid "Portfolio"
-msgstr "نمونه کارها"
-
-#: .\templates\base.html:51
-msgid "Skills"
-msgstr "مهارت‌ها"
-
-#: .\templates\base.html:52
-msgid "Experience"
-msgstr "تجربه"
-
-#: .\templates\base.html:53
-msgid "Education"
-msgstr "تحصیلات"
-
-#: .\templates\base.html:54
-msgid "Testimonials"
-msgstr "نظرات"
-
-#: .\templates\base.html:55
-msgid "Services"
-msgstr "خدمات"
-
-#: .\templates\base.html:56
-msgid "Get in Touch"
-msgstr "تماس با من"
-
-#: .\templates\base.html:57
-msgid "Follow Me"
-msgstr "دنبال کنید"
-
-#: .\templates\base.html:58
-msgid "View More"
-msgstr "مشاهده بیشتر"
-
-#: .\templates\base.html:59
-msgid "Submit"
-msgstr "ارسال"
-
-#: .\templates\base.html:60
-msgid "Cancel"
-msgstr "لغو"
-
 #: .\templates\base.html:103
 msgid "Connect"
 msgstr "ارتباط"
@@ -1316,3 +1272,213 @@ msgstr "ارتباط"
 #: .\templates\base.html:126
 msgid "All rights reserved."
 msgstr "تمامی حقوق محفوظ است."
+
+#: .\templates\portfolio\about.html:10
+msgid "About Me"
+msgstr "درباره من"
+
+#: .\templates\portfolio\about.html:11
+msgid "Get to know more about my background and skills"
+msgstr "با سوابق و مهارت‌های من بیشتر آشنا شوید"
+
+#: .\templates\portfolio\about.html:19
+msgid "Hello! I'm Fatemeh Najafgholipour"
+msgstr "سلام! من فاطمه نجفقلی پور هستم"
+
+#: .\templates\portfolio\about.html:20
+msgid ""
+"I'm a passionate back-end developer with experience in building modern web "
+"applications. I love creating solutions that combine great user experience "
+"with clean, maintainable code."
+msgstr ""
+"من یک توسعه‌دهنده‌ی بک‌اند پرشور با تجربه در ساخت برنامه‌های وب مدرن هستم. من "
+"عاشق ایجاد راه‌حل‌هایی هستم که تجربه‌ی کاربری عالی را با کد تمیز و قابل نگهداری "
+"ترکیب می‌کنند."
+
+#: .\templates\portfolio\about.html:22
+msgid ""
+"My journey in programming started when I met my husband. Since then, I've "
+"worked on various projects ranging from small business websites to complex "
+"web applications."
+msgstr ""
+"سفر من در برنامه‌نویسی از زمانی شروع شد که با همسرم آشنا شدم. از آن زمان، روی "
+"پروژه‌های مختلفی از وب‌سایت‌های کسب‌وکارهای کوچک گرفته تا برنامه‌های کاربردی وب "
+"پیچیده کار کرده‌ام."
+
+#: .\templates\portfolio\about.html:24
+msgid ""
+"When I'm not coding, you can find me learning or travelling. I believe in "
+"continuous learning and staying up-to-date with the latest technologies and "
+"best practices."
+msgstr ""
+"وقتی کد نمی‌نویسم، می‌توانید من را در حال یادگیری یا سفر پیدا کنید. من به "
+"یادگیری مداوم و به‌روز ماندن با جدیدترین فناوری‌ها و بهترین شیوه‌ها اعتقاد دارم."
+
+#: .\templates\portfolio\about.html:29
+msgid "Technologies"
+msgstr "تکنولوژی‌ها"
+
+#: .\templates\portfolio\about.html:33
+msgid "Years Experience"
+msgstr "سابقه حرفه‌ای"
+
+#: .\templates\portfolio\about.html:37
+msgid "Projects Completed"
+msgstr "پروژه‌های تکمیل‌شده"
+
+#: .\templates\portfolio\about.html:43
+msgid "Technical Skills"
+msgstr "مهارت‌های فنی"
+
+#: .\templates\portfolio\blog_list.html:13
+msgid "My Blog"
+msgstr "نوشته‌های من"
+
+#: .\templates\portfolio\blog_list.html:14
+msgid "Thoughts, tutorials, and insights on web development and technology"
+msgstr "افکار، آموزش‌ها و بینش‌ها در مورد توسعه وب و فناوری"
+
+#: .\templates\portfolio\code_sample_list.html:13
+msgid "Code Samples"
+msgstr "بخشی از کدهای پروژه‌ها"
+
+#: .\templates\portfolio\code_sample_list.html:14
+msgid "A collection of code snippets, algorithms, and programming solutions"
+msgstr "مجموعه‌ای از قطعه کدها، الگوریتم‌ها و راه‌حل‌های برنامه‌نویسی"
+
+#: .\templates\portfolio\contact.html:4
+msgid "Contact - Fatemeh NGP"
+msgstr ""
+
+#: .\templates\portfolio\contact.html:431 .\templates\portfolio\home.html:21
+msgid "Get In Touch"
+msgstr "تماس با من"
+
+#: .\templates\portfolio\contact.html:432
+msgid "Let's discuss your next project or opportunity"
+msgstr "اگه پروژه‌ای در ذهن دارین، خوشحال می‌شم باهم درباره‌ش صحبت کنیم."
+
+#: .\templates\portfolio\contact.html:440
+msgid "Let's Connect"
+msgstr "با من در ارتباط باشید"
+
+#: .\templates\portfolio\contact.html:441
+msgid ""
+"I'm always interested in hearing about new opportunities and interesting "
+"projects. Whether you have a question or just want to say hi, feel free to "
+"reach out!"
+msgstr ""
+"من همیشه به شنیدن درباره فرصت‌های جدید و پروژه‌های جالب علاقه‌مند هستم. اگر "
+"سوالی دارید یا فقط می‌خواهید سلام کنید، خوشحال می‌شوم که با من تماس بگیرید!"
+
+#: .\templates\portfolio\contact.html:447
+#: .\templates\portfolio\contact.html:486
+msgid "Email"
+msgstr "ایمیل"
+
+#: .\templates\portfolio\contact.html:454
+msgid "Location"
+msgstr "موقعیت مکانی"
+
+#: .\templates\portfolio\contact.html:455
+msgid "Tabriz, Iran"
+msgstr "تبریز، ایران"
+
+#: .\templates\portfolio\contact.html:461
+msgid "Response Time"
+msgstr "زمان پاسخگویی"
+
+#: .\templates\portfolio\contact.html:462
+msgid "Usually within 24 hours"
+msgstr "معمولاً در عرض ۲۴ ساعت"
+
+#: .\templates\portfolio\contact.html:478
+msgid "Name"
+msgstr "نام"
+
+#: .\templates\portfolio\contact.html:494
+msgid "Subject"
+msgstr "موضوع"
+
+#: .\templates\portfolio\contact.html:502
+msgid "Message"
+msgstr "پیام"
+
+#: .\templates\portfolio\contact.html:509
+msgid "Send Message"
+msgstr "ارسال پیام"
+
+#: .\templates\portfolio\home.html:12
+msgid "Hi, I'm <span class=\"highlight\">Fatemeh Najafgholipour</span>"
+msgstr "سلام، من <span class=\"highlight\">فاطمه نجف‌قلی‌پور</span> هستم"
+
+#: .\templates\portfolio\home.html:14
+msgid "Backend Developer"
+msgstr "توسعه‌دهنده بک‌اند"
+
+#: .\templates\portfolio\home.html:16
+msgid ""
+"I build modern web applications with clean code and great user experiences."
+msgstr "من برنامه‌های وب مدرن را با کد تمیز و تجربه کاربری عالی توسعه می‌دهم."
+
+#: .\templates\portfolio\home.html:17
+msgid ""
+"Passionate about Python, Django, Rest and creating solutions that matter."
+msgstr "به پایتون، جنگو، رست و خلق راه‌حل‌های کاربردی علاقه‌مندم."
+
+#: .\templates\portfolio\home.html:20
+msgid "View My Work"
+msgstr "دیدن نمونه‌کارها"
+
+#: .\templates\portfolio\home.html:37
+msgid "Featured Projects"
+msgstr "پروژه های منتخب"
+
+#: .\templates\portfolio\home.html:69
+msgid "No featured projects yet. Add some through the admin panel!"
+msgstr ""
+
+#: .\templates\portfolio\home.html:78
+msgid "Latest Blog Posts"
+msgstr "تازه‌ها در وبلاگ"
+
+#: .\templates\portfolio\project_list.html:9
+msgid "My Projects"
+msgstr "پروژه‌های من"
+
+#: .\templates\portfolio\project_list.html:10
+msgid "A collection of my work and contributions"
+msgstr "مجموعه‌ای از آثار و دستاوردهای من"
+
+#~ msgid "Portfolio"
+#~ msgstr "نمونه کارها"
+
+#~ msgid "Skills"
+#~ msgstr "مهارت‌ها"
+
+#~ msgid "Experience"
+#~ msgstr "تجربه"
+
+#~ msgid "Education"
+#~ msgstr "تحصیلات"
+
+#~ msgid "Testimonials"
+#~ msgstr "نظرات"
+
+#~ msgid "Services"
+#~ msgstr "خدمات"
+
+#~ msgid "Get in Touch"
+#~ msgstr "تماس با من"
+
+#~ msgid "Follow Me"
+#~ msgstr "دنبال کنید"
+
+#~ msgid "View More"
+#~ msgstr "مشاهده بیشتر"
+
+#~ msgid "Submit"
+#~ msgstr "ارسال"
+
+#~ msgid "Cancel"
+#~ msgstr "لغو"

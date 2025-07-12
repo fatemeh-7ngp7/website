@@ -1,5 +1,6 @@
 <!-- templates/portfolio/code_sample_list.html -->
 {% extends 'base.html' %}
+{% load i18n %}
 
 {% block title %}Code Samples - Fatemeh NGP{% endblock %}
 
@@ -9,8 +10,8 @@
 <section class="code-samples-section">
     <div class="container">
         <div class="section-header">
-            <h1>Code Samples</h1>
-            <p>A collection of code snippets, algorithms, and programming solutions</p>
+            <h1>{% trans "Code Samples" %}</h1>
+            <p>{% trans "A collection of code snippets, algorithms, and programming solutions" %}</p>
         </div>
 
         <!-- Filter Tabs -->
