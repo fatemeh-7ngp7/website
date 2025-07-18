@@ -23,7 +23,7 @@ from django.conf.urls.i18n import i18n_patterns
 
 # URLs that don't need language prefix
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('@7f7F&$/', admin.site.urls),
     path('i18n/', include('django.conf.urls.i18n')),  # For language switching
 ]
 
