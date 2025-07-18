@@ -9,12 +9,12 @@
         --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
         --accent-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        --dark-bg: #f8f9fa;
-        --glass-bg: rgba(255, 255, 255, 0.5);
-        --glass-border: rgba(255, 255, 255, 0.3);
-        --text-primary: #2c3e50;
-        --text-secondary: #6c757d;
-        --shadow-glow: 0 0 40px rgba(102, 126, 234, 0.3);
+        --dark-bg: var(--bg-primary);
+        --glass-bg: rgba(255, 255, 255, 0.7);
+        --glass-border: rgba(255, 255, 255, 0.2);
+        --text-primary: var(--text-primary);
+        --text-secondary: var(--text-secondary);
+        --shadow-glow: 0 0 40px rgba(102, 126, 234, 0.2);
     }
 
     * {
@@ -372,6 +372,57 @@
 
     .alert-error::before {
         content: '✗';
+    }
+
+    /* Dark theme overrides */
+    .dark-theme .page-header {
+        background: var(--primary-gradient);
+    }
+
+    .dark-theme .page-header::before {
+        opacity: 0.6;
+    }
+
+    .dark-theme .contact-section {
+        background: var(--bg-primary);
+    }
+
+    .dark-theme .contact-method {
+        background: rgba(31, 41, 55, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+    }
+
+    .dark-theme .contact-form {
+        background: rgba(31, 41, 55, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+    }
+
+    .dark-theme .form-group input,
+    .dark-theme .form-group textarea {
+        background: rgba(17, 24, 39, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: var(--text-primary);
+    }
+
+    .dark-theme .form-group input:focus,
+    .dark-theme .form-group textarea:focus {
+        border-color: var(--primary-color);
+        background: rgba(17, 24, 39, 0.8);
+    }
+
+    .dark-theme .contact-method:hover {
+        border-color: rgba(102, 126, 234, 0.3);
+        box-shadow: 0 0 30px rgba(102, 126, 234, 0.1);
+    }
+
+    /* Keep the purple gradient visible in dark mode */
+    .dark-theme .page-header h1 {
+        background: linear-gradient(45deg, #a790ef, #a0aafb);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
     }
 
     /* Responsive Design */
