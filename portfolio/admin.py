@@ -26,7 +26,7 @@ class CodeSampleAdmin(admin.ModelAdmin):
 
     fieldsets = (
         ('Basic Information', {
-            'fields': ('title', 'slug', 'description', 'language', 'difficulty')
+            'fields': ('title', 'slug', 'description', 'language', 'difficulty', 'featured')
         }),
         ('Code', {
             'fields': ('code', 'filename', 'lines_of_code')
