@@ -1,726 +1,1516 @@
-<!-- templates/portfolio/code_sample_detail.html -->
 {% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
 
-{% block title %}{{ sample.title }} - Code Sample - Fatemeh NGP{% endblock %}
+{% block title %}{{ sample.title }} - {% trans "Code Sample" %} - Fatemeh NGP{% endblock %}
 
-{% block description %}{{ sample.description|truncatewords:25 }}{% endblock %}
-
-{% block content %}
-<section class="code-detail-section">
-    <div class="container">
-        <!-- Header -->
-        <header class="code-header">
-            <div class="breadcrumb">
-                <a href="{% url 'code_sample_list' %}">
-                    <i class="fas fa-arrow-left"></i>
-                    Back to Code Samples
-                </a>
-            </div>
-
-            <div class="code-title-section">
-                <h1 class="code-title">{{ sample.title }}</h1>
-                <p class="code-description">{{ sample.description }}</p>
-            </div>
-
-            <div class="code-meta-bar">
-                <div class="meta-left">
-                    <span class="language-tag {{ sample.language|lower }}">
-                        <i class="fas fa-code"></i>
-                        {{ sample.language }}
-                    </span>
-                    {% if sample.difficulty %}
-                        <span class="difficulty-tag difficulty-{{ sample.difficulty|lower }}">
-                            <i class="fas fa-signal"></i>
-                            {{ sample.difficulty }}
-                        </span>
-                    {% endif %}
-                    <span class="date-tag">
-                        <i class="fas fa-calendar-alt"></i>
-                        {{ sample.created_at|date:"F d, Y" }}
-                    </span>
-                </div>
-
-                <div class="meta-right">
-                    {% if sample.github_url %}
-                        <a href="{{ sample.github_url }}"
-                           target="_blank"
-                           rel="noopener noreferrer"
-                           class="action-btn github-btn">
-                            <i class="fab fa-github"></i>
-                            View on GitHub
-                        </a>
-                    {% endif %}
-                    <button class="action-btn copy-btn" onclick="copyCode()">
-                        <i class="fas fa-copy"></i>
-                        Copy Code
-                    </button>
-                </div>
-            </div>
-        </header>
-
-        <!-- Code Display -->
-        <div class="code-container">
-            <div class="code-toolbar">
-                <div class="code-info">
-                    <span class="filename">
-                        <i class="fas fa-file-code"></i>
-                        {{ sample.filename|default:"code."|add:sample.language|lower }}
-                    </span>
-                    {% if sample.lines_of_code %}
-                        <span class="line-count">{{ sample.lines_of_code }} lines</span>
-                    {% endif %}
-                </div>
-                <div class="toolbar-actions">
-                    <button class="toolbar-btn" onclick="toggleLineNumbers()" title="Toggle Line Numbers">
-                        <i class="fas fa-list-ol"></i>
-                    </button>
-                    <button class="toolbar-btn" onclick="toggleFullscreen()" title="Fullscreen">
-                        <i class="fas fa-expand"></i>
-                    </button>
-                </div>
-            </div>
-
-            <div class="code-block" id="code-block">
-                <pre><code class="language-{{ sample.language|lower }}" id="code-content">{{ sample.code }}</code></pre>
-            </div>
-        </div>
-
-        <!-- Additional Information -->
-        <div class="info-grid">
-            <!-- Algorithm Complexity -->
-            {% if sample.complexity %}
-                <div class="info-card">
-                    <h3><i class="fas fa-brain"></i> Complexity</h3>
-                    <div class="complexity-info">
-                        <span class="complexity-value">O({{ sample.complexity }})</span>
-                        <p>Time complexity analysis</p>
-                    </div>
-                </div>
-            {% endif %}
-
-            <!-- Usage Instructions -->
-            {% if sample.usage_instructions %}
-                <div class="info-card">
-                    <h3><i class="fas fa-play"></i> How to Use</h3>
-                    <div class="usage-content">
-                        {{ sample.usage_instructions|safe }}
-                    </div>
-                </div>
-            {% endif %}
-
-            <!-- Dependencies -->
-            {% if sample.dependencies %}
-                <div class="info-card">
-                    <h3><i class="fas fa-puzzle-piece"></i> Dependencies</h3>
-                    <div class="dependencies-list">
-                        {% for dep in sample.dependencies.all %}
-                            <span class="dependency-tag">{{ dep.name }}</span>
-                        {% endfor %}
-                    </div>
-                </div>
-            {% endif %}
-
-            <!-- Tags -->
-            {% if sample.get_tags_list %}
-                <div class="info-card">
-                    <h3><i class="fas fa-tags"></i> Tags</h3>
-                    <div class="tags-list">
-                        {% for tag in sample.get_tags_list %}
-                            <span class="tag">{{ tag.name }}</span>
-                        {% endfor %}
-                    </div>
-                </div>
-            {% endif %}
-        </div>
-
-        <!-- Explanation -->
-        {% if sample.explanation %}
-            <div class="explanation-section">
-                <h2><i class="fas fa-lightbulb"></i> Code Explanation</h2>
-                <div class="explanation-content">
-                    {{ sample.explanation|safe }}
-                </div>
-            </div>
-        {% endif %}
-
-        <!-- Example Usage -->
-        {% if sample.example_usage %}
-            <div class="example-section">
-                <h2><i class="fas fa-terminal"></i> Example Usage</h2>
-                <div class="example-code">
-                    <pre><code class="language-{{ sample.language|lower }}">{{ sample.example_usage }}</code></pre>
-                </div>
-            </div>
-        {% endif %}
-
-        <!-- Related Samples -->
-        {% if related_samples %}
-            <div class="related-section">
-                <h2><i class="fas fa-link"></i> Related Code Samples</h2>
-                <div class="related-grid">
-                    {% for related in related_samples %}
-                        <div class="related-card">
-                            <div class="related-header">
-                                <h4>
-                                    <a href="{% url 'code_sample_detail' related.slug %}">{{ related.title }}</a>
-                                </h4>
-                                <span class="related-language">{{ related.language }}</span>
-                            </div>
-                            <p class="related-description">{{ related.description|truncatewords:15 }}</p>
-                        </div>
-                    {% endfor %}
-                </div>
-            </div>
-        {% endif %}
-    </div>
-</section>
+{% block extra_css %}
+<!-- Prism.js for syntax highlighting -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css" rel="stylesheet">
 
 <style>
-.code-detail-section {
-    padding: 80px 0;
-    min-height: 70vh;
-}
-
-.breadcrumb {
-    margin-bottom: 2rem;
-}
-
-.breadcrumb a {
-    color: var(--accent-color, #007bff);
-    text-decoration: none;
-    font-weight: 500;
-    transition: color 0.3s ease;
-}
-
-.breadcrumb a:hover {
-    color: var(--primary-color, #333);
-}
-
-.breadcrumb i {
-    margin-right: 0.5rem;
-}
-
-.code-title-section {
-    margin-bottom: 2rem;
-}
-
-.code-title {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-    color: var(--primary-color, #333);
-}
-
-.code-description {
-    font-size: 1.2rem;
-    color: var(--text-muted, #666);
-    line-height: 1.6;
-    max-width: 800px;
-}
-
-.code-meta-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-    padding: 1.5rem;
-    background: #f8f9fa;
-    border-radius: 8px;
-    margin-bottom: 2rem;
-}
-
-.meta-left {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-}
-
-.meta-right {
-    display: flex;
-    gap: 1rem;
-}
-
-.language-tag,
-.difficulty-tag,
-.date-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    font-size: 0.9rem;
-    font-weight: 500;
-}
-
-.language-tag {
-    background: var(--accent-color, #007bff);
-    color: white;
-}
-
-.language-tag.python { background: #3776ab; }
-.language-tag.javascript { background: #f7df1e; color: #333; }
-.language-tag.html-css { background: #e34f26; }
-.language-tag.django { background: #092e20; }
-
-.difficulty-tag {
-    color: white;
-}
-
-.difficulty-beginner { background: #28a745; }
-.difficulty-intermediate { background: #ffc107; color: #333; }
-.difficulty-advanced { background: #dc3545; }
-
-.date-tag {
-    background: #6c757d;
-    color: white;
-}
-
-.action-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 6px;
-    font-weight: 500;
-    text-decoration: none;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.github-btn {
-    background: #333;
-    color: white;
-}
-
-.copy-btn {
-    background: var(--accent-color, #007bff);
-    color: white;
-}
-
-.action-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-}
-
-.code-container {
-    margin-bottom: 3rem;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-}
-
-.code-toolbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 1.5rem;
-    background: #2d3748;
-    color: white;
-}
-
-.code-info {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.filename {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-family: 'Courier New', monospace;
-    font-weight: 500;
-}
-
-.line-count {
-    font-size: 0.9rem;
-    opacity: 0.8;
-}
-
-.toolbar-actions {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.toolbar-btn {
-    background: none;
-    border: none;
-    color: white;
-    padding: 0.5rem;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.toolbar-btn:hover {
-    background: rgba(255,255,255,0.1);
-}
-
-.code-block {
-    background: #1a202c;
-    overflow-x: auto;
-    max-height: 600px;
-    overflow-y: auto;
-}
-
-.code-block pre {
-    margin: 0;
-    padding: 1.5rem;
-    background: none;
-}
-
-.code-block code {
-    color: #e2e8f0;
-    font-family: 'Courier New', monospace;
-    font-size: 0.9rem;
-    line-height: 1.5;
-    background: none;
-}
-
-.info-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 3rem;
-}
-
-.info-card {
-    background: white;
-    padding: 1.5rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    border: 1px solid #e9ecef;
-}
-
-.info-card h3 {
-    margin: 0 0 1rem;
-    color: var(--primary-color, #333);
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 1.2rem;
-}
-
-.complexity-info {
-    text-align: center;
-}
-
-.complexity-value {
-    display: inline-block;
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: var(--accent-color, #007bff);
-    background: #f8f9fa;
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    margin-bottom: 0.5rem;
-}
-
-.usage-content {
-    line-height: 1.6;
-}
-
-.dependencies-list,
-.tags-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-}
-
-.dependency-tag,
-.tag {
-    background: #e9ecef;
-    color: #495057;
-    padding: 0.25rem 0.75rem;
-    border-radius: 15px;
-    font-size: 0.9rem;
-    font-weight: 500;
-}
-
-.dependency-tag {
-    background: #d4edda;
-    color: #155724;
-}
-
-.explanation-section,
-.example-section,
-.related-section {
-    margin-bottom: 3rem;
-}
-
-.explanation-section h2,
-.example-section h2,
-.related-section h2 {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--primary-color, #333);
-    margin-bottom: 1.5rem;
-    font-size: 1.8rem;
-}
-
-.explanation-content {
-    background: white;
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    border: 1px solid #e9ecef;
-    line-height: 1.7;
-}
-
-.example-code {
-    background: #1a202c;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-}
-
-.example-code pre {
-    margin: 0;
-    padding: 1.5rem;
-    overflow-x: auto;
-}
-
-.example-code code {
-    color: #e2e8f0;
-    font-family: 'Courier New', monospace;
-    font-size: 0.9rem;
-    line-height: 1.5;
-}
-
-.related-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
-}
-
-.related-card {
-    background: white;
-    padding: 1.5rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    border: 1px solid #e9ecef;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.related-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-}
-
-.related-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 1rem;
-}
-
-.related-header h4 {
-    margin: 0;
-    font-size: 1.1rem;
-}
-
-.related-header a {
-    color: var(--primary-color, #333);
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-
-.related-header a:hover {
-    color: var(--accent-color, #007bff);
-}
-
-.related-language {
-    background: var(--accent-color, #007bff);
-    color: white;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    font-weight: 500;
-}
-
-.related-description {
-    color: var(--text-muted, #666);
-    line-height: 1.5;
-    margin: 0;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .code-title {
-        font-size: 2rem;
+    /* Code Sample Header */
+    .sample-header-section {
+        background: linear-gradient(135deg,
+            var(--bg-primary) 0%,
+            var(--bg-secondary) 25%,
+            rgba(59, 130, 246, 0.1) 50%,
+            rgba(168, 85, 247, 0.1) 75%,
+            var(--bg-tertiary) 100%);
+        padding: 4rem 0 2rem;
+        position: relative;
+        overflow: hidden;
+        margin-top: 0;
     }
 
-    .code-meta-bar {
-        flex-direction: column;
-        align-items: flex-start;
+    [data-theme="dark"] .sample-header-section {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 25%, #0f3460 50%, #533483 75%, #7209b7 100%);
     }
 
-    .meta-right {
-        width: 100%;
-        justify-content: flex-start;
+    .sample-header-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background:
+            radial-gradient(circle at 25% 40%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+            radial-gradient(circle at 75% 60%, rgba(168, 85, 247, 0.12) 0%, transparent 50%);
+
     }
 
-    .info-grid,
-    .related-grid {
-        grid-template-columns: 1fr;
+    [data-theme="dark"] .sample-header-section::before {
+        background:
+            radial-gradient(circle at 25% 40%, rgba(114, 9, 183, 0.4) 0%, transparent 50%),
+            radial-gradient(circle at 75% 60%, rgba(59, 130, 246, 0.3) 0%, transparent 50%);
     }
 
-    .code-toolbar {
-        flex-direction: column;
-        gap: 1rem;
-        align-items: flex-start;
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        33% { transform: translateY(-10px) rotate(1deg); }
+        66% { transform: translateY(10px) rotate(-1deg); }
     }
 
-    .toolbar-actions {
-        align-self: flex-end;
-    }
-}
-
-@media (max-width: 480px) {
-    .code-detail-section {
-        padding: 40px 0;
+    .breadcrumb {
+        color: var(--text-muted);
+        margin-bottom: 2rem;
+        position: relative;
+        z-index: 1;
     }
 
-    .code-title {
-        font-size: 1.8rem;
+    .breadcrumb a {
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: var(--transition);
     }
 
-    .meta-left {
-        flex-direction: column;
+    .breadcrumb a:hover {
+        color: var(--accent-primary);
+    }
+
+    .breadcrumb-separator {
+        margin: 0 0.5rem;
+        color: var(--text-muted);
+    }
+
+    .sample-header-content {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        grid-template-columns: 1fr 300px;
+        gap: 3rem;
+        align-items: start;
+    }
+
+    .sample-main-info h1 {
+        font-size: clamp(2rem, 4vw, 3.5rem);
+        font-weight: 800;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-primary) 50%, #8b5cf6 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        line-height: 1.2;
+    }
+
+    .sample-meta {
+        display: flex;
+        gap: 2rem;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+    }
+
+    .meta-item i {
+        color: var(--accent-primary);
+    }
+
+    .sample-description {
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+        line-height: 1.7;
+        margin-bottom: 2rem;
+    }
+
+    .sample-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    .tag-badge {
+        background: linear-gradient(135deg, var(--accent-primary), #8b5cf6);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        border: none;
+        transition: var(--transition);
+    }
+
+    .tag-badge:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+    }
+
+    .sample-sidebar {
+        background: var(--bg-secondary);
+        border-radius: 1.5rem;
+        padding: 2rem;
+        border: 1px solid var(--border-color);
+        backdrop-filter: blur(10px);
+        position: sticky;
+        top: 100px;
+    }
+
+    .sidebar-section {
+        margin-bottom: 2rem;
+    }
+
+    .sidebar-section:last-child {
+        margin-bottom: 0;
+    }
+
+    .sidebar-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
         gap: 0.5rem;
     }
 
-    .action-btn {
+    .sample-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .action-button {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1rem;
+        background: var(--bg-tertiary);
+        border: 1px solid var(--border-color);
+        border-radius: 0.75rem;
+        color: var(--text-primary);
+        text-decoration: none;
+        font-weight: 500;
+        transition: var(--transition);
+        cursor: pointer;
+    }
+
+    .action-button:hover {
+        background: var(--accent-primary);
+        color: white;
+        border-color: var(--accent-primary);
+        transform: translateY(-2px);
+    }
+
+    .action-button i {
+        font-size: 1.1rem;
+    }
+
+    /* Code Display */
+    .code-section {
+        padding: 4rem 0;
+        background: var(--bg-secondary);
+    }
+
+    .code-container {
+        background: var(--bg-primary);
+        border-radius: 1.5rem;
+        overflow: hidden;
+        box-shadow: var(--shadow-lg);
+        border: 1px solid var(--border-color);
+    }
+
+    .code-header {
+        background: #1a202c;
+        padding: 1rem 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #4a5568;
+    }
+
+    .code-header-left {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .code-dots {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .dot {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+    }
+
+    .dot.red { background: #ff5f57; }
+    .dot.yellow { background: #ffbd2e; }
+    .dot.green { background: #28ca42; }
+
+    .code-title {
+        color: #e2e8f0;
         font-size: 0.9rem;
+        font-weight: 600;
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    }
+
+    .code-language-badge {
+        background: linear-gradient(135deg, var(--accent-primary), #8b5cf6);
+        color: white;
         padding: 0.4rem 0.8rem;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        font-weight: 600;
     }
-}
-</style>
 
-<script>
-function copyCode() {
-    const codeContent = document.getElementById('code-content');
-    const textArea = document.createElement('textarea');
-    textArea.value = codeContent.textContent;
-    document.body.appendChild(textArea);
-    textArea.select();
-    document.execCommand('copy');
-    document.body.removeChild(textArea);
-
-    // Update button text temporarily
-    const copyBtn = document.querySelector('.copy-btn');
-    const originalHTML = copyBtn.innerHTML;
-    copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
-    copyBtn.style.background = '#28a745';
-
-    setTimeout(() => {
-        copyBtn.innerHTML = originalHTML;
-        copyBtn.style.background = '';
-    }, 2000);
-}
-
-function toggleLineNumbers() {
-    const codeBlock = document.getElementById('code-block');
-    const pre = codeBlock.querySelector('pre');
-
-    if (pre.style.counterReset) {
-        // Remove line numbers
-        pre.style.counterReset = '';
-        pre.style.paddingLeft = '1.5rem';
-        const code = pre.querySelector('code');
-        code.style.counterIncrement = '';
-        code.style.display = '';
-
-        // Remove line number styling
-        const lines = code.textContent.split('\n');
-        code.innerHTML = lines.join('\n');
-    } else {
-        // Add line numbers
-        pre.style.counterReset = 'line';
-        pre.style.paddingLeft = '3.5rem';
-        const code = pre.querySelector('code');
-        code.style.counterIncrement = 'line';
-        code.style.display = 'block';
-
-        // Add line number styling
-        const lines = code.textContent.split('\n');
-        const numberedLines = lines.map(line =>
-            `<span class="line-number">${line}</span>`
-        ).join('\n');
-        code.innerHTML = numberedLines;
-
-        // Add CSS for line numbers
-        const style = document.createElement('style');
-        style.textContent = `
-            .line-number::before {
-                counter-increment: line;
-                content: counter(line);
-                position: absolute;
-                left: 1rem;
-                color: #718096;
-                font-size: 0.8rem;
-                text-align: right;
-                width: 2rem;
-            }
-            .line-number {
-                position: relative;
-                padding-left: 1rem;
-                display: block;
-            }
-        `;
-        document.head.appendChild(style);
+    .code-header-actions {
+        display: flex;
+        gap: 0.5rem;
     }
-}
 
-function toggleFullscreen() {
-    const codeContainer = document.querySelector('.code-container');
-    const toggleBtn = document.querySelector('[onclick="toggleFullscreen()"]');
-
-    if (codeContainer.classList.contains('fullscreen')) {
-        // Exit fullscreen
-        codeContainer.classList.remove('fullscreen');
-        toggleBtn.innerHTML = '<i class="fas fa-expand"></i>';
-        toggleBtn.title = 'Fullscreen';
-        document.body.style.overflow = '';
-    } else {
-        // Enter fullscreen
-        codeContainer.classList.add('fullscreen');
-        toggleBtn.innerHTML = '<i class="fas fa-compress"></i>';
-        toggleBtn.title = 'Exit Fullscreen';
-        document.body.style.overflow = 'hidden';
+    .code-action-btn {
+        background: none;
+        border: none;
+        color: #a0aec0;
+        cursor: pointer;
+        padding: 0.5rem;
+        border-radius: 0.375rem;
+        transition: var(--transition);
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
     }
-}
 
-// Add fullscreen styles
-const fullscreenStyle = document.createElement('style');
-fullscreenStyle.textContent = `
-    .code-container.fullscreen {
-        position: fixed;
-        top: 0;
+    .code-action-btn:hover {
+        color: var(--accent-primary);
+        background: rgba(59, 130, 246, 0.1);
+    }
+
+    .code-content {
+        background: #2d3748;
+        position: relative;
+    }
+
+    .code-content pre {
+        margin: 0 !important;
+        background: transparent !important;
+        padding: 2rem !important;
+        border-radius: 0 !important;
+        overflow-x: auto;
+        font-size: 0.9rem !important;
+        line-height: 1.6 !important;
+    }
+
+    .code-content code {
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace !important;
+        color: #e2e8f0 !important;
+        direction: ltr !important;
+        text-align: left !important;
+        unicode-bidi: bidi-override !important;
+    }
+
+    /* Force LTR for all code-related elements */
+    .code-container,
+    .code-content,
+    .code-content pre,
+    .code-content code,
+    .code-title,
+    .code-filename,
+    pre[class*="language-"],
+    code[class*="language-"] {
+        direction: ltr !important;
+        text-align: left !important;
+        unicode-bidi: embed !important;
+    }
+
+    /* Ensure code blocks are not affected by page RTL */
+    [dir="rtl"] .code-container,
+    [dir="rtl"] .code-content,
+    [dir="rtl"] .code-content pre,
+    [dir="rtl"] .code-content code,
+    [dir="rtl"] .code-title,
+    [dir="rtl"] .code-filename,
+    [dir="rtl"] pre[class*="language-"],
+    [dir="rtl"] code[class*="language-"] {
+        direction: ltr !important;
+        text-align: left !important;
+        unicode-bidi: bidi-override !important;
+    }
+
+    /* Fix for browser translation affecting code */
+    .code-content *,
+    .code-container * {
+        direction: ltr !important;
+        text-align: left !important;
+    }
+
+    /* Protect code elements from RTL inheritance */
+    .code-header,
+    .code-header-left,
+    .code-header-actions {
+        direction: ltr !important;
+    }
+
+    /* Sample Details */
+    .sample-details {
+        padding: 4rem 0;
+    }
+
+    .details-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 4rem;
+    }
+
+    .detail-content {
+        background: var(--bg-secondary);
+        border-radius: 1.5rem;
+        padding: 3rem;
+        border: 1px solid var(--border-color);
+    }
+
+    .section-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 1.5rem;
+        position: relative;
+        padding-bottom: 0.5rem;
+    }
+
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
         left: 0;
-        width: 100vw;
-        height: 100vh;
-        z-index: 9999;
-        margin: 0;
-        border-radius: 0;
+        width: 60px;
+        height: 3px;
+        background: linear-gradient(135deg, var(--accent-primary), #8b5cf6);
+        border-radius: 2px;
     }
 
-    .code-container.fullscreen .code-block {
-        max-height: calc(100vh - 60px);
+    .detail-text {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: var(--text-secondary);
+        margin-bottom: 2.5rem;
     }
-`;
-document.head.appendChild(fullscreenStyle);
 
-// Close fullscreen on Escape key
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        const codeContainer = document.querySelector('.code-container');
-        if (codeContainer.classList.contains('fullscreen')) {
-            toggleFullscreen();
+    .usage-section {
+        margin-bottom: 2.5rem;
+    }
+
+    .usage-code {
+        background: var(--bg-tertiary);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        font-size: 0.9rem;
+        border: 1px solid var(--border-color);
+        overflow-x: auto;
+        margin: 1rem 0;
+        position: relative;
+        direction: ltr !important;
+        text-align: left !important;
+    }
+
+    .usage-code::before {
+        content: '$ ';
+        color: var(--accent-primary);
+        font-weight: bold;
+    }
+
+    /* Technical Specifications */
+    .tech-specs {
+        background: var(--bg-secondary);
+        border-radius: 1.5rem;
+        padding: 2rem;
+        border: 1px solid var(--border-color);
+        margin-bottom: 2rem;
+    }
+
+    .spec-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .spec-item:last-child {
+        border-bottom: none;
+    }
+
+    .spec-label {
+        color: var(--text-secondary);
+        font-weight: 500;
+    }
+
+    .spec-value {
+        color: var(--text-primary);
+        font-weight: 600;
+    }
+
+    .complexity-badge {
+        background: var(--accent-light);
+        color: var(--accent-primary);
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+        border: 1px solid var(--accent-primary);
+    }
+
+    /* Related Samples */
+    .related-samples {
+        padding: 4rem 0;
+        background: var(--bg-secondary);
+    }
+
+    .related-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+    }
+
+    .related-card {
+        background: var(--bg-primary);
+        border-radius: 1rem;
+        padding: 2rem;
+        border: 1px solid var(--border-color);
+        transition: var(--transition);
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .related-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--accent-primary);
+    }
+
+    .related-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: var(--text-primary);
+    }
+
+    .related-language {
+        color: var(--accent-primary);
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .related-description {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+
+    /* Back Button */
+    .back-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text-secondary);
+        text-decoration: none;
+        font-weight: 500;
+        margin-bottom: 2rem;
+        transition: var(--transition);
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        background: var(--bg-tertiary);
+        border: 1px solid var(--border-color);
+    }
+
+    .back-button:hover {
+        color: var(--accent-primary);
+        background: var(--bg-secondary);
+        border-color: var(--accent-primary);
+        transform: translateX(-5px);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .sample-header-content {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        .sample-sidebar {
+            position: static;
+        }
+
+        .details-grid {
+            grid-template-columns: 1fr;
+            gap: 2rem;
         }
     }
-});
+
+    @media (max-width: 768px) {
+        .sample-meta {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .detail-content {
+            padding: 2rem;
+        }
+
+        .tech-specs {
+            padding: 1.5rem;
+        }
+
+        .related-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .code-header {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .code-header-actions {
+            width: 100%;
+            justify-content: flex-end;
+        }
+    }
+
+    /* Animation Classes */
+    .fade-in-up {
+        opacity: 0;
+        transform: translateY(30px);
+        animation: fadeInUp 0.6s ease-out forwards;
+    }
+
+    @keyframes fadeInUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .stagger-1 { animation-delay: 0.1s; }
+    .stagger-2 { animation-delay: 0.2s; }
+    .stagger-3 { animation-delay: 0.3s; }
+    .stagger-4 { animation-delay: 0.4s; }
+    .stagger-5 { animation-delay: 0.5s; }
+
+    /* Custom scrollbar for code */
+    .code-content pre::-webkit-scrollbar {
+        height: 8px;
+    }
+
+    .code-content pre::-webkit-scrollbar-track {
+        background: #1a202c;
+    }
+
+    .code-content pre::-webkit-scrollbar-thumb {
+        background: var(--accent-primary);
+        border-radius: 4px;
+    }
+
+    .code-content pre::-webkit-scrollbar-thumb:hover {
+        background: var(--accent-hover);
+    }
+
+    /* Additional Styles for Completion */
+    .btn-primary {
+        background: linear-gradient(135deg, var(--accent-primary), #8b5cf6);
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 0.75rem;
+        text-decoration: none;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        transition: var(--transition);
+        border: none;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+        color: white;
+        text-decoration: none;
+    }
+
+    .highlight-line {
+        background-color: rgba(59, 130, 246, 0.2) !important;
+        display: block;
+        margin: 0 -2rem;
+        padding: 0 2rem;
+        border-left: 3px solid var(--accent-primary);
+    }
+
+    .line-numbers-rows > span {
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+
+    .line-numbers-rows > span:hover {
+        background-color: rgba(59, 130, 246, 0.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Sample Header -->
+<section class="sample-header-section">
+    <div class="container">
+        <!-- Back Button -->
+        <a href="{% url 'code_sample_list' %}" class="back-button fade-in-up">
+            <i class="fas fa-arrow-left"></i>
+            {% if LANGUAGE_CODE == 'fa' %}
+                بازگشت به نمونه کدها
+            {% else %}
+                Back to Code Samples
+            {% endif %}
+        </a>
+
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb fade-in-up stagger-1">
+            <a href="{% url 'home' %}">
+                {% if LANGUAGE_CODE == 'fa' %}
+                    خانه
+                {% else %}
+                    Home
+                {% endif %}
+            </a>
+            <span class="breadcrumb-separator">/</span>
+            <a href="{% url 'code_sample_list' %}">
+                {% if LANGUAGE_CODE == 'fa' %}
+                    نمونه کدها
+                {% else %}
+                    Code Samples
+                {% endif %}
+            </a>
+            <span class="breadcrumb-separator">/</span>
+            <span>{{ sample.title }}</span>
+        </nav>
+
+        <div class="sample-header-content">
+            <div class="sample-main-info fade-in-up stagger-2">
+                <h1>{{ sample.title }}</h1>
+
+                <div class="sample-meta">
+                    <div class="meta-item">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>{{ sample.created_at|date:"F d, Y" }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas fa-code"></i>
+                        <span>{{ sample.get_language_display }}</span>
+                    </div>
+                    {% if sample.lines_of_code %}
+                    <div class="meta-item">
+                        <i class="fas fa-list-ol"></i>
+                        <span>{{ sample.lines_of_code }}
+                            {% if LANGUAGE_CODE == 'fa' %}خط کد{% else %}lines of code{% endif %}
+                        </span>
+                    </div>
+                    {% endif %}
+                    {% if sample.difficulty %}
+                    <div class="meta-item">
+                        <i class="fas fa-signal"></i>
+                        <span>{{ sample.get_difficulty_display }}</span>
+                    </div>
+                    {% endif %}
+                    {% if sample.complexity %}
+                    <div class="meta-item">
+                        <i class="fas fa-chart-line"></i>
+                        <span>
+                            {% if LANGUAGE_CODE == 'fa' %}
+                                پیچیدگی: O({{ sample.complexity }})
+                            {% else %}
+                                Complexity: O({{ sample.complexity }})
+                            {% endif %}
+                        </span>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <p class="sample-description">{{ sample.description }}</p>
+
+                {% if sample.get_tags_list %}
+                <div class="sample-tags">
+                    {% for tag in sample.get_tags_list %}
+                    <span class="tag-badge">{{ tag.name }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="sample-sidebar fade-in-up stagger-3">
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">
+                        <i class="fas fa-tools"></i>
+                        {% if LANGUAGE_CODE == 'fa' %}
+                            عملیات
+                        {% else %}
+                            Actions
+                        {% endif %}
+                    </h3>
+                    <div class="sample-actions">
+                        <button class="action-button" onclick="copyAllCode()" id="copyAllBtn">
+                            <i class="fas fa-copy"></i>
+                            {% if LANGUAGE_CODE == 'fa' %}
+                                کپی کل کد
+                            {% else %}
+                                Copy All Code
+                            {% endif %}
+                        </button>
+                        <button class="action-button" onclick="downloadCode()">
+                            <i class="fas fa-download"></i>
+                            {% if LANGUAGE_CODE == 'fa' %}
+                                دانلود فایل
+                            {% else %}
+                                Download File
+                            {% endif %}
+                        </button>
+                        {% if sample.github_url %}
+                        <a href="{{ sample.github_url }}" class="action-button" target="_blank">
+                            <i class="fab fa-github"></i>
+                            {% if LANGUAGE_CODE == 'fa' %}
+                                مشاهده در GitHub
+                            {% else %}
+                                View on GitHub
+                            {% endif %}
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">
+                        <i class="fas fa-info-circle"></i>
+                        {% if LANGUAGE_CODE == 'fa' %}
+                            مشخصات فنی
+                        {% else %}
+                            Technical Specs
+                        {% endif %}
+                    </h3>
+                    <div class="tech-specs">
+                        <div class="spec-item">
+                            <span class="spec-label">
+                                {% if LANGUAGE_CODE == 'fa' %}
+                                    زبان برنامه‌نویسی
+                                {% else %}
+                                    Language
+                                {% endif %}
+                            </span>
+                            <span class="spec-value">{{ sample.get_language_display }}</span>
+                        </div>
+                        {% if sample.difficulty %}
+                        <div class="spec-item">
+                            <span class="spec-label">
+                                {% if LANGUAGE_CODE == 'fa' %}
+                                    سطح دشواری
+                                {% else %}
+                                    Difficulty Level
+                                {% endif %}
+                            </span>
+                            <span class="spec-value">{{ sample.get_difficulty_display }}</span>
+                        </div>
+                        {% endif %}
+                        {% if sample.lines_of_code %}
+                        <div class="spec-item">
+                            <span class="spec-label">
+                                {% if LANGUAGE_CODE == 'fa' %}
+                                    تعداد خطوط
+                                {% else %}
+                                    Lines of Code
+                                {% endif %}
+                            </span>
+                            <span class="spec-value">{{ sample.lines_of_code }}</span>
+                        </div>
+                        {% endif %}
+                        {% if sample.complexity %}
+                        <div class="spec-item">
+                            <span class="spec-label">
+                                {% if LANGUAGE_CODE == 'fa' %}
+                                    پیچیدگی زمانی
+                                {% else %}
+                                    Time Complexity
+                                {% endif %}
+                            </span>
+                            <span class="complexity-badge">O({{ sample.complexity }})</span>
+                        </div>
+                        {% endif %}
+                        <div class="spec-item">
+                            <span class="spec-label">
+                                {% if LANGUAGE_CODE == 'fa' %}
+                                    آخرین بروزرسانی
+                                {% else %}
+                                    Last Updated
+                                {% endif %}
+                            </span>
+                            <span class="spec-value">{{ sample.updated_at|date:"M d, Y" }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Code Display Section -->
+<section class="code-section">
+    <div class="container">
+        <div class="code-container fade-in-up stagger-4">
+            <div class="code-header">
+                <div class="code-header-left">
+                    <div class="code-dots">
+                        <div class="dot red"></div>
+                        <div class="dot yellow"></div>
+                        <div class="dot green"></div>
+                    </div>
+                    <div class="code-title">
+                        {{ sample.filename|default:"code"|add:"."|add:sample.language }}
+                    </div>
+                    <div class="code-language-badge">
+                        {{ sample.get_language_display }}
+                    </div>
+                </div>
+
+                <div class="code-header-actions">
+                    <button class="code-action-btn" onclick="copyAllCode()" title="Copy code">
+                        <i class="fas fa-copy"></i>
+                        <span>Copy</span>
+                    </button>
+                    <button class="code-action-btn" onclick="downloadCode()" title="Download">
+                        <i class="fas fa-download"></i>
+                        <span>Download</span>
+                    </button>
+                    <!--<button class="code-action-btn" onclick="toggleFullscreen()" title="Fullscreen" id="fullscreenBtn">
+                        <i class="fas fa-expand"></i>
+                        <span>Expand</span>
+                    </button>-->
+                </div>
+            </div>
+
+            <div class="code-content" id="codeContainer">
+                <pre class="line-numbers"><code class="language-{{ sample.language|lower }}" id="mainCode">{{ sample.code }}</code></pre>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Sample Details -->
+<section class="sample-details">
+    <div class="container">
+        <div class="details-grid">
+            <div class="detail-content fade-in-up stagger-5">
+                {% if sample.explanation %}
+                <h2 class="section-title">
+                    {% if LANGUAGE_CODE == 'fa' %}
+                        توضیحات کد
+                    {% else %}
+                        Code Explanation
+                    {% endif %}
+                </h2>
+                <div class="detail-text">{{ sample.explanation|linebreaks }}</div>
+                {% endif %}
+
+                {% if sample.usage_instructions %}
+                <div class="usage-section">
+                    <h3 class="section-title">
+                        {% if LANGUAGE_CODE == 'fa' %}
+                            نحوه استفاده
+                        {% else %}
+                            How to Use
+                        {% endif %}
+                    </h3>
+                    <div class="detail-text">{{ sample.usage_instructions|linebreaks }}</div>
+                </div>
+                {% endif %}
+
+                {% if sample.example_usage %}
+                <div class="usage-section">
+                    <h3 class="section-title">
+                        {% if LANGUAGE_CODE == 'fa' %}
+                            مثال کاربردی
+                        {% else %}
+                            Usage Example
+                        {% endif %}
+                    </h3>
+                    <div class="usage-code">{{ sample.example_usage }}</div>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="fade-in-up stagger-5">
+                <!-- Contact CTA -->
+                <div class="tech-specs">
+                    <h3 class="sidebar-title">
+                        <i class="fas fa-handshake"></i>
+                        {% if LANGUAGE_CODE == 'fa' %}
+                            نیاز به کمک؟
+                        {% else %}
+                            Need Help?
+                        {% endif %}
+                    </h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 1.5rem; line-height: 1.6;">
+                        {% if LANGUAGE_CODE == 'fa' %}
+                            اگر سوالی درباره این کد دارید یا نیاز به کمک دارید، خوشحال می‌شوم کمکتان کنم.
+                        {% else %}
+                            If you have questions about this code or need help, I'd be happy to assist you.
+                        {% endif %}
+                    </p>
+                    <a href="{% url 'contact' %}" class="action-button">
+                        <i class="fas fa-envelope"></i>
+                        {% if LANGUAGE_CODE == 'fa' %}
+                            تماس با من
+                        {% else %}
+                            Contact Me
+                        {% endif %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Related Samples -->
+<section class="related-samples">
+    <div class="container">
+        <div class="section-header fade-in-up">
+            <h2 class="section-title" style="text-align: center; margin-bottom: 0;">
+                {% if LANGUAGE_CODE == 'fa' %}
+                    نمونه کدهای مرتبط
+                {% else %}
+                    Related Code Samples
+                {% endif %}
+            </h2>
+            <p style="text-align: center; color: var(--text-secondary); margin-top: 1rem; margin-bottom: 3rem;">
+                {% if LANGUAGE_CODE == 'fa' %}
+                    کدهای دیگری که ممکن است برایتان مفید باشد
+                {% else %}
+                    Other code samples that might be useful for you
+                {% endif %}
+            </p>
+        </div>
+
+        <div class="related-grid">
+            {% for related in related_samples %}
+            <a href="{{ related.get_absolute_url }}" class="related-card fade-in-up stagger-{{ forloop.counter }}">
+                <h3 class="related-title">{{ related.title }}</h3>
+                <div class="related-language">{{ related.get_language_display }}</div>
+                <p class="related-description">{{ related.description|truncatewords:15 }}</p>
+            </a>
+            {% empty %}
+            <!-- Placeholder related samples -->
+            <a href="#" class="related-card fade-in-up stagger-1">
+                <h3 class="related-title">
+                    {% if LANGUAGE_CODE == 'fa' %}
+                        الگوریتم مرتب‌سازی سریع
+                    {% else %}
+                        Quick Sort Algorithm
+                    {% endif %}
+                </h3>
+                <div class="related-language">Python</div>
+                <p class="related-description">
+                    {% if LANGUAGE_CODE == 'fa' %}
+                        پیاده‌سازی بهینه الگوریتم مرتب‌سازی سریع با پیچیدگی O(n log n)
+                    {% else %}
+                        Efficient implementation of quick sort algorithm with O(n log n) complexity
+                    {% endif %}
+                </p>
+            </a>
+
+            <a href="#" class="related-card fade-in-up stagger-2">
+                <h3 class="related-title">
+                    {% if LANGUAGE_CODE == 'fa' %}
+                        API Client با Requests
+                    {% else %}
+                        API Client with Requests
+                    {% endif %}
+                </h3>
+                <div class="related-language">Python</div>
+                <p class="related-description">
+                    {% if LANGUAGE_CODE == 'fa' %}
+                        کلاس کاربردی برای کار با API های RESTful با مدیریت خطا
+                    {% else %}
+                        Utility class for working with RESTful APIs with error handling
+                    {% endif %}
+                </p>
+            </a>
+
+            <a href="#" class="related-card fade-in-up stagger-3">
+                <h3 class="related-title">
+                    {% if LANGUAGE_CODE == 'fa' %}
+                        Django Model Serializer
+                    {% else %}
+                        Django Model Serializer
+                    {% endif %}
+                </h3>
+                <div class="related-language">Django</div>
+                <p class="related-description">
+                    {% if LANGUAGE_CODE == 'fa' %}
+                        سریالایزر پیشرفته برای مدل‌های Django با ولیدیشن سفارشی
+                    {% else %}
+                        Advanced serializer for Django models with custom validation
+                    {% endif %}
+                </p>
+            </a>
+            {% endfor %}
+        </div>
+
+        <div style="text-align: center; margin-top: 3rem;">
+            <a href="{% url 'code_sample_list' %}" class="btn btn-primary fade-in-up">
+                {% if LANGUAGE_CODE == 'fa' %}
+                    مشاهده همه نمونه کدها
+                {% else %}
+                    View All Code Samples
+                {% endif %}
+                <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Prism.js for syntax highlighting -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+
+<script>
+    // Observer options for animations
+    const observerOptions = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.1
+    };
+
+    // Animation Observer
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                entry.target.style.animationPlayState = 'running';
+                observer.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+
+    // Observe all animation elements
+    document.querySelectorAll('.fade-in-up').forEach(el => {
+        el.style.animationPlayState = 'paused';
+        observer.observe(el);
+    });
+
+    // Copy all code functionality
+    function copyAllCode() {
+        const codeElement = document.getElementById('mainCode');
+        const code = codeElement.textContent;
+
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(code).then(() => {
+                const btn = document.getElementById('copyAllBtn');
+                const icon = btn.querySelector('i');
+                const text = btn.querySelector('span') || btn.lastChild;
+                const originalContent = btn.innerHTML;
+
+                // Change button appearance
+                btn.innerHTML = '<i class="fas fa-check"></i> {% if LANGUAGE_CODE == "fa" %}کپی شد!{% else %}Copied!{% endif %}';
+                btn.style.background = '#10b981';
+                btn.style.color = 'white';
+                btn.style.borderColor = '#10b981';
+
+                // Show toast
+                showToast('{% if LANGUAGE_CODE == "fa" %}کد با موفقیت کپی شد!{% else %}Code copied successfully!{% endif %}');
+
+                // Reset after 3 seconds
+                setTimeout(() => {
+                    btn.innerHTML = originalContent;
+                    btn.style.background = '';
+                    btn.style.color = '';
+                    btn.style.borderColor = '';
+                }, 3000);
+            }).catch(err => {
+                console.error('Failed to copy code: ', err);
+                showToast('{% if LANGUAGE_CODE == "fa" %}خطا در کپی کردن کد{% else %}Failed to copy code{% endif %}', 'error');
+            });
+        }
+    }
+
+    // Download code functionality
+    function downloadCode() {
+        const codeElement = document.getElementById('mainCode');
+        const code = codeElement.textContent;
+        const filename = '{{ sample.filename|default:"code" }}' +
+                        {% if sample.language == 'python' %}
+                            '.py';
+                        {% elif sample.language == 'javascript' %}
+                            '.js';
+                        {% elif sample.language == 'html-css' %}
+                            '.html';
+                        {% elif sample.language == 'django' %}
+                            '.py';
+                        {% elif sample.language == 'sql' %}
+                            '.sql';
+                        {% elif sample.language == 'bash' %}
+                            '.sh';
+                        {% elif sample.language == 'json' %}
+                            '.json';
+                        {% else %}
+                            '.txt';
+                        {% endif %}
+
+        const blob = new Blob([code], { type: 'text/plain' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+
+        showToast('{% if LANGUAGE_CODE == "fa" %}فایل دانلود شد!{% else %}File downloaded!{% endif %}');
+    }
+
+    // Fullscreen toggle functionality
+    let isFullscreen = false;
+
+    function toggleFullscreen() {
+        const container = document.getElementById('codeContainer');
+        const btn = document.getElementById('fullscreenBtn');
+        const icon = btn.querySelector('i');
+        const text = btn.querySelector('span');
+
+        if (!isFullscreen) {
+            // Enter fullscreen
+            container.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                z-index: 10000;
+                background: #2d3748;
+                border-radius: 0;
+                overflow-y: auto;
+            `;
+
+            const pre = container.querySelector('pre');
+            if (pre) {
+                pre.style.height = 'calc(100vh - 4rem)';
+                pre.style.margin = '0';
+            }
+
+            icon.className = 'fas fa-compress';
+            text.textContent = '{% if LANGUAGE_CODE == "fa" %}بستن{% else %}Close{% endif %}';
+            isFullscreen = true;
+
+            // Prevent body scroll
+            document.body.style.overflow = 'hidden';
+        } else {
+            // Exit fullscreen
+            container.style.cssText = '';
+
+            const pre = container.querySelector('pre');
+            if (pre) {
+                pre.style.height = '';
+                pre.style.margin = '';
+            }
+
+            icon.className = 'fas fa-expand';
+            text.textContent = '{% if LANGUAGE_CODE == "fa" %}تمام صفحه{% else %}Expand{% endif %}';
+            isFullscreen = false;
+
+            // Restore body scroll
+            document.body.style.overflow = '';
+        }
+    }
+
+    // Close fullscreen with ESC key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && isFullscreen) {
+            toggleFullscreen();
+        }
+    });
+
+    // Toast notification function
+    function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.textContent = message;
+
+        const bgColor = type === 'error' ? '#ef4444' : '#10b981';
+
+        toast.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: ${bgColor};
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            z-index: 10001;
+            font-size: 0.9rem;
+            font-weight: 500;
+            opacity: 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        `;
+
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+            toast.style.opacity = '1';
+            toast.style.transform = 'translateY(0)';
+        }, 100);
+
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                if (document.body.contains(toast)) {
+                    document.body.removeChild(toast);
+                }
+            }, 300);
+        }, 3000);
+    }
+
+    // Code line highlighting on click
+    document.addEventListener('DOMContentLoaded', function() {
+        const codeLines = document.querySelectorAll('.code-content pre .line-numbers-rows > span');
+
+        codeLines.forEach((line, index) => {
+            line.addEventListener('click', function() {
+                // Remove previous highlights
+                document.querySelectorAll('.code-content pre code .highlight-line').forEach(el => {
+                    el.classList.remove('highlight-line');
+                });
+
+                // Add highlight to current line
+                const codeLine = document.querySelector(`.code-content pre code`).children[index];
+                if (codeLine) {
+                    codeLine.classList.add('highlight-line');
+
+                    // Copy line to clipboard
+                    if (navigator.clipboard) {
+                        navigator.clipboard.writeText(codeLine.textContent);
+                        showToast(`{% if LANGUAGE_CODE == "fa" %}خط ${index + 1} کپی شد{% else %}Line ${index + 1} copied{% endif %}`);
+                    }
+                }
+            });
+        });
+
+        // Initialize Prism highlighting
+        if (typeof Prism !== 'undefined') {
+            Prism.highlightAll();
+        }
+
+        // Force LTR direction for all code elements
+        forceCodeLTR();
+    });
+
+    // Function to force LTR direction for code elements
+    function forceCodeLTR() {
+        const codeElements = document.querySelectorAll(`
+            .code-container,
+            .code-content,
+            .code-content pre,
+            .code-content code,
+            .code-title,
+            .code-filename,
+            pre[class*="language-"],
+            code[class*="language-"],
+            .code-header,
+            .code-header-left,
+            .code-header-actions,
+            .usage-code
+        `);
+
+        codeElements.forEach(element => {
+            element.style.direction = 'ltr';
+            element.style.textAlign = 'left';
+            element.style.unicodeBidi = 'bidi-override';
+
+            // Add attribute to prevent translation services from affecting direction
+            element.setAttribute('translate', 'no');
+            element.setAttribute('dir', 'ltr');
+        });
+    }
+
+    // Re-apply LTR direction after any DOM changes
+    const codeObserver = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.type === 'childList' || mutation.type === 'attributes') {
+                // Small delay to ensure elements are rendered
+                setTimeout(forceCodeLTR, 100);
+            }
+        });
+    });
+
+    // Start observing
+    codeObserver.observe(document.body, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['dir', 'style']
+    });
+
+    // Action button hover effects
+    document.querySelectorAll('.action-button').forEach(button => {
+        button.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-3px) scale(1.02)';
+        });
+
+        button.addEventListener('mouseleave', function() {
+            if (!this.style.background.includes('rgb(16, 185, 129)')) {
+                this.style.transform = 'translateY(-2px) scale(1)';
+            }
+        });
+    });
+
+    // Related cards interaction
+    document.querySelectorAll('.related-card').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-8px) scale(1.02)';
+        });
+
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(-5px) scale(1)';
+        });
+    });
+
+    // Reading progress indicator
+    function addReadingProgress() {
+        const progressBar = document.createElement('div');
+        progressBar.style.cssText = `
+            position: fixed;
+            top: 80px;
+            left: 0;
+            width: 0%;
+            height: 3px;
+            background: linear-gradient(135deg, var(--accent-primary), #8b5cf6);
+            z-index: 1001;
+            transition: width 0.1s ease;
+        `;
+
+        document.body.appendChild(progressBar);
+
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            progressBar.style.width = scrolled + '%';
+        });
+    }
+
+    // Add reading progress on load
+    addReadingProgress();
+
+    // Tag badge click to copy
+    document.querySelectorAll('.tag-badge').forEach(badge => {
+        badge.addEventListener('click', function(e) {
+            e.preventDefault();
+            const tagName = this.textContent.trim();
+
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(tagName).then(() => {
+                    showToast(`{% if LANGUAGE_CODE == "fa" %}تگ "${tagName}" کپی شد{% else %}Tag "${tagName}" copied{% endif %}`);
+
+                    // Visual feedback
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = 'translateY(-2px)';
+                    }, 150);
+                });
+            }
+        });
+
+        badge.style.cursor = 'pointer';
+        badge.title = '{% if LANGUAGE_CODE == "fa" %}برای کپی کلیک کنید{% else %}Click to copy{% endif %}';
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        // Ctrl/Cmd + C on code area
+        if ((e.ctrlKey || e.metaKey) && e.key === 'c' &&
+            e.target.closest('.code-content')) {
+            e.preventDefault();
+            copyAllCode();
+        }
+
+        // Ctrl/Cmd + S to download
+        if ((e.ctrlKey || e.metaKey) && e.key === 's' &&
+            e.target.closest('.code-container')) {
+            e.preventDefault();
+            downloadCode();
+        }
+    });
+
+    // Add keyboard shortcut hints
+    const shortcutHints = document.createElement('div');
+    shortcutHints.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 0.5rem;
+        padding: 0.75rem;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        z-index: 1000;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.3s ease;
+        max-width: 200px;
+    `;
+
+    shortcutHints.innerHTML = `
+        <div style="margin-bottom: 0.5rem; font-weight: 600; color: var(--text-primary);">
+            {% if LANGUAGE_CODE == "fa" %}میانبرهای کیبورد{% else %}Keyboard Shortcuts{% endif %}
+        </div>
+        <div>Ctrl+C: {% if LANGUAGE_CODE == "fa" %}کپی کد{% else %}Copy code{% endif %}</div>
+        <div>Ctrl+S: {% if LANGUAGE_CODE == "fa" %}دانلود{% else %}Download{% endif %}</div>
+        <div>Esc: {% if LANGUAGE_CODE == "fa" %}خروج از تمام صفحه{% else %}Exit fullscreen{% endif %}</div>
+    `;
+
+    document.body.appendChild(shortcutHints);
+
+    // Show shortcuts hint when hovering over code
+    document.querySelector('.code-container').addEventListener('mouseenter', () => {
+        shortcutHints.style.opacity = '1';
+        shortcutHints.style.transform = 'translateY(0)';
+    });
+
+    document.querySelector('.code-container').addEventListener('mouseleave', () => {
+        shortcutHints.style.opacity = '0';
+        shortcutHints.style.transform = 'translateY(20px)';
+    });
+
+    // Smooth parallax effect
+    let ticking = false;
+
+    function updateParallax() {
+        const scrolled = window.pageYOffset;
+        const header = document.querySelector('.sample-header-section');
+
+
+
+        ticking = false;
+    }
+
+    function requestTick() {
+        if (!ticking) {
+            requestAnimationFrame(updateParallax);
+            ticking = true;
+        }
+    }
+
+    window.addEventListener('scroll', requestTick);
 </script>
 {% endblock %}

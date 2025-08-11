@@ -1,62 +1,1214 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load i18n %}  {# Add this if not already present #}
+{% load i18n %}
 
-{% block title %}About - Fatemeh NGP{% endblock %}
+{% block title %}
+    {% if LANGUAGE_CODE == 'fa' %}
+        درباره من - فاطمه NGP
+    {% else %}
+        About Me - Fatemeh NGP
+    {% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Page Header */
+    .about-header {
+        background: linear-gradient(135deg,
+            var(--bg-primary) 0%,
+            var(--bg-secondary) 25%,
+            rgba(59, 130, 246, 0.1) 50%,
+            rgba(168, 85, 247, 0.1) 75%,
+            var(--bg-tertiary) 100%);
+        padding: 6rem 0 4rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    [data-theme="dark"] .about-header {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 25%, #0f3460 50%, #533483 75%, #7209b7 100%);
+    }
+
+    .about-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background:
+            radial-gradient(circle at 30% 40%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+            radial-gradient(circle at 70% 60%, rgba(168, 85, 247, 0.12) 0%, transparent 50%);
+
+    }
+
+    [data-theme="dark"] .about-header::before {
+        background:
+            radial-gradient(circle at 30% 40%, rgba(114, 9, 183, 0.4) 0%, transparent 50%),
+            radial-gradient(circle at 70% 60%, rgba(59, 130, 246, 0.3) 0%, transparent 50%);
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        33% { transform: translateY(-15px) rotate(1deg); }
+        66% { transform: translateY(15px) rotate(-1deg); }
+    }
+
+    .about-intro {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        grid-template-columns: 300px 1fr;
+        gap: 4rem;
+        align-items: center;
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .profile-image-container {
+        position: relative;
+    }
+
+    .profile-image {
+        width: 300px;
+        height: 300px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 5px solid var(--accent-primary);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .profile-image:hover {
+        transform: scale(1.05);
+        box-shadow: 0 25px 50px rgba(59, 130, 246, 0.3);
+    }
+
+    .profile-placeholder {
+        width: 300px;
+        height: 300px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--accent-primary), #8b5cf6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 4rem;
+        font-weight: bold;
+        border: 5px solid var(--accent-primary);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .profile-placeholder::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+        transform: rotate(45deg);
+        animation: shine 3s infinite;
+    }
+
+    @keyframes shine {
+        0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+        50% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        100% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+    }
+
+    .intro-content h1 {
+        font-size: clamp(2.5rem, 4vw, 3.5rem);
+        font-weight: 800;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-primary) 50%, #8b5cf6 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .intro-tagline {
+        font-size: 1.4rem;
+        color: var(--accent-primary);
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+    }
+
+    .intro-description {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: var(--text-secondary);
+        margin-bottom: 2rem;
+    }
+
+    .intro-stats {
+        display: flex;
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-item {
+        text-align: center;
+    }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--accent-primary);
+        display: block;
+    }
+
+    .stat-label {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Main Content Sections */
+    .section {
+        padding: 5rem 0;
+        position: relative;
+    }
+
+    .section-header {
+        text-align: center;
+        margin-bottom: 4rem;
+    }
+
+    .section-title {
+        font-size: clamp(2.2rem, 4vw, 3rem);
+        font-weight: 800;
+        margin-bottom: 1rem;
+        color: var(--text-primary);
+        position: relative;
+        display: inline-block;
+    }
+
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 4px;
+        background: linear-gradient(135deg, var(--accent-primary), #8b5cf6);
+        border-radius: 2px;
+    }
+
+    .section-subtitle {
+        font-size: 1.2rem;
+        color: var(--text-secondary);
+        max-width: 600px;
+        margin: 0 auto;
+        line-height: 1.7;
+    }
+
+    /* Story Section */
+    .story-content {
+        max-width: 800px;
+        margin: 0 auto;
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: var(--text-secondary);
+    }
+
+    .story-content p {
+        margin-bottom: 1.5rem;
+    }
+
+    .story-highlight {
+        background: var(--accent-light);
+        padding: 0.2rem 0.5rem;
+        border-radius: 0.3rem;
+        color: var(--accent-primary);
+        font-weight: 600;
+    }
+
+    /* Experience Timeline */
+    .timeline-container {
+        max-width: 800px;
+        margin: 0 auto;
+        position: relative;
+    }
+
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 50%;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: var(--border-color);
+        transform: translateX(-50%);
+    }
+
+    .timeline-item {
+        display: flex;
+        margin-bottom: 3rem;
+        position: relative;
+    }
+
+    .timeline-item:nth-child(odd) {
+        flex-direction: row-reverse;
+    }
+
+    .timeline-content {
+        background: var(--bg-secondary);
+        padding: 2rem;
+        border-radius: 1rem;
+        border: 1px solid var(--border-color);
+        width: calc(50% - 2rem);
+        position: relative;
+        transition: var(--transition);
+    }
+
+    .timeline-content:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--accent-primary);
+    }
+
+    .timeline-content::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        width: 0;
+        height: 0;
+        border: 15px solid transparent;
+    }
+
+    .timeline-item:nth-child(odd) .timeline-content::before {
+        left: -30px;
+        border-right-color: var(--bg-secondary);
+    }
+
+    .timeline-item:nth-child(even) .timeline-content::before {
+        right: -30px;
+        border-left-color: var(--bg-secondary);
+    }
+
+    .timeline-dot {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 20px;
+        height: 20px;
+        background: var(--accent-primary);
+        border-radius: 50%;
+        border: 4px solid var(--bg-primary);
+        z-index: 2;
+    }
+
+    .timeline-period {
+        color: var(--accent-primary);
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .timeline-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .timeline-company {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+
+    .timeline-description {
+        color: var(--text-secondary);
+        line-height: 1.6;
+    }
+
+    /* Skills Section */
+    .skills-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2.5rem;
+        margin-bottom: 3rem;
+    }
+
+    .skill-category {
+        background: var(--bg-secondary);
+        border-radius: 1.5rem;
+        padding: 2.5rem;
+        border: 1px solid var(--border-color);
+        text-align: center;
+        transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .skill-category::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, var(--accent-primary), transparent);
+        opacity: 0;
+        transition: opacity 0.4s ease;
+    }
+
+    .skill-category:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        border-color: var(--accent-primary);
+    }
+
+    .skill-category:hover::before {
+        opacity: 0.05;
+    }
+
+    .skill-icon {
+        font-size: 3rem;
+        color: var(--accent-primary);
+        margin-bottom: 1.5rem;
+        position: relative;
+        z-index: 1;
+        transition: transform 0.4s ease;
+    }
+
+    .skill-category:hover .skill-icon {
+        transform: scale(1.1) rotate(5deg);
+    }
+
+    .skill-category-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        color: var(--text-primary);
+        position: relative;
+        z-index: 1;
+    }
+
+    .skills-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        justify-content: center;
+        position: relative;
+        z-index: 1;
+    }
+
+    .skill-badge {
+        background: var(--bg-tertiary);
+        color: var(--text-secondary);
+        padding: 0.6rem 1.2rem;
+        border-radius: 2rem;
+        font-size: 0.9rem;
+        font-weight: 500;
+        border: 1px solid var(--border-color);
+        transition: var(--transition);
+        cursor: pointer;
+    }
+
+    .skill-badge:hover {
+        background: var(--accent-primary);
+        color: white;
+        border-color: var(--accent-primary);
+        transform: translateY(-2px);
+    }
+
+    .skill-level {
+        display: block;
+        font-size: 0.7rem;
+        opacity: 0.8;
+        margin-top: 0.2rem;
+    }
+
+    /* CTA Section */
+    .cta-section {
+        background: var(--bg-secondary);
+        text-align: center;
+        padding: 4rem 0;
+    }
+
+    .cta-content {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .cta-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        color: var(--text-primary);
+    }
+
+    .cta-description {
+        font-size: 1.2rem;
+        color: var(--text-secondary);
+        margin-bottom: 2.5rem;
+        line-height: 1.7;
+    }
+
+    .cta-buttons {
+        display: flex;
+        gap: 1.5rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .about-intro {
+            grid-template-columns: 1fr;
+            text-align: center;
+            gap: 2rem;
+        }
+
+        .profile-image,
+        .profile-placeholder {
+            width: 250px;
+            height: 250px;
+            margin: 0 auto;
+        }
+
+        .intro-stats {
+            justify-content: center;
+        }
+
+        .timeline::before {
+            left: 2rem;
+        }
+
+        .timeline-item {
+            flex-direction: column;
+        }
+
+        .timeline-content {
+            width: calc(100% - 4rem);
+            margin-left: 4rem;
+        }
+
+        .timeline-content::before {
+            left: -30px !important;
+            border-right-color: var(--bg-secondary) !important;
+            border-left-color: transparent !important;
+        }
+
+        .timeline-dot {
+            left: 2rem;
+        }
+
+        .skills-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .cta-buttons {
+            flex-direction: column;
+            align-items: center;
+        }
+    }
+
+    /* Animation Classes */
+    .fade-in-up {
+        opacity: 0;
+        transform: translateY(50px);
+        animation: fadeInUp 0.8s ease-out forwards;
+    }
+
+    @keyframes fadeInUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .stagger-1 { animation-delay: 0.1s; }
+    .stagger-2 { animation-delay: 0.2s; }
+    .stagger-3 { animation-delay: 0.3s; }
+    .stagger-4 { animation-delay: 0.4s; }
+    .stagger-5 { animation-delay: 0.5s; }
+    .stagger-6 { animation-delay: 0.6s; }
+</style>
+{% endblock %}
 
 {% block content %}
-<section class="page-header">
+<!-- About Header Section -->
+<section class="about-header">
     <div class="container">
-        <h1>{% trans "About Me" %}</h1>
-        <p>{% trans "Get to know more about my background and skills" %}</p>
-    </div>
-</section>
+        <div class="about-intro fade-in-up">
+            <div class="profile-image-container">
+                {% comment %}
+                <!-- Replace with actual profile image when available -->
 
-<section class="about-content">
-    <div class="container">
-        <div class="about-grid">
-            <div class="about-text">
-                <h2>{% trans "Hello! I'm Fatemeh Najafgholipour" %}</h2>
-                <p>{% trans "I'm a passionate back-end developer with experience in building modern web applications. I love creating solutions that combine great user experience with clean, maintainable code." %}</p>
-                
-                <p>{% trans "My journey in programming started when I met my husband. Since then, I've worked on various projects ranging from small business websites to complex web applications." %}</p>
-                
-                <p>{% trans "When I'm not coding, you can find me learning or travelling. I believe in continuous learning and staying up-to-date with the latest technologies and best practices." %}</p>
-                
-                <div class="about-stats">
-                    <div class="stat">
-                        <h3>{{ skills.count }}+</h3>
-                        <p>{% trans "Technologies" %}</p>
-                    </div>
-                    <div class="stat">
-                        <h3>1+</h3>
-                        <p>{% trans "Years Experience" %}</p>
-                    </div>
-                    <div class="stat">
-                        <h3>7+</h3>
-                        <p>{% trans "Projects Completed" %}</p>
-                    </div>
-                </div>
+                {% endcomment %}
+                <img src="{% static 'images/profile.jpg' %}" alt="Fatemeh Najafgholipour" class="profile-image">
+
             </div>
-            
-            <div class="skills-section">
-                <h3>{% trans "Technical Skills" %}</h3>
-                {% regroup skills by category as skill_groups %}
-                {% for group in skill_groups %}
-                <div class="skill-category">
-                    <h4>{{ group.grouper|title }}</h4> {# If group.grouper is a user-facing string, consider translating it in the backend or here if possible #}
-                    <div class="skills-list">
-                        {% for skill in group.list %}
-                        <div class="skill-item">
-                            <span class="skill-name">{{ skill.name }}</span> {# If skill.name is not translated in the backend, wrap with {% trans skill.name %} #}
-                            <span class="skill-level skill-{{ skill.level }}">{{ skill.get_level_display }}</span>
-                        </div>
-                        {% endfor %}
-                    </div>
+
+            <div class="intro-content">
+                <h1>
+                    {% if LANGUAGE_CODE == 'fa' %}
+                        سلام، من فاطمه هستم
+                    {% else %}
+                        Hi, I'm Fatemeh
+                    {% endif %}
+                </h1>
+                <p class="intro-tagline">
+                    {% if LANGUAGE_CODE == 'fa' %}
+                        توسعه‌دهنده بک‌اند پایتون و جنگو
+                    {% else %}
+                        Python & Django Backend Developer
+                    {% endif %}
+                </p>
+                <div class="intro-description">
+                    {% if LANGUAGE_CODE == 'fa' %}
+                        <p>با بیش از ۲ سال تجربه در توسعه نرم‌افزار، من یک متخصص بک‌اند هستم که روی پایتون و جنگو تمرکز دارم. عاشق کدنویسی تمیز و حل مسائل پیچیده هستم.</p>
+                    {% else %}
+                        <p>With over 2 years of experience in software development, I'm a backend specialist focused on Python and Django. I'm passionate about clean code and solving complex problems.</p>
+                    {% endif %}
                 </div>
-                {% endfor %}
+
+                <div class="intro-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">2+</span>
+                        <span class="stat-label">
+                            {% if LANGUAGE_CODE == 'fa' %}
+                                سال تجربه
+                            {% else %}
+                                Years Experience
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">10+</span>
+                        <span class="stat-label">
+                            {% if LANGUAGE_CODE == 'fa' %}
+                                پروژه کامل
+                            {% else %}
+                                Projects Done
+                            {% endif %}
+                        </span>
+                    </div>
+                    <!--<div class="stat-item">
+                        <span class="stat-number">100%</span>
+                        <span class="stat-label">
+                            {% if LANGUAGE_CODE == 'fa' %}
+                                رضایت مشتری
+                            {% else %}
+                                Client Satisfaction
+                            {% endif %}
+                        </span>
+                    </div>-->
+                </div>
             </div>
         </div>
     </div>
 </section>
+
+<!-- My Story Section -->
+<section class="section">
+    <div class="container">
+        <div class="section-header fade-in-up">
+            <h2 class="section-title">
+                {% if LANGUAGE_CODE == 'fa' %}
+                    داستان من
+                {% else %}
+                    My Story
+                {% endif %}
+            </h2>
+            <p class="section-subtitle">
+                {% if LANGUAGE_CODE == 'fa' %}
+                    سفری که من را به دنیای برنامه‌نویسی رساند
+                {% else %}
+                    The journey that led me to the world of programming
+                {% endif %}
+            </p>
+        </div>
+
+        <div class="story-content fade-in-up stagger-1">
+            {% if LANGUAGE_CODE == 'fa' %}
+                <p>سفر من در دنیای برنامه‌نویسی از کنجکاوی ساده آغاز شد. وقتی برای اولین بار با کد آشنا شدم، فهمیدم که می‌توانم ایده‌هایم را به واقعیت تبدیل کنم.</p>
+
+                <p>شروع با <span class="story-highlight">پایتون</span> بود - زبانی که به دلیل سادگی و قدرتش عاشقش شدم. سپس <span class="story-highlight">جنگو</span> را کشف کردم و فهمیدم که می‌توانم اپلیکیشن‌های وب پیچیده و قدرتمند بسازم.</p>
+
+                <p>امروز، تمرکز من روی ایجاد راه‌حل‌های نرم‌افزاری که نه تنها کار می‌کنند، بلکه قابل نگهداری، مقیاس‌پذیر و امن هستند، است. همیشه در حال یادگیری تکنولوژی‌های جدید و بهبود مهارت‌هایم هستم.</p>
+
+                <p>باور دارم که <span class="story-highlight">کد خوب</span> مانند شعر است - باید زیبا، قابل فهم و هدفمند باشد.</p>
+            {% else %}
+                <p>My journey into programming started with simple curiosity. When I first encountered code, I realized I could turn my ideas into reality.</p>
+
+                <p>It began with <span class="story-highlight">Python</span> - a language I fell in love with for its simplicity and power. Then I discovered <span class="story-highlight">Django</span> and realized I could build complex, powerful web applications.</p>
+
+                <p>Today, I focus on creating software solutions that don't just work, but are maintainable, scalable, and secure. I'm always learning new technologies and improving my skills.</p>
+
+                <p>I believe that <span class="story-highlight">good code</span> is like poetry - it should be beautiful, understandable, and purposeful.</p>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Experience Timeline -->
+<section class="section" style="background: var(--bg-secondary);">
+    <div class="container">
+        <div class="section-header fade-in-up">
+            <h2 class="section-title">
+                {% if LANGUAGE_CODE == 'fa' %}
+                    تجربه حرفه‌ای
+                {% else %}
+                    Professional Experience
+                {% endif %}
+            </h2>
+            <p class="section-subtitle">
+                {% if LANGUAGE_CODE == 'fa' %}
+                    مسیر رشد و یادگیری من در دنیای فناوری
+                {% else %}
+                    My growth and learning path in the tech world
+                {% endif %}
+            </p>
+        </div>
+
+        <div class="timeline-container">
+            <div class="timeline fade-in-up stagger-2">
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-period">
+                            {% if LANGUAGE_CODE == 'fa' %}
+                                ۲۰۲۵ - حال حاضر
+                            {% else %}
+                                2025 - Present
+                            {% endif %}
+                        </div>
+                        <h3 class="timeline-title">
+                            {% if LANGUAGE_CODE == 'fa' %}
+                                توسعه‌دهنده Python/Django مستقل
+                            {% else %}
+                                Freelance Python/Django Developer
+                            {% endif %}
+                        </h3>
+                        <p class="timeline-company">
+                            {% if LANGUAGE_CODE == 'fa' %}
+                                مستقل
+                            {% else %}
+                                Self-Employed
+                            {% endif %}
+                        </p>
+                        <p class="timeline-description">
+                            {% if LANGUAGE_CODE == 'fa' %}
+                                توسعه اپلیکیشن‌های وب برای مشتریان مختلف، تمرکز بر API های REST، بهینه‌سازی دیتابیس و معماری مقیاس‌پذیر.
+                            {% else %}
+                                Developing web applications for various clients, focusing on REST APIs, database optimization, and scalable architecture.
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="timeline-dot"></div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-period">
+                            {% if LANGUAGE_CODE == 'fa' %}
+                                ۲۰۲۳ - ۲۰۲۴
+                            {% else %}
+                                2023 - 2024
+                            {% endif %}
+                        </div>
+                        <h3 class="timeline-title">
+                            {% if LANGUAGE_CODE == 'fa' %}
+                                توسعه‌دهنده Backend جونیور
+                            {% else %}
+                                Junior Backend Developer
+                            {% endif %}
+                        </h3>
+                        <p class="timeline-company">
+                            {% if LANGUAGE_CODE == 'fa' %}
+                                کالج جامپ بک‌اند با جنگو کوئرا
+                            {% else %}
+                                College Jump Backend With Django Quera
+                            {% endif %}
+                        </p>
+                        <p class="timeline-description">
+                            {% if LANGUAGE_CODE == 'fa' %}
+                                کار بر روی پروژه های تمرینی، یادگیری بهتر جنگو با محوریت بک اند.
+                            {% else %}
+                                Working on practice projects, learning better Django with a focus on the backend.
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="timeline-dot"></div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <div class="timeline-period">
+                            {% if LANGUAGE_CODE == 'fa' %}
+                                ۲۰۲۲ - ۲۰۲۳
+                            {% else %}
+                                2022 - 2023
+                            {% endif %}
+                        </div>
+                        <h3 class="timeline-title">
+                            {% if LANGUAGE_CODE == 'fa' %}
+                                شروع سفر برنامه‌نویسی
+                            {% else %}
+                                Started Programming Journey
+                            {% endif %}
+                        </h3>
+                        <p class="timeline-company">
+                            {% if LANGUAGE_CODE == 'fa' %}
+                                خودآموز
+                            {% else %}
+                                Self-Learning
+                            {% endif %}
+                        </p>
+                        <p class="timeline-description">
+                            {% if LANGUAGE_CODE == 'fa' %}
+                                یادگیری مبانی برنامه‌نویسی، Python، و اصول توسعه وب. ساختن پروژه‌های شخصی و کسب تجربه عملی.
+                            {% else %}
+                                Learning programming fundamentals, Python, and web development principles. Building personal projects and gaining practical experience.
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="timeline-dot"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Skills Section -->
+<section class="section">
+    <div class="container">
+        <div class="section-header fade-in-up">
+            <h2 class="section-title">
+                {% if LANGUAGE_CODE == 'fa' %}
+                    مهارت‌ها و تخصص‌ها
+                {% else %}
+                    Skills & Expertise
+                {% endif %}
+            </h2>
+            <p class="section-subtitle">
+                {% if LANGUAGE_CODE == 'fa' %}
+                    تکنولوژی‌ها و ابزارهایی که با آن‌ها کار می‌کنم
+                {% else %}
+                    Technologies and tools I work with
+                {% endif %}
+            </p>
+        </div>
+
+        <div class="skills-grid">
+            {% for category, skills_in_category in skills.items %}
+            <div class="skill-category fade-in-up stagger-{{ forloop.counter }}">
+                <div class="skill-icon">
+                    {% if category == 'programming' %}
+                        <i class="fas fa-code"></i>
+                    {% elif category == 'framework' %}
+                        <i class="fas fa-layer-group"></i>
+                    {% elif category == 'database' %}
+                        <i class="fas fa-database"></i>
+                    {% elif category == 'tool' %}
+                        <i class="fas fa-tools"></i>
+                    {% else %}
+                        <i class="fas fa-star"></i>
+                    {% endif %}
+                </div>
+                <h3 class="skill-category-title">
+                    {% if category == 'programming' %}
+                        {% if LANGUAGE_CODE == 'fa' %}
+                            زبان‌های برنامه‌نویسی
+                        {% else %}
+                            Programming Languages
+                        {% endif %}
+                    {% elif category == 'framework' %}
+                        {% if LANGUAGE_CODE == 'fa' %}
+                            فریمورک‌ها
+                        {% else %}
+                            Frameworks
+                        {% endif %}
+                    {% elif category == 'database' %}
+                        {% if LANGUAGE_CODE == 'fa' %}
+                            پایگاه داده
+                        {% else %}
+                            Databases
+                        {% endif %}
+                    {% elif category == 'tool' %}
+                        {% if LANGUAGE_CODE == 'fa' %}
+                            ابزارها و تکنولوژی‌ها
+                        {% else %}
+                            Tools & Technologies
+                        {% endif %}
+                    {% else %}
+                        {% if LANGUAGE_CODE == 'fa' %}
+                            سایر
+                        {% else %}
+                            Other
+                        {% endif %}
+                    {% endif %}
+                </h3>
+                <div class="skills-list">
+                    {% for skill in skills_in_category %}
+                    <span class="skill-badge">
+                        {{ skill.name }}
+                        <span class="skill-level">{{ skill.get_level_display }}</span>
+                    </span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% empty %}
+            <!-- Default skills if none are in database -->
+            <div class="skill-category fade-in-up stagger-1">
+                <div class="skill-icon">
+                    <i class="fas fa-code"></i>
+                </div>
+                <h3 class="skill-category-title">
+                    {% if LANGUAGE_CODE == 'fa' %}
+                        زبان‌های برنامه‌نویسی
+                    {% else %}
+                        Programming Languages
+                    {% endif %}
+                </h3>
+                <div class="skills-list">
+                    <span class="skill-badge">Python <span class="skill-level">Expert</span></span>
+
+                    <!--<span class="skill-badge">SQL <span class="skill-level">Advanced</span></span>-->
+                    <span class="skill-badge">HTML/CSS <span class="skill-level">Advanced</span></span>
+                </div>
+            </div>
+
+            <div class="skill-category fade-in-up stagger-2">
+                <div class="skill-icon">
+                    <i class="fas fa-layer-group"></i>
+                </div>
+                <h3 class="skill-category-title">
+                    {% if LANGUAGE_CODE == 'fa' %}
+                        فریمورک‌ها
+                    {% else %}
+                        Frameworks
+                    {% endif %}
+                </h3>
+                <div class="skills-list">
+                    <span class="skill-badge">Django <span class="skill-level">Expert</span></span>
+                    <span class="skill-badge">Django REST <span class="skill-level">Advanced</span></span>
+
+                </div>
+            </div>
+
+            <div class="skill-category fade-in-up stagger-3">
+                <div class="skill-icon">
+                    <i class="fas fa-database"></i>
+                </div>
+                <h3 class="skill-category-title">
+                    {% if LANGUAGE_CODE == 'fa' %}
+                        پایگاه داده
+                    {% else %}
+                        Databases
+                    {% endif %}
+                </h3>
+                <div class="skills-list">
+                    <span class="skill-badge">MySQL <span class="skill-level">Advanced</span></span>
+                    <!--<span class="skill-badge">PostgreSQL <span class="skill-level">Advanced</span></span>
+
+                    <span class="skill-badge">SQLite <span class="skill-level">Expert</span></span>
+                    <span class="skill-badge">Redis <span class="skill-level">Intermediate</span></span>-->
+                </div>
+            </div>
+
+            <div class="skill-category fade-in-up stagger-4">
+                <div class="skill-icon">
+                    <i class="fas fa-tools"></i>
+                </div>
+                <h3 class="skill-category-title">
+                    {% if LANGUAGE_CODE == 'fa' %}
+                        ابزارها و تکنولوژی‌ها
+                    {% else %}
+                        Tools & Technologies
+                    {% endif %}
+                </h3>
+                <div class="skills-list">
+                    <span class="skill-badge">Git <span class="skill-level">Advanced</span></span>
+
+                    <span class="skill-badge">Linux <span class="skill-level">Intermediate</span></span>
+                    <!--<span class="skill-badge">Docker <span class="skill-level">Intermediate</span></span>
+                    <span class="skill-badge">AWS <span class="skill-level">Beginner</span></span>-->
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="cta-section">
+    <div class="container">
+        <div class="cta-content fade-in-up">
+            <h2 class="cta-title">
+                {% if LANGUAGE_CODE == 'fa' %}
+                    آماده همکاری هستم!
+                {% else %}
+                    Ready to Work Together!
+                {% endif %}
+            </h2>
+            <p class="cta-description">
+                {% if LANGUAGE_CODE == 'fa' %}
+                    اگر به دنبال یک توسعه‌دهنده با تجربه برای پروژه بعدی‌تان هستید، بیایید صحبت کنیم.
+                {% else %}
+                    If you're looking for an experienced developer for your next project, let's talk.
+                {% endif %}
+            </p>
+            <div class="cta-buttons">
+                <a href="{% url 'contact' %}" class="btn btn-primary">
+                    <i class="fas fa-envelope"></i>
+                    {% if LANGUAGE_CODE == 'fa' %}
+                        تماس با من
+                    {% else %}
+                        Contact Me
+                    {% endif %}
+                </a>
+                <a href="{% url 'project_list' %}" class="btn btn-secondary">
+                    <i class="fas fa-folder-open"></i>
+                    {% if LANGUAGE_CODE == 'fa' %}
+                        مشاهده پروژه‌ها
+                    {% else %}
+                        View Projects
+                    {% endif %}
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Animation Observer
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                entry.target.style.animationPlayState = 'running';
+                observer.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+
+    // Observe all animation elements
+    document.querySelectorAll('.fade-in-up').forEach(el => {
+        el.style.animationPlayState = 'paused';
+        observer.observe(el);
+    });
+
+    // Skill badge interactions
+    document.querySelectorAll('.skill-badge').forEach(badge => {
+        badge.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-3px) scale(1.05)';
+        });
+
+        badge.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(-2px) scale(1)';
+        });
+
+        // Click to copy skill name
+        badge.addEventListener('click', function() {
+            const skillName = this.textContent.split('\n')[0].trim();
+
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(skillName).then(() => {
+                    showToast(`${skillName} copied to clipboard!`);
+                });
+            }
+        });
+
+        badge.style.cursor = 'pointer';
+        badge.title = 'Click to copy';
+    });
+
+    // Animated counter for stats
+    function animateValue(element, start, end, duration) {
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            const currentValue = Math.floor(progress * (end - start) + start);
+
+            if (element.textContent.includes('+')) {
+                element.textContent = currentValue + '+';
+            } else if (element.textContent.includes('%')) {
+                element.textContent = currentValue + '%';
+            } else {
+                element.textContent = currentValue;
+            }
+
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
+
+    // Trigger counter animation when stats come into view
+    const statsObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                const statNumbers = entry.target.querySelectorAll('.stat-number');
+                statNumbers.forEach(stat => {
+                    const text = stat.textContent;
+                    const value = parseInt(text.match(/\d+/)[0]);
+                    animateValue(stat, 0, value, 2000);
+                });
+                statsObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.5 });
+
+    const statsSection = document.querySelector('.intro-stats');
+    if (statsSection) {
+        statsObserver.observe(statsSection);
+    }
+
+    // Smooth parallax effect for profile image
+    let ticking = false;
+
+    function updateParallax() {
+        const scrolled = window.pageYOffset;
+        const parallax = document.querySelector('.profile-placeholder');
+
+        if (parallax) {
+            const speed = scrolled * 0.2;
+            parallax.style.transform = `translateY(${speed}px) scale(${1 + scrolled * 0.0001})`;
+        }
+
+        ticking = false;
+    }
+
+    function requestTick() {
+        if (!ticking) {
+            requestAnimationFrame(updateParallax);
+            ticking = true;
+        }
+    }
+
+    window.addEventListener('scroll', requestTick);
+
+    // Timeline items hover effect
+    document.querySelectorAll('.timeline-content').forEach(item => {
+        item.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-8px) scale(1.02)';
+        });
+
+        item.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(-5px) scale(1)';
+        });
+    });
+
+    // Toast notification function
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.textContent = message;
+        toast.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--accent-primary);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            z-index: 10000;
+            font-size: 0.9rem;
+            font-weight: 500;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-lg);
+        `;
+
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+            toast.style.opacity = '1';
+            toast.style.transform = 'translateY(0)';
+        }, 100);
+
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                if (document.body.contains(toast)) {
+                    document.body.removeChild(toast);
+                }
+            }, 300);
+        }, 3000);
+    }
+
+    // Profile image placeholder click effect
+    const profilePlaceholder = document.querySelector('.profile-placeholder');
+    if (profilePlaceholder) {
+        profilePlaceholder.addEventListener('click', function() {
+            this.style.animation = 'none';
+            this.offsetHeight; // Trigger reflow
+            this.style.animation = 'shine 1s ease-in-out';
+        });
+    }
+
+    // Intersection Observer for timeline dots
+    const timelineObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                const dot = entry.target.querySelector('.timeline-dot');
+                if (dot) {
+                    dot.style.animation = 'pulse 1.5s infinite';
+                }
+            }
+        });
+    }, { threshold: 0.8 });
+
+    document.querySelectorAll('.timeline-item').forEach(item => {
+        timelineObserver.observe(item);
+    });
+
+    // Add pulse animation for timeline dots
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+        }
+    `;
+    document.head.appendChild(style);
+
+    // Dynamic typing effect for intro tagline
+    const tagline = document.querySelector('.intro-tagline');
+    if (tagline) {
+        const text = tagline.textContent;
+        tagline.textContent = '';
+        let i = 0;
+
+        function typeWriter() {
+            if (i < text.length) {
+                tagline.textContent += text.charAt(i);
+                i++;
+                setTimeout(typeWriter, 100);
+            }
+        }
+
+        // Start typing when the element comes into view
+        const typingObserver = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    setTimeout(typeWriter, 1000);
+                    typingObserver.unobserve(entry.target);
+                }
+            });
+        });
+
+        typingObserver.observe(tagline);
+    }
+</script>
 {% endblock %}

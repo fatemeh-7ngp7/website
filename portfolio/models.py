@@ -69,7 +69,7 @@ class CodeSample(models.Model):
     language = models.CharField(max_length=50, choices=LANGUAGE_CHOICES)
     difficulty = models.CharField(max_length=20, choices=DIFFICULTY_CHOICES, blank=True, null=True)
     tags = models.CharField(max_length=200, help_text="Comma-separated tags", blank=True)
-
+    featured = models.BooleanField(default=False)
     # Additional fields referenced in templates
     filename = models.CharField(max_length=100, blank=True, help_text="Optional filename for the code")
     lines_of_code = models.IntegerField(blank=True, null=True)

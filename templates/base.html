@@ -1,220 +1,471 @@
-<!-- Updated base.html with Dark Mode Toggle -->
-{% load i18n %}
-{% load static %}
-{% get_current_language as LANGUAGE_CODE %}
 <!DOCTYPE html>
+{% load static %}
+{% load i18n %}
+{% get_current_language as LANGUAGE_CODE %}
 <html lang="{{ LANGUAGE_CODE }}" dir="{% if LANGUAGE_CODE == 'fa' %}rtl{% else %}ltr{% endif %}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}{% trans "Fatemeh NGP - Portfolio" %}{% endblock %}</title>
-    <meta name="description" content="{% block description %}{% trans "Backend developer portfolio showcasing projects and skills" %}{% endblock %}">
-    <link rel="icon" href="{% static 'favicon/favicon.ico' %}" type="image/x-icon">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- CSS -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-tomorrow.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <title>{% block title %}{% trans "Portfolio" %}{% endblock %}</title>
 
-    <!-- RTL Support for Persian -->
-    {% if LANGUAGE_CODE == 'fa' %}
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/samim-font@v4.0.5/dist/font-face.css" rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{% static 'favicon/favicon.ico' %}">
+
     <style>
-        /* RTL-specific styles */
-        .nav-menu {
+        :root {
+            /* Light mode colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-tertiary: #f1f5f9;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border-color: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+
+            /* Accent color */
+            --accent-primary: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-light: #dbeafe;
+
+            /* Typography */
+            --font-en: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-fa: 'Samim', 'Tahoma', sans-serif;
+
+            /* Transitions */
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Dark mode colors */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-primary: #0f172a;
+                --bg-secondary: #1e293b;
+                --bg-tertiary: #334155;
+                --text-primary: #f1f5f9;
+                --text-secondary: #cbd5e1;
+                --text-muted: #94a3b8;
+                --border-color: #334155;
+                --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.3), 0 1px 2px -1px rgb(0 0 0 / 0.3);
+                --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.3), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+                --accent-light: #1e40af;
+            }
+        }
+
+        /* Manual dark mode override */
+        [data-theme="dark"] {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.3), 0 1px 2px -1px rgb(0 0 0 / 0.3);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.3), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+            --accent-light: #1e40af;
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-tertiary: #f1f5f9;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border-color: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --accent-light: #dbeafe;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-en);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: var(--transition);
+        }
+
+        /* Persian font for Persian text */
+        [lang="fa"], .fa-text {
+            font-family: var(--font-fa);
             direction: rtl;
         }
-        .nav-logo {
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-primary);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+            transition: var(--transition);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+            text-decoration: none;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+        }
+
+        .logo img {
+            margin-right: 8px;
+        }
+
+        [dir="rtl"] .logo img {
             margin-right: 0;
-            margin-left: auto;
+            margin-left: 8px;
         }
-        .language-switcher {
-            direction: ltr;
+
+        .logo:hover {
+            color: var(--accent-hover);
         }
-        /* Add more RTL styles as needed */
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--accent-primary);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent-primary);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover::after, .nav-links a.active::after {
+            width: 100%;
+        }
+
+        /* Controls */
+        .nav-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .theme-toggle, .lang-toggle {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: var(--transition);
+        }
+
+        .theme-toggle:hover, .lang-toggle:hover {
+            background: var(--bg-secondary);
+            color: var(--accent-primary);
+        }
+
+        /* Mobile menu */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Main content */
+        main {
+            margin-top: 80px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-container {
+                padding: 1rem;
+            }
+
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: var(--bg-primary);
+                border-bottom: 1px solid var(--border-color);
+                flex-direction: column;
+                padding: 1rem;
+                gap: 1rem;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .nav-controls {
+                gap: 0.5rem;
+            }
+        }
+
+        /* Utility classes */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .section {
+            padding: 4rem 0;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-primary {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-tertiary);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
     </style>
-    {% endif %}
+
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar" id="navbar">
+    <nav class="navbar">
         <div class="nav-container">
-            <div class="nav-logo">
-                <a href="{% url 'home' %}">Fatemeh NGP</a>
-            </div>
-            <div class="nav-menu" id="nav-menu">
-                <a href="{% url 'home' %}" class="nav-link">{% trans "Home" %}</a>
-                <a href="{% url 'about' %}" class="nav-link">{% trans "About" %}</a>
-                <a href="{% url 'project_list' %}" class="nav-link">{% trans "Projects" %}</a>
-                <a href="{% url 'code_sample_list' %}" class="nav-link">{% trans "Code" %}</a>
-                <a href="{% url 'blog_list' %}" class="nav-link">{% trans "Blog" %}</a>
-                <a href="{% url 'contact' %}" class="nav-link">{% trans "Contact" %}</a>
-            </div>
+            <a href="{% url 'home' %}" class="logo">
+                <img src="{% static 'favicon/favicon.ico' %}" alt="Logo" style="width: 24px; height: 24px; margin-left: 8px;">
+                {% if LANGUAGE_CODE == 'fa' %}
+                    Fatemeh NGP
+                {% else %}
+                    Fatemeh NGP
+                {% endif %}
+            </a>
 
-            <!-- Dark Mode Toggle -->
-            <div class="theme-switcher">
-                <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
-                    <i class="fas fa-sun" id="themeIcon"></i>
-                </button>
-            </div>
-
-            <!-- Language Switcher -->
-            <div class="language-switcher">
-                <div class="language-dropdown">
-                    <button class="language-btn" id="languageBtn">
-                        <i class="fas fa-globe"></i>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="/#home">{% trans "Home" %}</a></li>
+                <li><a href="/#projects">{% trans "Projects" %}</a></li>
+                <li>
+                    <a href="/#skills">
                         {% if LANGUAGE_CODE == 'fa' %}
-                            فارسی
+                            مهارت‌ها
                         {% else %}
-                            English
+                            Skills
                         {% endif %}
-                        <i class="fas fa-chevron-down"></i>
-                    </button>
-                    <div class="language-options" id="languageOptions">
-                        {% get_available_languages as LANGUAGES %}
-                        {% get_language_info_list for LANGUAGES as languages %}
-                        {% for language in languages %}
-                            <form action="{% url 'set_language' %}" method="post" class="language-form">
-                                {% csrf_token %}
-                                <input name="next" type="hidden" value="{{ request.get_full_path }}">
-                                <input name="language" type="hidden" value="{{ language.code }}">
-                                <button type="submit" class="language-option {% if language.code == LANGUAGE_CODE %}active{% endif %}">
-                                    {% if language.code == 'fa' %}
-                                        <span class="flag">🇮🇷</span> فارسی
-                                    {% else %}
-                                        <span class="flag">🇺🇸</span> English
-                                    {% endif %}
-                                </button>
-                            </form>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
+                    </a>
+                </li>
+                <li><a href="/#blog">{% trans "Blog" %}</a></li>
+                <li><a href="/#contact">{% trans "Contact" %}</a></li>
+            </ul>
 
-            <div class="nav-toggle" id="nav-toggle">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
+            <div class="nav-controls">
+                <!-- Theme Toggle -->
+                <button class="theme-toggle" id="themeToggle" title="{% trans 'Toggle theme' %}">
+                    <i class="fas fa-moon" id="themeIcon"></i>
+                </button>
+
+                <!-- Language Toggle -->
+                <form method="post" action="{% url 'set_language' %}" style="display: inline;">
+                    {% csrf_token %}
+                    <input name="next" type="hidden" value="{{ request.get_full_path|slice:'3:' }}">
+                    <input name="language" type="hidden" value="{% if LANGUAGE_CODE == 'en' %}fa{% else %}en{% endif %}">
+                    <button type="submit" class="lang-toggle" title="{% trans 'Change language' %}">
+                        {% if LANGUAGE_CODE == 'en' %}فا{% else %}EN{% endif %}
+                    </button>
+                </form>
+
+                <!-- Mobile Menu Button -->
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
             </div>
         </div>
     </nav>
 
     <!-- Main Content -->
     <main>
-        {% block content %}
-        {% endblock %}
+        {% block content %}{% endblock %}
     </main>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h4>{% trans "Connect" %}</h4>
-                    <div class="social-links">
-                        <a href="https://github.com/fatemeh-7ngp7"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label="GitHub"
-                            title="{% if LANGUAGE_CODE == 'fa' %}مشاهده پروفایل گیتهاب من{% else %}View my GitHub profile{% endif %}">
-                            <i class="fab fa-github"></i>
-                        </a>
-                        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
-                        <a href="https://www.instagram.com/fatemeh7najafgholipour7/"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label="Instagram">
-                            <i class="fab fa-instagram"></i>
-                        </a>
-                        <a href="mailto:najafgholipoorfatemeh@gmail.com?subject={% if LANGUAGE_CODE == 'fa' %}تماس از وبسایت{% else %}Contact from website{% endif %}&body={% if LANGUAGE_CODE == 'fa' %}سلام فاطمه،{% else %}Hello Fatemeh,{% endif %}"
-                            aria-label="Email">
-                            <i class="fas fa-envelope"></i>
-                        </a>
-                    </div>
-                </div>
-                <div class="footer-section">
-                    <p>&copy; 2025 Fatemeh NGP. {% trans "All rights reserved." %}</p>
-                </div>
-            </div>
-        </div>
-    </footer>
-
     <!-- JavaScript -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-python.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-javascript.min.js"></script>
-
-    <!-- Dark Mode & Language Switcher Script -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Dark Mode Toggle
-            const themeToggle = document.getElementById('themeToggle');
-            const themeIcon = document.getElementById('themeIcon');
-            const body = document.body;
+        // Theme Management
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        const body = document.body;
 
-            // Check for saved theme preference or default to light mode
-            const currentTheme = localStorage.getItem('theme') || 'light';
+        // Check for saved theme or default to system preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
-            // Apply the current theme
-            if (currentTheme === 'dark') {
-                body.classList.add('dark-theme');
-                themeIcon.classList.remove('fa-sun');
-                themeIcon.classList.add('fa-moon');
-            }
+        if (savedTheme) {
+            body.setAttribute('data-theme', savedTheme);
+            updateThemeIcon(savedTheme);
+        } else if (systemDark) {
+            body.setAttribute('data-theme', 'dark');
+            updateThemeIcon('dark');
+        } else {
+            body.setAttribute('data-theme', 'light');
+            updateThemeIcon('light');
+        }
 
-            // Theme toggle functionality
-            themeToggle.addEventListener('click', function() {
-                body.classList.toggle('dark-theme');
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
 
-                if (body.classList.contains('dark-theme')) {
-                    themeIcon.classList.remove('fa-sun');
-                    themeIcon.classList.add('fa-moon');
-                    localStorage.setItem('theme', 'dark');
-                } else {
-                    themeIcon.classList.remove('fa-moon');
-                    themeIcon.classList.add('fa-sun');
-                    localStorage.setItem('theme', 'light');
-                }
-            });
+            body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        });
 
-            // Language Switcher
-            const languageBtn = document.getElementById('languageBtn');
-            const languageOptions = document.getElementById('languageOptions');
+        function updateThemeIcon(theme) {
+            themeIcon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+        }
 
-            if (languageBtn && languageOptions) {
-                languageBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    languageOptions.classList.toggle('show');
-                });
+        // Mobile Menu
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const navLinks = document.getElementById('navLinks');
 
-                // Close dropdown when clicking outside
-                document.addEventListener('click', function(e) {
-                    if (!languageBtn.contains(e.target) && !languageOptions.contains(e.target)) {
-                        languageOptions.classList.remove('show');
-                    }
-                });
-            }
+        mobileMenuBtn.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
 
-            // Mobile menu toggle
-            const navToggle = document.getElementById('nav-toggle');
-            const navMenu = document.getElementById('nav-menu');
-
-            if (navToggle && navMenu) {
-                navToggle.addEventListener('click', function() {
-                    navMenu.classList.toggle('active');
-                    navToggle.classList.toggle('active');
-                });
-            }
-
-            // Navbar scroll effect
-            const navbar = document.getElementById('navbar');
-            window.addEventListener('scroll', function() {
-                if (window.scrollY > 50) {
-                    navbar.classList.add('scrolled');
-                } else {
-                    navbar.classList.remove('scrolled');
+        // Smooth Scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                    // Close mobile menu
+                    navLinks.classList.remove('active');
                 }
             });
         });
+
+        // Active Navigation
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('section[id]');
+            const scrollPos = window.scrollY + 100;
+
+            sections.forEach(section => {
+                const top = section.offsetTop;
+                const height = section.offsetHeight;
+                const id = section.getAttribute('id');
+                const navLink = document.querySelector(`a[href="#${id}"]`);
+
+                if (scrollPos >= top && scrollPos < top + height) {
+                    document.querySelectorAll('.nav-links a').forEach(link =>
+                        link.classList.remove('active')
+                    );
+                    if (navLink) navLink.classList.add('active');
+                }
+            });
+        });
+
+        // Listen for system theme changes
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            if (!localStorage.getItem('theme')) {
+                const newTheme = e.matches ? 'dark' : 'light';
+                body.setAttribute('data-theme', newTheme);
+                updateThemeIcon(newTheme);
+            }
+        });
     </script>
+
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

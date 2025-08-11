@@ -1,61 +1,717 @@
-<!-- templates/portfolio/blog_list.html -->
 {% extends 'base.html' %}
+{% load static %}
 {% load i18n %}
 
-{% block title %}Blog - Fatemeh NGP{% endblock %}
+{% block title %}{% trans "Blog" %} - {% trans "Portfolio" %}{% endblock %}
 
-{% block description %}Read my latest blog posts about web development, programming, and technology{% endblock %}
+{% block extra_css %}
+<style>
+    /* Blog Header */
+    .blog-header-section {
+        background: linear-gradient(135deg,
+            var(--bg-primary) 0%,
+            var(--bg-secondary) 25%,
+            rgba(59, 130, 246, 0.1) 50%,
+            rgba(168, 85, 247, 0.1) 75%,
+            var(--bg-tertiary) 100%);
+        padding: 6rem 0 4rem;
+        position: relative;
+        overflow: hidden;
+        margin-top: 0;
+    }
+
+    [data-theme="dark"] .blog-header-section {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 25%, #0f3460 50%, #533483 75%, #7209b7 100%);
+    }
+
+    .blog-header-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background:
+            radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(168, 85, 247, 0.12) 0%, transparent 50%),
+            radial-gradient(circle at 40% 80%, rgba(34, 197, 94, 0.08) 0%, transparent 50%);
+    }
+
+    [data-theme="dark"] .blog-header-section::before {
+        background:
+            radial-gradient(circle at 20% 50%, rgba(114, 9, 183, 0.4) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(59, 130, 246, 0.3) 0%, transparent 50%),
+            radial-gradient(circle at 40% 80%, rgba(168, 85, 247, 0.35) 0%, transparent 50%);
+    }
+
+    .blog-header-section::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%233b82f6' fill-opacity='0.04'%3E%3Cpath d='M60 2L62 58L60 60L58 58L60 2ZM2 60L58 58L60 60L58 62L2 60ZM60 118L58 62L60 60L62 62L60 118ZM118 60L62 62L60 60L62 58L118 60Z'/%3E%3C/g%3E%3C/svg%3E");
+        opacity: 0.6;
+    }
+
+    [data-theme="dark"] .blog-header-section::after {
+        background: url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.08'%3E%3Cpath d='M60 2L62 58L60 60L58 58L60 2ZM2 60L58 58L60 60L58 62L2 60ZM60 118L58 62L60 60L62 62L60 118ZM118 60L62 62L60 60L62 58L118 60Z'/%3E%3C/g%3E%3C/svg%3E");
+        opacity: 0.8;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        33% { transform: translateY(-10px) rotate(1deg); }
+        66% { transform: translateY(10px) rotate(-1deg); }
+    }
+
+    .blog-header-content {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+    }
+
+    .blog-title {
+        font-size: clamp(2.5rem, 5vw, 4rem);
+        font-weight: 800;
+        margin-bottom: 1.5rem;
+        background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-primary) 50%, #8b5cf6 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: shimmer 3s ease-in-out infinite;
+        background-size: 200% 200%;
+    }
+
+    @keyframes shimmer {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+
+    .blog-subtitle {
+        font-size: 1.2rem;
+        color: var(--text-secondary);
+        max-width: 600px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    /* Filter Section */
+    .filters-section {
+        background: var(--bg-secondary);
+        padding: 1.5rem 0;
+        border-bottom: 1px solid var(--border-color);
+        position: sticky;
+        top: 80px;
+        z-index: 100;
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+    }
+
+    .filters-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+    }
+
+    .filter-tags {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .filter-tag {
+        padding: 0.5rem 1.25rem;
+        border: 1px solid var(--border-color);
+        border-radius: 25px;
+        background: var(--bg-primary);
+        color: var(--text-secondary);
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: var(--transition);
+        cursor: pointer;
+        white-space: nowrap;
+    }
+
+    .filter-tag:hover,
+    .filter-tag.active {
+        background: var(--accent-primary);
+        color: white;
+        border-color: var(--accent-primary);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+    }
+
+    .search-container {
+        position: relative;
+        min-width: 250px;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 0.75rem 1rem 0.75rem 2.5rem;
+        border: 1px solid var(--border-color);
+        border-radius: 25px;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        font-size: 0.9rem;
+        outline: none;
+        transition: var(--transition);
+    }
+
+    .search-input:focus {
+        border-color: var(--accent-primary);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        cursor: pointer;
+    }
+
+    /* Blog Posts Section */
+    .blog-posts-section {
+        padding: 4rem 0;
+    }
+
+    .blog-grid {
+        display: grid;
+        gap: 3rem;
+        margin-bottom: 4rem;
+    }
+
+    .blog-card {
+        background: var(--bg-secondary);
+        border-radius: 1.5rem;
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        backdrop-filter: blur(10px);
+    }
+
+    .blog-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(135deg, var(--accent-primary), #8b5cf6);
+        transform: scaleX(0);
+        transition: transform 0.4s ease;
+    }
+
+    .blog-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        border-color: var(--accent-primary);
+    }
+
+    .blog-card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .blog-card-content {
+        padding: 2.5rem;
+    }
+
+    .blog-meta {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
+
+    .meta-item i {
+        color: var(--accent-primary);
+        font-size: 0.85rem;
+    }
+
+    .blog-post-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: var(--text-primary);
+        text-decoration: none;
+        display: block;
+        transition: var(--transition);
+        line-height: 1.3;
+    }
+
+    .blog-post-title:hover {
+        color: var(--accent-primary);
+    }
+
+    .blog-excerpt {
+        color: var(--text-secondary);
+        margin-bottom: 2rem;
+        line-height: 1.7;
+        font-size: 1.05rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .blog-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .read-more {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--accent-primary);
+        text-decoration: none;
+        font-weight: 600;
+        transition: var(--transition);
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        background: var(--accent-light);
+    }
+
+    .read-more:hover {
+        color: white;
+        background: var(--accent-primary);
+        transform: translateX(5px);
+        box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+    }
+
+    .reading-time {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        background: var(--bg-tertiary);
+        padding: 0.4rem 0.8rem;
+        border-radius: 15px;
+        border: 1px solid var(--border-color);
+    }
+
+    /* Pagination */
+    .pagination-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 4rem;
+    }
+
+    .pagination {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        list-style: none;
+    }
+
+    .pagination a, .pagination span {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 44px;
+        height: 44px;
+        border-radius: 0.75rem;
+        text-decoration: none;
+        font-weight: 500;
+        transition: var(--transition);
+        border: 1px solid var(--border-color);
+    }
+
+    .pagination a {
+        background: var(--bg-secondary);
+        color: var(--text-secondary);
+    }
+
+    .pagination a:hover {
+        background: var(--accent-primary);
+        color: white;
+        border-color: var(--accent-primary);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+    }
+
+    .pagination .current {
+        background: var(--accent-primary);
+        color: white;
+        border-color: var(--accent-primary);
+    }
+
+    .pagination .disabled {
+        background: var(--bg-tertiary);
+        color: var(--text-muted);
+        border-color: var(--border-color);
+        cursor: not-allowed;
+        opacity: 0.5;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 6rem 2rem;
+        color: var(--text-secondary);
+    }
+
+    .empty-state i {
+        font-size: 5rem;
+        color: var(--text-muted);
+        margin-bottom: 2rem;
+        opacity: 0.5;
+    }
+
+    .empty-state h3 {
+        font-size: 1.75rem;
+        margin-bottom: 1rem;
+        color: var(--text-primary);
+        font-weight: 600;
+    }
+
+    .empty-state p {
+        font-size: 1.1rem;
+        max-width: 500px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    /* Stats Section */
+    .blog-stats {
+        background: var(--bg-secondary);
+        padding: 3rem 0;
+        border-top: 1px solid var(--border-color);
+        margin-top: 4rem;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 2rem;
+        text-align: center;
+    }
+
+    .stat-card {
+        background: var(--bg-primary);
+        padding: 2rem;
+        border-radius: 1rem;
+        border: 1px solid var(--border-color);
+        transition: var(--transition);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--accent-primary);
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--accent-primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 500;
+    }
+
+    /* RTL Support */
+    [dir="rtl"] .blog-meta {
+        flex-direction: row-reverse;
+    }
+
+    [dir="rtl"] .blog-footer {
+        flex-direction: row-reverse;
+    }
+
+    [dir="rtl"] .read-more:hover {
+        transform: translateX(-5px);
+    }
+
+    [dir="rtl"] .read-more i {
+        transform: rotate(180deg);
+    }
+
+    [dir="rtl"] .pagination {
+        flex-direction: row-reverse;
+    }
+
+    [dir="rtl"] .filters-container {
+        flex-direction: row-reverse;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .blog-header-section {
+            padding: 4rem 0 3rem;
+        }
+
+        .blog-title {
+            font-size: 2.5rem;
+        }
+
+        .filters-section {
+            padding: 1rem 0;
+            top: 60px;
+        }
+
+        .filters-container {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: stretch;
+        }
+
+        .filter-tags {
+            justify-content: center;
+            gap: 0.5rem;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            padding-bottom: 0.5rem;
+        }
+
+        .filter-tags::-webkit-scrollbar {
+            display: none;
+        }
+
+        .filter-tag {
+            padding: 0.4rem 1rem;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .search-container {
+            min-width: auto;
+            width: 100%;
+        }
+
+        .blog-posts-section {
+            padding: 2rem 0;
+        }
+
+        .blog-card-content {
+            padding: 2rem;
+        }
+
+        .blog-post-title {
+            font-size: 1.5rem;
+        }
+
+        .blog-footer {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        [dir="rtl"] .blog-footer {
+            align-items: flex-end;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    /* Animation Classes */
+    .fade-in-up {
+        opacity: 0;
+        transform: translateY(30px);
+        animation: fadeInUp 0.6s ease-out forwards;
+    }
+
+    @keyframes fadeInUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .stagger-1 { animation-delay: 0.1s; }
+    .stagger-2 { animation-delay: 0.2s; }
+    .stagger-3 { animation-delay: 0.3s; }
+    .stagger-4 { animation-delay: 0.4s; }
+    .stagger-5 { animation-delay: 0.5s; }
+    .stagger-6 { animation-delay: 0.6s; }
+</style>
+{% endblock %}
 
 {% block content %}
-<section class="blog-section">
+<!-- Blog Header Section -->
+<section class="blog-header-section">
     <div class="container">
-        <div class="section-header">
-            <h1>{% trans "My Blog" %}</h1>
-            <p>{% trans "Thoughts, tutorials, and insights on web development and technology" %}</p>
+        <div class="blog-header-content fade-in-up">
+            <h1 class="blog-title">
+                {% if LANGUAGE_CODE == 'fa' %}
+                    وبلاگ
+                {% else %}
+                    {% trans "Blog" %}
+                {% endif %}
+            </h1>
+            <p class="blog-subtitle">
+                {% if LANGUAGE_CODE == 'fa' %}
+                    به اشتراک‌گذاری تجربیات، ایده‌ها و آموزش‌های برنامه‌نویسی
+                {% else %}
+                    {% trans "Sharing experiences, ideas, and programming tutorials" %}
+                {% endif %}
+            </p>
         </div>
+    </div>
+</section>
 
+<!-- Filter Section -->
+<section class="filters-section" role="navigation" aria-label="Blog filters">
+    <div class="container">
+        <div class="filters-container fade-in-up stagger-1">
+            <div class="filter-tags" role="group" aria-label="{% if LANGUAGE_CODE == 'fa' %}فیلتر مقالات{% else %}Article filters{% endif %}">
+                <a href="{% url 'blog_list' %}"
+                   class="filter-tag active"
+                   data-filter="all"
+                   aria-pressed="true">
+                    {% if LANGUAGE_CODE == 'fa' %}
+                        همه مقالات
+                    {% else %}
+                        All Posts
+                    {% endif %}
+                </a>
+
+                <a href="?category=django"
+                   class="filter-tag"
+                   data-filter="django"
+                   aria-pressed="false">Django</a>
+
+                <a href="?category=python"
+                   class="filter-tag"
+                   data-filter="python"
+                   aria-pressed="false">Python</a>
+
+                <a href="?category=tutorial"
+                   class="filter-tag"
+                   data-filter="tutorial"
+                   aria-pressed="false">
+                    {% if LANGUAGE_CODE == 'fa' %}
+                        آموزش‌ها
+                    {% else %}
+                        Tutorials
+                    {% endif %}
+                </a>
+
+                <a href="?category=tips"
+                   class="filter-tag"
+                   data-filter="tips"
+                   aria-pressed="false">
+                    {% if LANGUAGE_CODE == 'fa' %}
+                        نکته‌ها
+                    {% else %}
+                        Tips & Tricks
+                    {% endif %}
+                </a>
+            </div>
+
+            <div class="search-container">
+                <i class="fas fa-search search-icon" aria-hidden="true"></i>
+                <input type="text"
+                       class="search-input"
+                       id="searchInput"
+                       placeholder="{% if LANGUAGE_CODE == 'fa' %}جستجو در مقالات...{% else %}Search articles...{% endif %}"
+                       aria-label="{% if LANGUAGE_CODE == 'fa' %}جستجو در مقالات وبلاگ{% else %}Search blog articles{% endif %}">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Blog Posts -->
+<section class="blog-posts-section">
+    <div class="container">
         {% if blog_list %}
-            <div class="blog-grid">
+            <div class="blog-grid" id="blogGrid">
                 {% for post in blog_list %}
-                    <article class="blog-card">
-                        {% if post.featured_image %}
-                            <div class="blog-image">
-                                <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" loading="lazy">
-                            </div>
-                        {% endif %}
-                        
-                        <div class="blog-content">
+                    <article class="blog-card fade-in-up stagger-{{ forloop.counter|add:1 }}"
+                            data-title="{{ post.title|lower }}"
+                            data-excerpt="{{ post.excerpt|lower }}">
+                        <div class="blog-card-content">
+                            <!-- Blog Meta -->
                             <div class="blog-meta">
-                                <span class="blog-date">
+                                <div class="meta-item">
                                     <i class="fas fa-calendar-alt"></i>
-                                    {{ post.created_at|date:"M d, Y" }}
-                                </span>
-                                {% if post.category %}
-                                    <span class="blog-category">
-                                        <i class="fas fa-tag"></i>
-                                        {{ post.category }}
-                                    </span>
-                                {% endif %}
-                            </div>
-                            
-                            <h2 class="blog-title">
-                                <a href="{% url 'blog_detail' post.slug %}">{{ post.title }}</a>
-                            </h2>
-                            
-                            <p class="blog-excerpt">{{ post.excerpt|default:post.content|truncatewords:30 }}</p>
-                            
-                            <div class="blog-footer">
-                                <a href="{% url 'blog_detail' post.slug %}" class="read-more-btn">
-                                    Read More <i class="fas fa-arrow-right"></i>
-                                </a>
-                                
-                                {% if post.tags.all %}
-                                    <div class="blog-tags">
-                                        {% for tag in post.tags.all %}
-                                            <span class="tag">{{ tag.name }}</span>
-                                        {% endfor %}
+                                    <time datetime="{{ post.created_date|date:'Y-m-d' }}">
+                                        {% if LANGUAGE_CODE == 'fa' %}
+                                            {{ post.created_date|date:"j F Y" }}
+                                        {% else %}
+                                            {{ post.created_date|date:"F j, Y" }}
+                                        {% endif %}
+                                    </time>
+                                </div>
+                                {% if post.updated_date != post.created_date %}
+                                    <div class="meta-item">
+                                        <i class="fas fa-edit"></i>
+                                        <time datetime="{{ post.updated_date|date:'Y-m-d' }}">
+                                            {% if LANGUAGE_CODE == 'fa' %}
+                                                آخرین ویرایش: {{ post.updated_date|date:"j F Y" }}
+                                            {% else %}
+                                                {% trans "Updated" %}: {{ post.updated_date|date:"F j, Y" }}
+                                            {% endif %}
+                                        </time>
                                     </div>
                                 {% endif %}
+                            </div>
+
+                            <!-- Blog Title -->
+                            <h2>
+                                <a href="{{ post.get_absolute_url }}" class="blog-post-title">
+                                    {{ post.title }}
+                                </a>
+                            </h2>
+
+                            <!-- Blog Excerpt -->
+                            <p class="blog-excerpt">
+                                {{ post.excerpt }}
+                            </p>
+
+                            <!-- Blog Footer -->
+                            <div class="blog-footer">
+                                <a href="{{ post.get_absolute_url }}" class="read-more">
+                                    {% if LANGUAGE_CODE == 'fa' %}
+                                        ادامه مطلب
+                                        <i class="fas fa-arrow-left"></i>
+                                    {% else %}
+                                        {% trans "Read More" %}
+                                        <i class="fas fa-arrow-right"></i>
+                                    {% endif %}
+                                </a>
+                                <div class="reading-time">
+                                    <i class="fas fa-clock"></i>
+                                    <span>
+                                        {% if LANGUAGE_CODE == 'fa' %}
+                                            {{ post.reading_time }} دقیقه مطالعه
+                                        {% else %}
+                                            {{ post.reading_time }} {% trans "min read" %}
+                                        {% endif %}
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </article>
@@ -64,281 +720,534 @@
 
             <!-- Pagination -->
             {% if is_paginated %}
-                <div class="pagination-wrapper">
-                    <nav aria-label="Blog pagination">
-                        <ul class="pagination">
-                            {% if page_obj.has_previous %}
-                                <li class="page-item">
-                                    <a class="page-link" href="?page=1" aria-label="First">
-                                        <i class="fas fa-angle-double-left"></i>
-                                    </a>
-                                </li>
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
-                                        <i class="fas fa-angle-left"></i>
-                                    </a>
-                                </li>
-                            {% endif %}
+                <div class="pagination-container fade-in-up">
+                    <ul class="pagination">
+                        {% if page_obj.has_previous %}
+                            <li>
+                                <a href="?page=1" title="{% trans 'First page' %}" aria-label="{% trans 'First page' %}">
+                                    <i class="fas fa-angle-double-left"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="?page={{ page_obj.previous_page_number }}" title="{% trans 'Previous page' %}" aria-label="{% trans 'Previous page' %}">
+                                    <i class="fas fa-angle-left"></i>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li>
+                                <span class="disabled" aria-label="{% trans 'First page (disabled)' %}">
+                                    <i class="fas fa-angle-double-left"></i>
+                                </span>
+                            </li>
+                            <li>
+                                <span class="disabled" aria-label="{% trans 'Previous page (disabled)' %}">
+                                    <i class="fas fa-angle-left"></i>
+                                </span>
+                            </li>
+                        {% endif %}
 
-                            {% for num in page_obj.paginator.page_range %}
-                                {% if page_obj.number == num %}
-                                    <li class="page-item active">
-                                        <span class="page-link">{{ num }}</span>
-                                    </li>
-                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                                    <li class="page-item">
-                                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-                                    </li>
-                                {% endif %}
-                            {% endfor %}
-
-                            {% if page_obj.has_next %}
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
-                                        <i class="fas fa-angle-right"></i>
-                                    </a>
-                                </li>
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Last">
-                                        <i class="fas fa-angle-double-right"></i>
-                                    </a>
-                                </li>
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <li><span class="current" aria-label="{% trans 'Current page' %}, {{ num }}">{{ num }}</span></li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <li><a href="?page={{ num }}" aria-label="{% trans 'Go to page' %} {{ num }}">{{ num }}</a></li>
                             {% endif %}
-                        </ul>
-                    </nav>
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                            <li>
+                                <a href="?page={{ page_obj.next_page_number }}" title="{% trans 'Next page' %}" aria-label="{% trans 'Next page' %}">
+                                    <i class="fas fa-angle-right"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="?page={{ page_obj.paginator.num_pages }}" title="{% trans 'Last page' %}" aria-label="{% trans 'Last page' %}">
+                                    <i class="fas fa-angle-double-right"></i>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li>
+                                <span class="disabled" aria-label="{% trans 'Next page (disabled)' %}">
+                                    <i class="fas fa-angle-right"></i>
+                                </span>
+                            </li>
+                            <li>
+                                <span class="disabled" aria-label="{% trans 'Last page (disabled)' %}">
+                                    <i class="fas fa-angle-double-right"></i>
+                                </span>
+                            </li>
+                        {% endif %}
+                    </ul>
                 </div>
             {% endif %}
         {% else %}
-            <div class="empty-state">
-                <div class="empty-icon">
-                    <i class="fas fa-edit"></i>
-                </div>
-                <h3>No Blog Posts Yet</h3>
-                <p>I'm working on some exciting content. Check back soon for new posts!</p>
+            <!-- Empty State -->
+            <div class="empty-state fade-in-up">
+                <i class="fas fa-newspaper"></i>
+                <h3>
+                    {% if LANGUAGE_CODE == 'fa' %}
+                        هنوز مطلبی منتشر نشده است
+                    {% else %}
+                        {% trans "No blog posts published yet" %}
+                    {% endif %}
+                </h3>
+                <p>
+                    {% if LANGUAGE_CODE == 'fa' %}
+                        به زودی مطالب جالبی در این بخش منتشر خواهد شد. از موضوعات برنامه‌نویسی تا نکات عملی توسعه نرم‌افزار.
+                    {% else %}
+                        {% trans "Check back soon for interesting articles and tutorials. From programming topics to practical software development tips." %}
+                    {% endif %}
+                </p>
             </div>
         {% endif %}
     </div>
 </section>
 
-<style>
-.blog-section {
-    padding: 80px 0;
-    min-height: 70vh;
-}
+<!-- Blog Stats -->
+<section class="blog-stats">
+    <div class="container">
+        <div class="stats-grid fade-in-up">
+            <div class="stat-card">
+                <div class="stat-number">{{ blog_list|length|default:"0" }}</div>
+                <div class="stat-label">
+                    {% if LANGUAGE_CODE == 'fa' %}
+                        مقاله منتشر شده
+                    {% else %}
+                        Published Articles
+                    {% endif %}
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">5+</div>
+                <div class="stat-label">
+                    {% if LANGUAGE_CODE == 'fa' %}
+                        موضوع مختلف
+                    {% else %}
+                        Different Topics
+                    {% endif %}
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">1000+</div>
+                <div class="stat-label">
+                    {% if LANGUAGE_CODE == 'fa' %}
+                        دقیقه مطالعه
+                    {% else %}
+                        Minutes of Reading
+                    {% endif %}
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">100%</div>
+                <div class="stat-label">
+                    {% if LANGUAGE_CODE == 'fa' %}
+                        کیفیت محتوا
+                    {% else %}
+                        Quality Content
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
 
-.section-header {
-    text-align: center;
-    margin-bottom: 60px;
-}
+{% block extra_js %}
+<script>
+    // Animation Observer
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
 
-.section-header h1 {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    color: var(--primary-color, #333);
-}
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                entry.target.style.animationPlayState = 'running';
+                observer.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
 
-.section-header p {
-    font-size: 1.2rem;
-    color: var(--text-muted, #666);
-    max-width: 600px;
-    margin: 0 auto;
-}
+    // Observe all animation elements
+    document.querySelectorAll('.fade-in-up').forEach(el => {
+        el.style.animationPlayState = 'paused';
+        observer.observe(el);
+    });
 
-.blog-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: 2rem;
-    margin-bottom: 3rem;
-}
+    // Enhanced Search Functionality
+    const searchInput = document.getElementById('searchInput');
+    const blogGrid = document.getElementById('blogGrid');
 
-.blog-card {
-    background: white;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
+    if (searchInput && blogGrid) {
+        let searchTimeout;
 
-.blog-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-}
+        searchInput.addEventListener('input', function(e) {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                const searchTerm = e.target.value.toLowerCase().trim();
+                const cards = blogGrid.querySelectorAll('.blog-card');
 
-.blog-image {
-    height: 200px;
-    overflow: hidden;
-}
+                cards.forEach((card, index) => {
+                    const title = card.dataset.title || '';
+                    const excerpt = card.dataset.excerpt || '';
 
-.blog-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.3s ease;
-}
+                    const isVisible = title.includes(searchTerm) || excerpt.includes(searchTerm);
 
-.blog-card:hover .blog-image img {
-    transform: scale(1.05);
-}
+                    if (isVisible) {
+                        card.style.display = 'block';
+                        card.style.animation = `fadeInUp 0.4s ease-out ${index * 0.1}s forwards`;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
 
-.blog-content {
-    padding: 1.5rem;
-}
+                // Show/hide empty state
+                const visibleCards = blogGrid.querySelectorAll('.blog-card[style*="block"], .blog-card:not([style*="none"])');
+                if (visibleCards.length === 0 && searchTerm !== '') {
+                    showEmptySearchState();
+                } else {
+                    hideEmptySearchState();
+                }
+            }, 300);
+        });
 
-.blog-meta {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 1rem;
-    font-size: 0.9rem;
-    color: var(--text-muted, #666);
-}
-
-.blog-meta i {
-    margin-right: 0.5rem;
-}
-
-.blog-category {
-    background: var(--accent-color, #007bff);
-    color: white;
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.8rem;
-}
-
-.blog-title {
-    margin-bottom: 1rem;
-}
-
-.blog-title a {
-    color: var(--primary-color, #333);
-    text-decoration: none;
-    font-size: 1.4rem;
-    font-weight: 600;
-    line-height: 1.3;
-    transition: color 0.3s ease;
-}
-
-.blog-title a:hover {
-    color: var(--accent-color, #007bff);
-}
-
-.blog-excerpt {
-    color: var(--text-muted, #666);
-    line-height: 1.6;
-    margin-bottom: 1.5rem;
-}
-
-.blog-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-}
-
-.read-more-btn {
-    color: var(--accent-color, #007bff);
-    text-decoration: none;
-    font-weight: 500;
-    transition: color 0.3s ease;
-}
-
-.read-more-btn:hover {
-    color: var(--primary-color, #333);
-}
-
-.read-more-btn i {
-    margin-left: 0.5rem;
-    transition: transform 0.3s ease;
-}
-
-.read-more-btn:hover i {
-    transform: translateX(3px);
-}
-
-.blog-tags {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-}
-
-.tag {
-    background: #f8f9fa;
-    color: #495057;
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.8rem;
-}
-
-.empty-state {
-    text-align: center;
-    padding: 4rem 2rem;
-    color: var(--text-muted, #666);
-}
-
-.empty-icon {
-    font-size: 4rem;
-    margin-bottom: 1rem;
-    opacity: 0.5;
-}
-
-.empty-state h3 {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-    color: var(--primary-color, #333);
-}
-
-.pagination-wrapper {
-    display: flex;
-    justify-content: center;
-    margin-top: 3rem;
-}
-
-.pagination {
-    display: flex;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    gap: 0.5rem;
-}
-
-.page-item {
-    display: flex;
-}
-
-.page-link {
-    padding: 0.5rem 0.75rem;
-    text-decoration: none;
-    color: var(--accent-color, #007bff);
-    border: 1px solid #dee2e6;
-    border-radius: 4px;
-    transition: all 0.3s ease;
-}
-
-.page-link:hover {
-    background-color: var(--accent-color, #007bff);
-    color: white;
-}
-
-.page-item.active .page-link {
-    background-color: var(--accent-color, #007bff);
-    color: white;
-    border-color: var(--accent-color, #007bff);
-}
-
-@media (max-width: 768px) {
-    .blog-grid {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
+        // Clear search on escape
+        searchInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                this.value = '';
+                this.dispatchEvent(new Event('input'));
+                this.blur();
+            }
+        });
     }
-    
-    .section-header h1 {
-        font-size: 2rem;
+
+    // Filter Functionality
+    document.querySelectorAll('.filter-tag').forEach(tag => {
+        tag.addEventListener('click', function(e) {
+            // Don't prevent default for actual navigation
+
+            // Update active states
+            document.querySelectorAll('.filter-tag').forEach(t => {
+                t.classList.remove('active');
+                t.setAttribute('aria-pressed', 'false');
+            });
+
+            this.classList.add('active');
+            this.setAttribute('aria-pressed', 'true');
+
+            // Add smooth transition effect
+            this.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                this.style.transform = '';
+            }, 150);
+        });
+    });
+
+    // Sticky filter behavior with scroll effect
+    let lastScrollTop = 0;
+    const filtersSection = document.querySelector('.filters-section');
+
+    window.addEventListener('scroll', function() {
+        const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+
+        if (filtersSection) {
+            if (currentScroll > lastScrollTop && currentScroll > 100) {
+                // Scrolling down
+                filtersSection.style.transform = 'translateY(-100%)';
+                filtersSection.style.opacity = '0.9';
+            } else {
+                // Scrolling up
+                filtersSection.style.transform = 'translateY(0)';
+                filtersSection.style.opacity = '1';
+            }
+        }
+
+        lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
+    }, { passive: true });
+
+    // Enhanced card hover effects
+    document.querySelectorAll('.blog-card').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-12px)';
+
+            // Add subtle glow effect
+            this.style.boxShadow = '0 25px 50px -12px rgba(59, 130, 246, 0.25), 0 0 0 1px rgba(59, 130, 246, 0.1)';
+        });
+
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(-8px)';
+            this.style.boxShadow = '';
+        });
+
+        // Add click ripple effect
+        card.addEventListener('click', function(e) {
+            const ripple = document.createElement('span');
+            const rect = this.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = e.clientX - rect.left - size / 2;
+            const y = e.clientY - rect.top - size / 2;
+
+            ripple.style.cssText = `
+                position: absolute;
+                border-radius: 50%;
+                background: rgba(59, 130, 246, 0.3);
+                transform: scale(0);
+                animation: ripple 0.6s linear;
+                width: ${size}px;
+                height: ${size}px;
+                left: ${x}px;
+                top: ${y}px;
+                pointer-events: none;
+            `;
+
+            this.style.position = 'relative';
+            this.style.overflow = 'hidden';
+            this.appendChild(ripple);
+
+            setTimeout(() => {
+                if (this.contains(ripple)) {
+                    this.removeChild(ripple);
+                }
+            }, 600);
+        });
+    });
+
+    // Animated counter for stats
+    function animateValue(element, start, end, duration) {
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            const currentValue = Math.floor(progress * (end - start) + start);
+
+            if (element.textContent.includes('+')) {
+                element.textContent = currentValue + '+';
+            } else if (element.textContent.includes('%')) {
+                element.textContent = currentValue + '%';
+            } else {
+                element.textContent = currentValue;
+            }
+
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            }
+        };
+        window.requestAnimationFrame(step);
     }
-    
-    .blog-footer {
-        flex-direction: column;
-        align-items: flex-start;
+
+    // Trigger counter animation when stats come into view
+    const statsObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                const statNumbers = entry.target.querySelectorAll('.stat-number');
+                statNumbers.forEach(stat => {
+                    const text = stat.textContent;
+                    const match = text.match(/\d+/);
+                    if (match) {
+                        const value = parseInt(match[0]);
+                        animateValue(stat, 0, value, 2000);
+                    }
+                });
+                statsObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.5 });
+
+    const statsSection = document.querySelector('.blog-stats');
+    if (statsSection) {
+        statsObserver.observe(statsSection);
     }
-}
-</style>
+
+    // Reading progress indicator
+    const progressBar = document.createElement('div');
+    progressBar.style.cssText = `
+        position: fixed;
+        top: 80px;
+        left: 0;
+        width: 0%;
+        height: 3px;
+        background: linear-gradient(135deg, var(--accent-primary), #8b5cf6);
+        z-index: 1001;
+        transition: width 0.1s ease;
+    `;
+    document.body.appendChild(progressBar);
+
+    window.addEventListener('scroll', () => {
+        const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+        const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const scrolled = (winScroll / height) * 100;
+        progressBar.style.width = scrolled + '%';
+    }, { passive: true });
+
+    // Empty search state functions
+    function showEmptySearchState() {
+        if (!document.getElementById('searchEmptyState')) {
+            const emptyState = document.createElement('div');
+            emptyState.id = 'searchEmptyState';
+            emptyState.className = 'empty-state';
+            emptyState.innerHTML = `
+                <i class="fas fa-search"></i>
+                <h3>
+                    {% if LANGUAGE_CODE == 'fa' %}
+                        هیچ مقاله‌ای یافت نشد
+                    {% else %}
+                        No Articles Found
+                    {% endif %}
+                </h3>
+                <p>
+                    {% if LANGUAGE_CODE == 'fa' %}
+                        لطفاً کلیدواژه‌های دیگری امتحان کنید یا فیلترها را تغییر دهید.
+                    {% else %}
+                        Try different keywords or adjust your filters.
+                    {% endif %}
+                </p>
+            `;
+            blogGrid.parentNode.appendChild(emptyState);
+        }
+    }
+
+    function hideEmptySearchState() {
+        const emptyState = document.getElementById('searchEmptyState');
+        if (emptyState) {
+            emptyState.remove();
+        }
+    }
+
+    // Keyboard navigation for filters
+    document.querySelectorAll('.filter-tag').forEach((tag, index, tags) => {
+        tag.addEventListener('keydown', function(e) {
+            let targetIndex;
+
+            switch(e.key) {
+                case 'ArrowLeft':
+                    e.preventDefault();
+                    targetIndex = index > 0 ? index - 1 : tags.length - 1;
+                    tags[targetIndex].focus();
+                    break;
+                case 'ArrowRight':
+                    e.preventDefault();
+                    targetIndex = index < tags.length - 1 ? index + 1 : 0;
+                    tags[targetIndex].focus();
+                    break;
+                case 'Home':
+                    e.preventDefault();
+                    tags[0].focus();
+                    break;
+                case 'End':
+                    e.preventDefault();
+                    tags[tags.length - 1].focus();
+                    break;
+            }
+        });
+    });
+
+    // Smooth scroll with offset for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                const offsetTop = target.offsetTop - 120; // Account for sticky elements
+                window.scrollTo({
+                    top: offsetTop,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+
+    // Add ripple animation keyframes
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+
+    // Performance optimization: Throttle scroll events
+    let ticking = false;
+
+    function updateOnScroll() {
+        // Any additional scroll-based updates can go here
+        ticking = false;
+    }
+
+    function requestTick() {
+        if (!ticking) {
+            requestAnimationFrame(updateOnScroll);
+            ticking = true;
+        }
+    }
+
+    // Lazy loading for images (if any blog posts have images)
+    if ('IntersectionObserver' in window) {
+        const imageObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    if (img.dataset.src) {
+                        img.src = img.dataset.src;
+                        img.classList.remove('lazy');
+                        imageObserver.unobserve(img);
+                    }
+                }
+            });
+        });
+
+        document.querySelectorAll('img[data-src]').forEach(img => {
+            imageObserver.observe(img);
+        });
+    }
+
+    // Social share tracking (for analytics)
+    document.querySelectorAll('.read-more').forEach(link => {
+        link.addEventListener('click', function() {
+            const articleTitle = this.closest('.blog-card').querySelector('.blog-post-title').textContent.trim();
+
+            // Here you can add analytics tracking
+            console.log(`Article clicked: ${articleTitle}`);
+        });
+    });
+
+    // Accessibility improvements
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add skip link for keyboard users
+        const skipLink = document.createElement('a');
+        skipLink.href = '#main-content';
+        skipLink.textContent = 'Skip to main content';
+        skipLink.style.cssText = `
+            position: absolute;
+            top: -40px;
+            left: 6px;
+            background: var(--accent-primary);
+            color: white;
+            padding: 8px;
+            text-decoration: none;
+            border-radius: 4px;
+            z-index: 10000;
+            transition: top 0.3s;
+        `;
+
+        skipLink.addEventListener('focus', function() {
+            this.style.top = '6px';
+        });
+
+        skipLink.addEventListener('blur', function() {
+            this.style.top = '-40px';
+        });
+
+        document.body.insertBefore(skipLink, document.body.firstChild);
+
+        // Add main content ID for skip link
+        const mainContent = document.querySelector('.blog-posts-section');
+        if (mainContent) {
+            mainContent.id = 'main-content';
+        }
+    });
+</script>
 {% endblock %}

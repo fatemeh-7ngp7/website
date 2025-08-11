@@ -1261,6 +1261,10 @@ msgstr "کد"
 msgid "Blog"
 msgstr "بلاگ"
 
+#: .\templates\base.html:338
+msgid "Skills"
+msgstr "مهارت‌ها"
+
 #: .\templates\base.html:49
 msgid "Contact"
 msgstr "تماس"
@@ -1429,6 +1433,10 @@ msgstr "به پایتون، جنگو، رست و خلق راه‌حل‌های �
 #: .\templates\portfolio\home.html:20
 msgid "View My Work"
 msgstr "دیدن نمونه‌کارها"
+
+#: .\templates\portfolio\home.html:878
+msgid "Let's Work Together"
+msgstr "بیایید فرصت همکاری با هم را تجربه کنیم"
 
 #: .\templates\portfolio\home.html:37
 msgid "Featured Projects"

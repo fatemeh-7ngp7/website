@@ -1,641 +1,1211 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}{{ project.title }} - Portfolio{% endblock %}
+{% block title %}{{ project.title }} - {% trans "Project Details" %} - Fatemeh NGP{% endblock %}
 
-{% block extra_head %}
-    <!-- Add any additional CSS or meta tags for this specific page -->
-    <meta name="description" content="{{ project.short_description }}">
-    <meta property="og:title" content="{{ project.title }}">
-    <meta property="og:description" content="{{ project.short_description }}">
-    {% if project.image %}
-    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ project.image.url }}">
-    {% endif %}
+{% block extra_css %}
+<style>
+    /* Project Header */
+    .project-header-section {
+        background: linear-gradient(135deg,
+            var(--bg-primary) 0%,
+            var(--bg-secondary) 25%,
+            rgba(59, 130, 246, 0.1) 50%,
+            rgba(168, 85, 247, 0.1) 75%,
+            var(--bg-tertiary) 100%);
+        padding: 4rem 0 2rem;
+        position: relative;
+        overflow: hidden;
+        margin-top: 0;
+    }
+
+    [data-theme="dark"] .project-header-section {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 25%, #0f3460 50%, #533483 75%, #7209b7 100%);
+    }
+
+    .project-header-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background:
+            radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(168, 85, 247, 0.12) 0%, transparent 50%);
+
+    }
+
+    [data-theme="dark"] .project-header-section::before {
+        background:
+            radial-gradient(circle at 20% 50%, rgba(114, 9, 183, 0.4) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(59, 130, 246, 0.3) 0%, transparent 50%);
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        33% { transform: translateY(-10px) rotate(1deg); }
+        66% { transform: translateY(10px) rotate(-1deg); }
+    }
+
+    .breadcrumb {
+        color: var(--text-muted);
+        margin-bottom: 2rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .breadcrumb a {
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: var(--transition);
+    }
+
+    .breadcrumb a:hover {
+        color: var(--accent-primary);
+    }
+
+    .breadcrumb-separator {
+        margin: 0 0.5rem;
+        color: var(--text-muted);
+    }
+
+    .project-header-content {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        grid-template-columns: 1fr 300px;
+        gap: 3rem;
+        align-items: start;
+    }
+
+    .project-main-info h1 {
+        font-size: clamp(2rem, 4vw, 3.5rem);
+        font-weight: 800;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-primary) 50%, #8b5cf6 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        line-height: 1.2;
+    }
+
+    .project-meta {
+        display: flex;
+        gap: 2rem;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+    }
+
+    .meta-item i {
+        color: var(--accent-primary);
+    }
+
+    .project-description {
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+        line-height: 1.7;
+        margin-bottom: 2rem;
+    }
+
+    .project-tech-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    .tech-badge {
+        background: linear-gradient(135deg, var(--accent-primary), #8b5cf6);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        border: none;
+        transition: var(--transition);
+    }
+
+    .tech-badge:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+    }
+
+    .project-sidebar {
+        background: var(--bg-secondary);
+        border-radius: 1.5rem;
+        padding: 2rem;
+        border: 1px solid var(--border-color);
+        backdrop-filter: blur(10px);
+        position: sticky;
+        top: 100px;
+    }
+
+    .sidebar-section {
+        margin-bottom: 2rem;
+    }
+
+    .sidebar-section:last-child {
+        margin-bottom: 0;
+    }
+
+    .sidebar-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .project-links {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .project-link {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1rem;
+        background: var(--bg-tertiary);
+        border: 1px solid var(--border-color);
+        border-radius: 0.75rem;
+        color: var(--text-primary);
+        text-decoration: none;
+        font-weight: 500;
+        transition: var(--transition);
+    }
+
+    .project-link:hover {
+        background: var(--accent-primary);
+        color: white;
+        border-color: var(--accent-primary);
+        transform: translateY(-2px);
+    }
+
+    .project-link i {
+        font-size: 1.1rem;
+    }
+
+    /* Project Gallery */
+    .project-gallery {
+        padding: 4rem 0;
+        background: var(--bg-secondary);
+    }
+
+    .gallery-container {
+        position: relative;
+    }
+
+    .main-image {
+        width: 100%;
+        max-height: 600px;
+        border-radius: 1.5rem;
+        overflow: hidden;
+        box-shadow: var(--shadow-lg);
+        margin-bottom: 2rem;
+        position: relative;
+    }
+
+    .main-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .main-image:hover img {
+        transform: scale(1.02);
+    }
+
+    .image-placeholder {
+        width: 100%;
+        height: 400px;
+        background: linear-gradient(135deg, var(--accent-primary) 0%, #8b5cf6 50%, #ec4899 100%);
+        border-radius: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 4rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .image-placeholder::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M20 20L0 0h40L20 20zm0 0L40 40H0L20 20z'/%3E%3C/g%3E%3C/svg%3E");
+
+    }
+
+    @keyframes slide {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
+    }
+
+    /* Project Details */
+    .project-details {
+        padding: 4rem 0;
+    }
+
+    .details-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 4rem;
+    }
+
+    .project-content {
+        background: var(--bg-secondary);
+        border-radius: 1.5rem;
+        padding: 3rem;
+        border: 1px solid var(--border-color);
+    }
+
+    .section-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 1.5rem;
+        position: relative;
+        padding-bottom: 0.5rem;
+    }
+
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 60px;
+        height: 3px;
+        background: linear-gradient(135deg, var(--accent-primary), #8b5cf6);
+        border-radius: 2px;
+    }
+
+    .project-description-full {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: var(--text-secondary);
+        margin-bottom: 2.5rem;
+    }
+
+    .features-list {
+        list-style: none;
+        padding: 0;
+        margin-bottom: 2.5rem;
+    }
+
+    .features-list li {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+        padding: 1rem;
+        background: var(--bg-tertiary);
+        border-radius: 0.75rem;
+        border: 1px solid var(--border-color);
+        transition: var(--transition);
+    }
+
+    .features-list li:hover {
+        transform: translateX(10px);
+        border-color: var(--accent-primary);
+    }
+
+    .features-list i {
+        color: var(--accent-primary);
+        font-size: 1.1rem;
+        margin-top: 0.1rem;
+        flex-shrink: 0;
+    }
+
+    .feature-text {
+        color: var(--text-secondary);
+        line-height: 1.6;
+    }
+
+    /* Technical Details */
+    .tech-details {
+        background: var(--bg-secondary);
+        border-radius: 1.5rem;
+        padding: 2rem;
+        border: 1px solid var(--border-color);
+        margin-bottom: 2rem;
+    }
+
+    .tech-section {
+        margin-bottom: 2rem;
+    }
+
+    .tech-section:last-child {
+        margin-bottom: 0;
+    }
+
+    .tech-section-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .tech-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .tech-item {
+        background: var(--bg-tertiary);
+        color: var(--text-secondary);
+        padding: 0.4rem 0.8rem;
+        border-radius: 1rem;
+        font-size: 0.85rem;
+        border: 1px solid var(--border-color);
+    }
+
+    .spec-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .spec-item:last-child {
+        border-bottom: none;
+    }
+
+    .spec-label {
+        color: var(--text-secondary);
+        font-weight: 500;
+    }
+
+    .spec-value {
+        color: var(--text-primary);
+        font-weight: 600;
+    }
+
+    /* Related Projects */
+    .related-projects {
+        padding: 4rem 0;
+        background: var(--bg-secondary);
+    }
+
+    .related-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+    }
+
+    .related-card {
+        background: var(--bg-primary);
+        border-radius: 1rem;
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+        transition: var(--transition);
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .related-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--accent-primary);
+    }
+
+    .related-image {
+        width: 100%;
+        height: 180px;
+        background: linear-gradient(135deg, var(--accent-primary), #8b5cf6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 2.5rem;
+    }
+
+    .related-content {
+        padding: 1.5rem;
+    }
+
+    .related-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: var(--text-primary);
+    }
+
+    .related-description {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+
+    /* Back Button */
+    .back-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text-secondary);
+        text-decoration: none;
+        font-weight: 500;
+        margin-bottom: 2rem;
+        transition: var(--transition);
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        background: var(--bg-tertiary);
+        border: 1px solid var(--border-color);
+    }
+
+    .back-button:hover {
+        color: var(--accent-primary);
+        background: var(--bg-secondary);
+        border-color: var(--accent-primary);
+        transform: translateX(-5px);
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+        .project-header-content {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        .project-sidebar {
+            position: static;
+        }
+
+        .details-grid {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .project-meta {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .project-content {
+            padding: 2rem;
+        }
+
+        .tech-details {
+            padding: 1.5rem;
+        }
+
+        .related-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* Animation Classes */
+    .fade-in-up {
+        opacity: 0;
+        transform: translateY(30px);
+        animation: fadeInUp 0.6s ease-out forwards;
+    }
+
+    @keyframes fadeInUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .stagger-1 { animation-delay: 0.1s; }
+    .stagger-2 { animation-delay: 0.2s; }
+    .stagger-3 { animation-delay: 0.3s; }
+    .stagger-4 { animation-delay: 0.4s; }
+    .stagger-5 { animation-delay: 0.5s; }
+</style>
 {% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gray-50">
-    <div class="container mx-auto px-4 py-8 max-w-7xl">
+<!-- Project Header -->
+<section class="project-header-section">
+    <div class="container">
+        <!-- Back Button -->
+        <a href="{% url 'project_list' %}" class="back-button fade-in-up">
+            <i class="fas fa-arrow-left"></i>
+            {% if LANGUAGE_CODE == 'fa' %}
+                بازگشت به پروژه‌ها
+            {% else %}
+                Back to Projects
+            {% endif %}
+        </a>
 
-        <!-- Breadcrumb Navigation -->
-        <nav class="mb-8" aria-label="Breadcrumb">
-            <ol class="flex items-center space-x-2 text-sm text-gray-500">
-                <li>
-                    <a href="{% url 'home' %}" class="hover:text-gray-700 transition-colors">Home</a>
-                </li>
-                <li class="flex items-center">
-                    <svg class="w-4 h-4 mx-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"/>
-                    </svg>
-                    <a href="{% url 'project_list' %}" class="hover:text-gray-700 transition-colors">Projects</a>
-                </li>
-                <li class="flex items-center">
-                    <svg class="w-4 h-4 mx-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"/>
-                    </svg>
-                    <span class="text-gray-900 font-medium">{{ project.title }}</span>
-                </li>
-            </ol>
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb fade-in-up stagger-1">
+            <a href="{% url 'home' %}">
+                {% if LANGUAGE_CODE == 'fa' %}
+                    خانه
+                {% else %}
+                    Home
+                {% endif %}
+            </a>
+            <span class="breadcrumb-separator">/</span>
+            <a href="{% url 'project_list' %}">
+                {% if LANGUAGE_CODE == 'fa' %}
+                    پروژه‌ها
+                {% else %}
+                    Projects
+                {% endif %}
+            </a>
+            <span class="breadcrumb-separator">/</span>
+            <span>{{ project.title }}</span>
         </nav>
 
-        <!-- Back Navigation -->
-        <div class="mb-8">
-            <a href="{% url 'project_list' %}"
-               class="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors group">
-                <svg class="w-4 h-4 mr-2 transform group-hover:-translate-x-1 transition-transform"
-                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                </svg>
-                Back to Projects
+        <div class="project-header-content">
+            <div class="project-main-info fade-in-up stagger-2">
+                <h1>{{ project.title }}</h1>
+
+                <div class="project-meta">
+                    <div class="meta-item">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>{{ project.created_date|date:"F d, Y" }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas fa-clock"></i>
+                        <span>
+                            {% if LANGUAGE_CODE == 'fa' %}
+                                آخرین بروزرسانی: {{ project.updated_date|date:"M d, Y" }}
+                            {% else %}
+                                Updated: {{ project.updated_date|date:"M d, Y" }}
+                            {% endif %}
+                        </span>
+                    </div>
+                    {% if project.featured %}
+                    <div class="meta-item">
+                        <i class="fas fa-star"></i>
+                        <span>
+                            {% if LANGUAGE_CODE == 'fa' %}
+                                پروژه ویژه
+                            {% else %}
+                                Featured Project
+                            {% endif %}
+                        </span>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <p class="project-description">
+                    {{ project.short_description|default:project.description|truncatewords:30 }}
+                </p>
+
+                <div class="project-tech-list">
+                    {% for tech in project.technologies.all %}
+                    <span class="tech-badge">{{ tech.name }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="project-sidebar fade-in-up stagger-3">
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">
+                        <i class="fas fa-link"></i>
+                        {% if LANGUAGE_CODE == 'fa' %}
+                            لینک‌های پروژه
+                        {% else %}
+                            Project Links
+                        {% endif %}
+                    </h3>
+                    <div class="project-links">
+                        {% if project.github_url %}
+                        <a href="{{ project.github_url }}" class="project-link" target="_blank">
+                            <i class="fab fa-github"></i>
+                            {% if LANGUAGE_CODE == 'fa' %}
+                                مشاهده کد
+                            {% else %}
+                                View Code
+                            {% endif %}
+                        </a>
+                        {% endif %}
+                        {% if project.live_url %}
+                        <a href="{{ project.live_url }}" class="project-link" target="_blank">
+                            <i class="fas fa-external-link-alt"></i>
+                            {% if LANGUAGE_CODE == 'fa' %}
+                                نمایش زنده
+                            {% else %}
+                                Live Demo
+                            {% endif %}
+                        </a>
+                        {% endif %}
+                        {% if not project.github_url and not project.live_url %}
+                        <p style="color: var(--text-muted); font-size: 0.9rem; text-align: center; padding: 1rem;">
+                            {% if LANGUAGE_CODE == 'fa' %}
+                                لینک‌ها به زودی اضافه خواهند شد
+                            {% else %}
+                                Links will be added soon
+                            {% endif %}
+                        </p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">
+                        <i class="fas fa-info-circle"></i>
+                        {% if LANGUAGE_CODE == 'fa' %}
+                            اطلاعات فنی
+                        {% else %}
+                            Technical Info
+                        {% endif %}
+                    </h3>
+                    <div class="spec-item">
+                        <span class="spec-label">
+                            {% if LANGUAGE_CODE == 'fa' %}
+                                تعداد تکنولوژی
+                            {% else %}
+                                Technologies
+                            {% endif %}
+                        </span>
+                        <span class="spec-value">{{ project.technologies.count }}</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">
+                            {% if LANGUAGE_CODE == 'fa' %}
+                                وضعیت
+                            {% else %}
+                                Status
+                            {% endif %}
+                        </span>
+                        <span class="spec-value">
+                            {% if LANGUAGE_CODE == 'fa' %}
+                                تکمیل شده
+                            {% else %}
+                                Completed
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">
+                            {% if LANGUAGE_CODE == 'fa' %}
+                                نوع
+                            {% else %}
+                                Type
+                            {% endif %}
+                        </span>
+                        <span class="spec-value">
+                            {% if LANGUAGE_CODE == 'fa' %}
+                                وب اپلیکیشن
+                            {% else %}
+                                Web Application
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Project Gallery -->
+<section class="project-gallery">
+    <div class="container">
+        <div class="gallery-container fade-in-up stagger-4">
+            {% if project.image %}
+            <div class="main-image">
+                <img src="{{ project.image.url }}" alt="{{ project.title }}">
+            </div>
+            {% else %}
+            <div class="image-placeholder">
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Project Details -->
+<section class="project-details">
+    <div class="container">
+        <div class="details-grid">
+            <div class="project-content fade-in-up stagger-5">
+                <h2 class="section-title">
+                    {% if LANGUAGE_CODE == 'fa' %}
+                        درباره این پروژه
+                    {% else %}
+                        About This Project
+                    {% endif %}
+                </h2>
+
+                <div class="project-description-full">
+                    {{ project.description|linebreaks }}
+                </div>
+
+                <h3 class="section-title">
+                    {% if LANGUAGE_CODE == 'fa' %}
+                        ویژگی‌های کلیدی
+                    {% else %}
+                        Key Features
+                    {% endif %}
+                </h3>
+
+                <ul class="features-list">
+                    <li>
+                        <i class="fas fa-check-circle"></i>
+                        <div class="feature-text">
+                            {% if LANGUAGE_CODE == 'fa' %}
+                                طراحی ریسپانسیو و سازگار با تمام دستگاه‌ها
+                            {% else %}
+                                Responsive design compatible with all devices
+                            {% endif %}
+                        </div>
+                    </li>
+                    <li>
+                        <i class="fas fa-check-circle"></i>
+                        <div class="feature-text">
+                            {% if LANGUAGE_CODE == 'fa' %}
+                                کدنویسی تمیز و قابل نگهداری
+                            {% else %}
+                                Clean and maintainable code structure
+                            {% endif %}
+                        </div>
+                    </li>
+                    <li>
+                        <i class="fas fa-check-circle"></i>
+                        <div class="feature-text">
+                            {% if LANGUAGE_CODE == 'fa' %}
+                                بهینه‌سازی برای سرعت و عملکرد
+                            {% else %}
+                                Optimized for speed and performance
+                            {% endif %}
+                        </div>
+                    </li>
+                    <li>
+                        <i class="fas fa-check-circle"></i>
+                        <div class="feature-text">
+                            {% if LANGUAGE_CODE == 'fa' %}
+                                امنیت بالا و استفاده از بهترین روش‌ها
+                            {% else %}
+                                High security with best practices implementation
+                            {% endif %}
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="fade-in-up stagger-5">
+                <div class="tech-details">
+                    <div class="tech-section">
+                        <h3 class="tech-section-title">
+                            <i class="fas fa-code"></i>
+                            {% if LANGUAGE_CODE == 'fa' %}
+                                تکنولوژی‌های استفاده شده
+                            {% else %}
+                                Technologies Used
+                            {% endif %}
+                        </h3>
+                        <div class="tech-list">
+                            {% for tech in project.technologies.all %}
+                            <span class="tech-item">{{ tech.name }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="tech-section">
+                        <h3 class="tech-section-title">
+                            <i class="fas fa-tools"></i>
+                            {% if LANGUAGE_CODE == 'fa' %}
+                                ابزارهای توسعه
+                            {% else %}
+                                Development Tools
+                            {% endif %}
+                        </h3>
+                        <div class="tech-list">
+                            <span class="tech-item">VS Code</span>
+                            <span class="tech-item">Git</span>
+                            <span class="tech-item">GitHub</span>
+                            <span class="tech-item">Postman</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact CTA -->
+                <div class="tech-details">
+                    <h3 class="tech-section-title">
+                        <i class="fas fa-handshake"></i>
+                        {% if LANGUAGE_CODE == 'fa' %}
+                            علاقه‌مند به همکاری؟
+                        {% else %}
+                            Interested in Collaboration?
+                        {% endif %}
+                    </h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 1.5rem; line-height: 1.6;">
+                        {% if LANGUAGE_CODE == 'fa' %}
+                            اگر پروژه مشابهی دارید یا نیاز به کمک دارید، خوشحال می‌شوم با شما همکاری کنم.
+                        {% else %}
+                            If you have a similar project or need help with development, I'd love to collaborate with you.
+                        {% endif %}
+                    </p>
+                    <a href="{% url 'contact' %}" class="project-link">
+                        <i class="fas fa-envelope"></i>
+                        {% if LANGUAGE_CODE == 'fa' %}
+                            تماس با من
+                        {% else %}
+                            Get In Touch
+                        {% endif %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Related Projects -->
+<section class="related-projects">
+    <div class="container">
+        <div class="section-header fade-in-up">
+            <h2 class="section-title" style="text-align: center; margin-bottom: 0;">
+                {% if LANGUAGE_CODE == 'fa' %}
+                    پروژه‌های مرتبط
+                {% else %}
+                    Related Projects
+                {% endif %}
+            </h2>
+            <p style="text-align: center; color: var(--text-secondary); margin-top: 1rem; margin-bottom: 3rem;">
+                {% if LANGUAGE_CODE == 'fa' %}
+                    پروژه‌های دیگری که ممکن است برایتان جالب باشد
+                {% else %}
+                    Other projects you might find interesting
+                {% endif %}
+            </p>
+        </div>
+
+        <div class="related-grid">
+            <!-- Related projects will be populated dynamically -->
+            <!-- For now showing placeholder cards -->
+            <a href="#" class="related-card fade-in-up stagger-1">
+                <div class="related-image">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <div class="related-content">
+                    <h3 class="related-title">
+                        {% if LANGUAGE_CODE == 'fa' %}
+                            فروشگاه آنلاین
+                        {% else %}
+                            E-Commerce Platform
+                        {% endif %}
+                    </h3>
+                    <p class="related-description">
+                        {% if LANGUAGE_CODE == 'fa' %}
+                            پلتفرم کامل فروش آنلاین با Django
+                        {% else %}
+                            Complete online selling platform with Django
+                        {% endif %}
+                    </p>
+                </div>
+            </a>
+
+            <a href="#" class="related-card fade-in-up stagger-2">
+                <div class="related-image">
+                    <i class="fas fa-blog"></i>
+                </div>
+                <div class="related-content">
+                    <h3 class="related-title">
+                        {% if LANGUAGE_CODE == 'fa' %}
+                            سیستم مدیریت محتوا
+                        {% else %}
+                            Content Management System
+                        {% endif %}
+                    </h3>
+                    <p class="related-description">
+                        {% if LANGUAGE_CODE == 'fa' %}
+                            سیستم مدیریت محتوا با قابلیت‌های پیشرفته
+                        {% else %}
+                            Advanced content management system
+                        {% endif %}
+                    </p>
+                </div>
+            </a>
+
+            <a href="#" class="related-card fade-in-up stagger-3">
+                <div class="related-image">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="related-content">
+                    <h3 class="related-title">
+                        {% if LANGUAGE_CODE == 'fa' %}
+                            داشبورد آنالیتیکس
+                        {% else %}
+                            Analytics Dashboard
+                        {% endif %}
+                    </h3>
+                    <p class="related-description">
+                        {% if LANGUAGE_CODE == 'fa' %}
+                            داشبورد تحلیل داده با نمودارهای تعاملی
+                        {% else %}
+                            Data analytics dashboard with interactive charts
+                        {% endif %}
+                    </p>
+                </div>
             </a>
         </div>
 
-        <!-- Project Hero Section -->
-        <section class="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
-            {% if project.image %}
-            <div class="relative">
-                <div class="aspect-w-16 aspect-h-9 md:aspect-h-6">
-                    <img src="{{ project.image.url }}"
-                         alt="{{ project.title }}"
-                         class="w-full h-full object-cover"
-                         loading="eager">
-                </div>
-
-                <!-- Project Badges Overlay -->
-                <div class="absolute top-4 right-4 flex flex-col gap-2">
-                    {% if project.featured %}
-                    <span class="bg-gradient-to-r from-yellow-400 to-yellow-500 text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg">
-                        ⭐ Featured
-                    </span>
-                    {% endif %}
-
-                    {% if project.is_recent %}
-                    <span class="bg-gradient-to-r from-green-400 to-green-500 text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg">
-                        🆕 New
-                    </span>
-                    {% endif %}
-                </div>
-
-                <!-- Gradient Overlay for Better Text Readability -->
-                <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none"></div>
-            </div>
-            {% endif %}
-
-            <!-- Project Header Content -->
-            <div class="p-6 md:p-8 lg:p-10">
-                <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
-
-                    <!-- Project Info -->
-                    <div class="flex-1">
-                        <div class="flex items-start justify-between mb-4">
-                            <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">
-                                {{ project.title }}
-                            </h1>
-                        </div>
-
-                        <p class="text-lg md:text-xl text-gray-600 mb-6 leading-relaxed">
-                            {{ project.short_description }}
-                        </p>
-
-                        <!-- Project Metadata -->
-                        <div class="flex flex-wrap items-center gap-4 text-sm text-gray-500">
-                            <div class="flex items-center">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                </svg>
-                                Created {{ project.created_date|date:"F d, Y" }}
-                            </div>
-
-                            {% if project.updated_date != project.created_date %}
-                            <div class="flex items-center">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                                </svg>
-                                Updated {{ project.updated_date|date:"F d, Y" }}
-                            </div>
-                            {% endif %}
-
-                            {% if project.client %}
-                            <div class="flex items-center">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                                </svg>
-                                Client: {{ project.client }}
-                            </div>
-                            {% endif %}
-                        </div>
-                    </div>
-
-                    <!-- Action Buttons -->
-                    <div class="flex flex-col sm:flex-row lg:flex-col xl:flex-row gap-3 lg:min-w-max">
-                        {% if project.live_url %}
-                        <a href="{{ project.live_url }}"
-                           target="_blank"
-                           rel="noopener noreferrer"
-                           class="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium rounded-lg hover:from-blue-700 hover:to-blue-800 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl">
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                            </svg>
-                            View Live Demo
-                        </a>
-                        {% endif %}
-
-                        {% if project.github_url %}
-                        <a href="{{ project.github_url }}"
-                           target="_blank"
-                           rel="noopener noreferrer"
-                           class="inline-flex items-center justify-center px-6 py-3 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-800 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl">
-                            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                            </svg>
-                            View Source Code
-                        </a>
-                        {% endif %}
-
-                        {% if project.demo_video_url %}
-                        <a href="{{ project.demo_video_url }}"
-                           target="_blank"
-                           rel="noopener noreferrer"
-                           class="inline-flex items-center justify-center px-6 py-3 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl">
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M19 10a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            Watch Demo
-                        </a>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Main Content Grid -->
-        <div class="grid grid-cols-1 xl:grid-cols-4 gap-8">
-
-            <!-- Main Content Area -->
-            <main class="xl:col-span-3 space-y-8">
-
-                <!-- Project Description -->
-                <section class="bg-white rounded-xl shadow-lg p-6 md:p-8">
-                    <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6 flex items-center">
-                        <svg class="w-6 h-6 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                        </svg>
-                        Project Overview
-                    </h2>
-                    <div class="prose prose-lg max-w-none text-gray-700 leading-relaxed">
-                        {{ project.description|linebreaks }}
-                    </div>
-                </section>
-
-                <!-- Key Features (if available) -->
-                {% if project.key_features %}
-                <section class="bg-white rounded-xl shadow-lg p-6 md:p-8">
-                    <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6 flex items-center">
-                        <svg class="w-6 h-6 mr-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                        Key Features
-                    </h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {% for feature in project.key_features %}
-                        <div class="flex items-start p-4 bg-gray-50 rounded-lg">
-                            <svg class="w-5 h-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                            </svg>
-                            <span class="text-gray-700">{{ feature }}</span>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </section>
+        <div style="text-align: center; margin-top: 3rem;">
+            <a href="{% url 'project_list' %}" class="btn btn-primary fade-in-up">
+                {% if LANGUAGE_CODE == 'fa' %}
+                    مشاهده همه پروژه‌ها
+                {% else %}
+                    View All Projects
                 {% endif %}
-
-                <!-- Challenges & Solutions (if available) -->
-                {% if project.challenges_and_solutions %}
-                <section class="bg-white rounded-xl shadow-lg p-6 md:p-8">
-                    <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6 flex items-center">
-                        <svg class="w-6 h-6 mr-3 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                        </svg>
-                        Challenges & Solutions
-                    </h2>
-                    <div class="prose prose-lg max-w-none text-gray-700 leading-relaxed">
-                        {{ project.challenges_and_solutions|linebreaks }}
-                    </div>
-                </section>
-                {% endif %}
-
-                <!-- Additional Images/Gallery (if available) -->
-                {% if project.additional_images.all %}
-                <section class="bg-white rounded-xl shadow-lg p-6 md:p-8">
-                    <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6 flex items-center">
-                        <svg class="w-6 h-6 mr-3 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                        </svg>
-                        Project Gallery
-                    </h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {% for image in project.additional_images.all %}
-                        <div class="aspect-w-16 aspect-h-9 rounded-lg overflow-hidden">
-                            <img src="{{ image.image.url }}"
-                                 alt="{{ image.caption|default:'Project screenshot' }}"
-                                 class="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                                 loading="lazy">
-                        </div>
-                        {% endfor %}
-                    </div>
-                </section>
-                {% endif %}
-
-            </main>
-
-            <!-- Sidebar -->
-            <aside class="xl:col-span-1 space-y-6">
-
-                <!-- Technologies Used -->
-                {% if project.technologies.all %}
-                <div class="bg-white rounded-xl shadow-lg p-6">
-                    <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                        <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                        </svg>
-                        Tech Stack
-                    </h3>
-                    <div class="flex flex-wrap gap-2">
-                        {% for tech in project.technologies.all %}
-                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800 border border-blue-200 hover:from-blue-100 hover:to-blue-200 transition-colors">
-                            {{ tech.name }}
-                        </span>
-                        {% endfor %}
-                    </div>
-                </div>
-                {% endif %}
-
-                <!-- Quick Links -->
-                <div class="bg-white rounded-xl shadow-lg p-6">
-                    <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                        <svg class="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
-                        </svg>
-                        Quick Links
-                    </h3>
-                    <div class="space-y-3">
-                        {% if project.live_url %}
-                        <a href="{{ project.live_url }}"
-                           target="_blank"
-                           rel="noopener noreferrer"
-                           class="flex items-center p-3 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors group">
-                            <svg class="w-5 h-5 mr-3 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                            </svg>
-                            <div>
-                                <div class="font-medium">Live Demo</div>
-                                <div class="text-sm text-gray-500">View the live project</div>
-                            </div>
-                        </a>
-                        {% endif %}
-
-                        {% if project.github_url %}
-                        <a href="{{ project.github_url }}"
-                           target="_blank"
-                           rel="noopener noreferrer"
-                           class="flex items-center p-3 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors group">
-                            <svg class="w-5 h-5 mr-3 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                            </svg>
-                            <div>
-                                <div class="font-medium">Source Code</div>
-                                <div class="text-sm text-gray-500">View on GitHub</div>
-                            </div>
-                        </a>
-                        {% endif %}
-
-                        {% if not project.live_url and not project.github_url %}
-                        <div class="flex items-center p-3 text-gray-400 bg-gray-50 rounded-lg">
-                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L12 12"/>
-                            </svg>
-                            <div>
-                                <div class="font-medium">Private Project</div>
-                                <div class="text-sm">No public links available</div>
-                            </div>
-                        </div>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <!-- Project Details -->
-                <div class="bg-white rounded-xl shadow-lg p-6">
-                    <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                        <svg class="w-5 h-5 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                        </svg>
-                        Project Details
-                    </h3>
-                    <div class="space-y-4">
-                        <div class="flex justify-between items-center py-2 border-b border-gray-100">
-                            <span class="text-gray-600 font-medium">Created</span>
-                            <span class="text-gray-900">{{ project.created_date|date:"M d, Y" }}</span>
-                        </div>
-
-                        {% if project.updated_date != project.created_date %}
-                        <div class="flex justify-between items-center py-2 border-b border-gray-100">
-                            <span class="text-gray-600 font-medium">Last Updated</span>
-                            <span class="text-gray-900">{{ project.updated_date|date:"M d, Y" }}</span>
-                        </div>
-                        {% endif %}
-
-                        <div class="flex justify-between items-center py-2 border-b border-gray-100">
-                            <span class="text-gray-600 font-medium">Status</span>
-                            <span class="text-gray-900">
-                                {% if project.featured %}
-                                    <span class="inline-flex items-center text-yellow-600 font-medium">
-                                        <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                        </svg>
-                                        Featured Project
-                                    </span>
-                                {% else %}
-                                    <span class="inline-flex items-center text-green-600 font-medium">
-                                        <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
-                                        </svg>
-                                        Active
-                                    </span>
-                                {% endif %}
-                            </span>
-                        </div>
-
-                        {% if project.category %}
-                        <div class="flex justify-between items-center py-2 border-b border-gray-100">
-                            <span class="text-gray-600 font-medium">Category</span>
-                            <span class="text-gray-900">{{ project.category }}</span>
-                        </div>
-                        {% endif %}
-
-                        {% if project.duration %}
-                        <div class="flex justify-between items-center py-2">
-                            <span class="text-gray-600 font-medium">Duration</span>
-                            <span class="text-gray-900">{{ project.duration }}</span>
-                        </div>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <!-- Share Project -->
-                <div class="bg-white rounded-xl shadow-lg p-6">
-                    <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                        <svg class="w-5 h-5 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"/>
-                        </svg>
-                        Share Project
-                    </h3>
-                    <div class="flex space-x-2">
-                        <!--<button onclick="shareProject('twitter')"
-                                class="flex-1 flex items-center justify-center p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
-                            </svg>
-                        </button>
-                        <button onclick="shareProject('linkedin')"
-                                class="flex-1 flex items-center justify-center p-2 bg-blue-700 text-white rounded-lg hover:bg-blue-800 transition-colors">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                            </svg>
-                        </button>-->
-                        <button onclick="copyProjectLink()"
-                                class="flex-1 flex items-center justify-center p-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Related Projects -->
-                {% if related_projects %}
-                <div class="bg-white rounded-xl shadow-lg p-6">
-                    <h3 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                        <svg class="w-5 h-5 mr-2 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0l-4-4m4 4l-4 4"/>
-                        </svg>
-                        Related Projects
-                    </h3>
-                    <div class="space-y-3">
-                        {% for related in related_projects %}
-                        <a href="{% url 'project_detail' related.slug %}"
-                           class="block p-3 hover:bg-gray-50 rounded-lg transition-colors group">
-                            <div class="flex items-center">
-                                {% if related.image %}
-                                <img src="{{ related.image.url }}"
-                                     alt="{{ related.title }}"
-                                     class="w-12 h-12 object-cover rounded-lg mr-3">
-                                {% else %}
-                                <div class="w-12 h-12 bg-gray-200 rounded-lg mr-3 flex items-center justify-center">
-                                    <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0l-4-4m4 4l-4 4"/>
-                                    </svg>
-                                </div>
-                                {% endif %}
-                                <div class="flex-1">
-                                    <h4 class="font-medium text-gray-900 group-hover:text-blue-600 transition-colors">
-                                        {{ related.title }}
-                                    </h4>
-                                    <p class="text-sm text-gray-500 truncate">
-                                        {{ related.short_description }}
-                                    </p>
-                                </div>
-                            </div>
-                        </a>
-                        {% endfor %}
-                    </div>
-                </div>
-                {% endif %}
-            </aside>
+                <i class="fas fa-arrow-right"></i>
+            </a>
         </div>
-
-        <!-- Project Navigation -->
-        <section class="mt-16 bg-white rounded-xl shadow-lg p-6 md:p-8">
-            <div class="flex flex-col md:flex-row items-center justify-between gap-6">
-
-                <!-- Previous Project -->
-                {% if previous_project %}
-                <a href="{% url 'project_detail' previous_project.slug %}"
-                   class="flex items-center group hover:bg-gray-50 p-4 rounded-lg transition-colors flex-1 md:max-w-sm">
-                    <div class="flex items-center">
-                        <svg class="w-6 h-6 text-gray-400 group-hover:text-blue-600 mr-3 transform group-hover:-translate-x-1 transition-all"
-                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                        </svg>
-                        <div class="text-left">
-                            <div class="text-sm text-gray-500 group-hover:text-gray-600">Previous Project</div>
-                            <div class="font-medium text-gray-900 group-hover:text-blue-600 truncate">
-                                {{ previous_project.title }}
-                            </div>
-                        </div>
-                    </div>
-                </a>
-                {% else %}
-                <div class="flex-1 md:max-w-sm"></div>
-                {% endif %}
-
-                <!-- Back to Projects -->
-                <a href="{% url 'project_list' %}"
-                   class="flex items-center justify-center px-6 py-3 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors group">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0l-4-4m4 4l-4 4"/>
-                    </svg>
-                    All Projects
-                </a>
-
-                <!-- Next Project -->
-                {% if next_project %}
-                <a href="{% url 'project_detail' next_project.slug %}"
-                   class="flex items-center group hover:bg-gray-50 p-4 rounded-lg transition-colors flex-1 md:max-w-sm justify-end">
-                    <div class="flex items-center">
-                        <div class="text-right">
-                            <div class="text-sm text-gray-500 group-hover:text-gray-600">Next Project</div>
-                            <div class="font-medium text-gray-900 group-hover:text-blue-600 truncate">
-                                {{ next_project.title }}
-                            </div>
-                        </div>
-                        <svg class="w-6 h-6 text-gray-400 group-hover:text-blue-600 ml-3 transform group-hover:translate-x-1 transition-all"
-                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                        </svg>
-                    </div>
-                </a>
-                {% else %}
-                <div class="flex-1 md:max-w-sm"></div>
-                {% endif %}
-            </div>
-        </section>
     </div>
-</div>
+</section>
+{% endblock %}
 
-<!-- JavaScript for Enhanced Functionality -->
+{% block extra_js %}
 <script>
-    // Share project functionality
-    function shareProject(platform) {
-        const url = encodeURIComponent(window.location.href);
-        const title = encodeURIComponent("{{ project.title|escapejs }}");
-        const description = encodeURIComponent("{{ project.short_description|escapejs }}");
+    // Animation Observer
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
 
-        let shareUrl = '';
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                entry.target.style.animationPlayState = 'running';
+                observer.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
 
-        switch(platform) {
-            case 'twitter':
-                shareUrl = `https://twitter.com/intent/tweet?url=${url}&text=${title} - ${description}`;
-                break;
-            case 'linkedin':
-                shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${url}`;
-                break;
-        }
+    // Observe all animation elements
+    document.querySelectorAll('.fade-in-up').forEach(el => {
+        el.style.animationPlayState = 'paused';
+        observer.observe(el);
+    });
 
-        if (shareUrl) {
-            window.open(shareUrl, '_blank', 'width=600,height=400');
-        }
-    }
-
-    // Copy project link
-    function copyProjectLink() {
-        navigator.clipboard.writeText(window.location.href).then(function() {
-            // Show success message
-            const button = event.target.closest('button');
-            const originalHTML = button.innerHTML;
-            button.innerHTML = `
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                </svg>
+    // Image zoom functionality
+    const mainImage = document.querySelector('.main-image img');
+    if (mainImage) {
+        mainImage.addEventListener('click', function() {
+            // Create lightbox overlay
+            const lightbox = document.createElement('div');
+            lightbox.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.9);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 10000;
+                cursor: pointer;
             `;
-            button.classList.remove('bg-gray-600', 'hover:bg-gray-700');
-            button.classList.add('bg-green-600');
 
-            setTimeout(() => {
-                button.innerHTML = originalHTML;
-                button.classList.remove('bg-green-600');
-                button.classList.add('bg-gray-600', 'hover:bg-gray-700');
-            }, 2000);
+            const img = document.createElement('img');
+            img.src = this.src;
+            img.alt = this.alt;
+            img.style.cssText = `
+                max-width: 90%;
+                max-height: 90%;
+                object-fit: contain;
+                border-radius: 8px;
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+            `;
+
+            lightbox.appendChild(img);
+            document.body.appendChild(lightbox);
+            document.body.style.overflow = 'hidden';
+
+            // Close on click
+            lightbox.addEventListener('click', function() {
+                document.body.removeChild(lightbox);
+                document.body.style.overflow = '';
+            });
+
+            // Close on escape
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    if (document.body.contains(lightbox)) {
+                        document.body.removeChild(lightbox);
+                        document.body.style.overflow = '';
+                    }
+                }
+            });
         });
     }
 
-    // Image lazy loading enhancement
-    document.addEventListener('DOMContentLoaded', function() {
-        const images = document.querySelectorAll('img[loading="lazy"]');
-
-        if ('IntersectionObserver' in window) {
-            const imageObserver = new IntersectionObserver((entries, observer) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        const img = entry.target;
-                        img.classList.add('fade-in');
-                        observer.unobserve(img);
-                    }
-                });
-            });
-
-            images.forEach(img => imageObserver.observe(img));
-        }
-    });
-
-    // Smooth scroll for anchor links
+    // Smooth scroll with offset for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             e.preventDefault();
             const target = document.querySelector(this.getAttribute('href'));
             if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
+                const offsetTop = target.offsetTop - 100;
+                window.scrollTo({
+                    top: offsetTop,
+                    behavior: 'smooth'
                 });
             }
         });
     });
-</script>
 
-<!-- Additional CSS for animations -->
-<style>
-    .fade-in {
-        animation: fadeIn 0.6s ease-in-out;
-    }
+    // Sticky sidebar behavior
+    function handleStickyElements() {
+        const sidebar = document.querySelector('.project-sidebar');
+        const content = document.querySelector('.project-content');
 
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
+        if (sidebar && content && window.innerWidth > 1024) {
+            const sidebarHeight = sidebar.offsetHeight;
+            const contentHeight = content.offsetHeight;
 
-    .hover-lift {
-        transition: transform 0.2s ease-in-out;
-    }
-
-    .hover-lift:hover {
-        transform: translateY(-2px);
-    }
-
-    /* Custom scrollbar for better UX */
-    ::-webkit-scrollbar {
-        width: 8px;
-    }
-
-    ::-webkit-scrollbar-track {
-        background: #f1f1f1;
-        border-radius: 4px;
-    }
-
-    ::-webkit-scrollbar-thumb {
-        background: #c1c1c1;
-        border-radius: 4px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-        background: #a8a8a8;
-    }
-
-    /* Responsive design improvements */
-    @media (max-width: 768px) {
-        .aspect-w-16 {
-            aspect-ratio: 16 / 10;
+            if (contentHeight > sidebarHeight) {
+                sidebar.style.position = 'sticky';
+                sidebar.style.top = '100px';
+            }
         }
     }
-</style>
+
+    // Handle sticky elements on load and resize
+    window.addEventListener('load', handleStickyElements);
+    window.addEventListener('resize', handleStickyElements);
+
+    // Tech badge hover effects
+    document.querySelectorAll('.tech-badge').forEach(badge => {
+        badge.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-3px) scale(1.05)';
+        });
+
+        badge.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(-2px) scale(1)';
+        });
+    });
+
+    // Project links tracking (for analytics)
+    document.querySelectorAll('.project-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            const linkType = this.textContent.trim();
+            const projectTitle = document.querySelector('h1').textContent;
+
+            // Here you can add analytics tracking
+            console.log(`Project link clicked: ${linkType} for ${projectTitle}`);
+        });
+    });
+
+    // Parallax effect for header
+    let ticking = false;
+
+
+    function requestTick() {
+        if (!ticking) {
+            requestAnimationFrame(updateParallax);
+            ticking = true;
+        }
+    }
+
+    window.addEventListener('scroll', requestTick);
+
+    // Reading progress indicator
+    function addReadingProgress() {
+        const progressBar = document.createElement('div');
+        progressBar.style.cssText = `
+            position: fixed;
+            top: 80px;
+            left: 0;
+            width: 0%;
+            height: 3px;
+            background: linear-gradient(135deg, var(--accent-primary), #8b5cf6);
+            z-index: 1001;
+            transition: width 0.1s ease;
+        `;
+
+        document.body.appendChild(progressBar);
+
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            progressBar.style.width = scrolled + '%';
+        });
+    }
+
+    // Add reading progress on load
+    document.addEventListener('DOMContentLoaded', addReadingProgress);
+
+    // Copy to clipboard functionality for tech badges
+    document.querySelectorAll('.tech-badge').forEach(badge => {
+        badge.addEventListener('click', function() {
+            const text = this.textContent.trim();
+
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(() => {
+                    // Show toast notification
+                    showToast(`${text} copied to clipboard!`);
+                });
+            }
+        });
+
+        // Add cursor pointer
+        badge.style.cursor = 'pointer';
+        badge.title = 'Click to copy';
+    });
+
+    // Toast notification function
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.textContent = message;
+        toast.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--accent-primary);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            z-index: 10000;
+            font-size: 0.9rem;
+            font-weight: 500;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-lg);
+        `;
+
+        document.body.appendChild(toast);
+
+        // Show toast
+        setTimeout(() => {
+            toast.style.opacity = '1';
+            toast.style.transform = 'translateY(0)';
+        }, 100);
+
+        // Hide toast
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                if (document.body.contains(toast)) {
+                    document.body.removeChild(toast);
+                }
+            }, 300);
+        }, 3000);
+    }
+</script>
 {% endblock %}

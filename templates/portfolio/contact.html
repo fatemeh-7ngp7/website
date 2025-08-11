@@ -1,566 +1,1336 @@
 {% extends 'base.html' %}
+{% load static %}
 {% load i18n %}
 
-{% block title %}{% trans "Contact - Fatemeh NGP" %}{% endblock %}
+{% block title %}{% trans "Contact" %} - {% trans "Portfolio" %}{% endblock %}
 
-{% block content %}
+{% block extra_css %}
 <style>
-    :root {
-        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        --accent-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        --dark-bg: var(--bg-primary);
-        --glass-bg: rgba(220, 220, 220, 0.3);
-        --glass-border: rgba(255, 255, 255, 0.2);
-        --text-primary: var(--text-primary);
-        --text-secondary: var(--text-secondary);
-        --shadow-glow: 0 0 40px rgba(102, 126, 234, 0.2);
-    }
-
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-
-    body {
-        background: var(--dark-bg);
-        color: var(--text-primary);
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        line-height: 1.6;
-        overflow-x: hidden;
-    }
-
-    /* Animated background particles */
-    .page-header {
+    /* Contact Header */
+    .contact-header-section {
+        background: linear-gradient(135deg,
+            var(--bg-primary) 0%,
+            var(--bg-secondary) 25%,
+            rgba(59, 130, 246, 0.1) 50%,
+            rgba(168, 85, 247, 0.1) 75%,
+            var(--bg-tertiary) 100%);
+        padding: 6rem 0 4rem;
         position: relative;
-        min-height: 60vh;
-        background: var(--primary-gradient);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
         overflow: hidden;
+        margin-top: 0;
     }
 
-    .page-header::before {
+    [data-theme="dark"] .contact-header-section {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 25%, #0f3460 50%, #533483 75%, #7209b7 100%);
+    }
+
+    .contact-header-section::before {
         content: '';
         position: absolute;
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;
-        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><radialGradient id="g" cx="50%" cy="50%" r="50%"><stop offset="0%" style="stop-color:rgba(255,255,255,0.1)"/><stop offset="100%" style="stop-color:rgba(255,255,255,0)"/></radialGradient></defs><circle cx="20" cy="20" r="2" fill="url(%23g)"><animate attributeName="opacity" values="0;1;0" dur="3s" repeatCount="indefinite"/></circle><circle cx="80" cy="30" r="1.5" fill="url(%23g)"><animate attributeName="opacity" values="0;1;0" dur="4s" repeatCount="indefinite" begin="1s"/></circle><circle cx="40" cy="70" r="2.5" fill="url(%23g)"><animate attributeName="opacity" values="0;1;0" dur="5s" repeatCount="indefinite" begin="2s"/></circle><circle cx="70" cy="80" r="1" fill="url(%23g)"><animate attributeName="opacity" values="0;1;0" dur="3.5s" repeatCount="indefinite" begin="0.5s"/></circle></svg>') repeat;
-        animation: float 20s linear infinite;
+        background:
+            radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(168, 85, 247, 0.12) 0%, transparent 50%),
+            radial-gradient(circle at 40% 80%, rgba(34, 197, 94, 0.08) 0%, transparent 50%);
+    }
+
+    [data-theme="dark"] .contact-header-section::before {
+        background:
+            radial-gradient(circle at 20% 50%, rgba(114, 9, 183, 0.4) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(59, 130, 246, 0.3) 0%, transparent 50%),
+            radial-gradient(circle at 40% 80%, rgba(168, 85, 247, 0.35) 0%, transparent 50%);
+    }
+
+    .contact-header-section::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%233b82f6' fill-opacity='0.04'%3E%3Cpath d='M60 2L62 58L60 60L58 58L60 2ZM2 60L58 58L60 60L58 62L2 60ZM60 118L58 62L60 60L62 62L60 118ZM118 60L62 62L60 60L62 58L118 60Z'/%3E%3C/g%3E%3C/svg%3E");
+        opacity: 0.6;
+    }
+
+    [data-theme="dark"] .contact-header-section::after {
+        background: url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.08'%3E%3Cpath d='M60 2L62 58L60 60L58 58L60 2ZM2 60L58 58L60 60L58 62L2 60ZM60 118L58 62L60 60L62 62L60 118ZM118 60L62 62L60 60L62 58L118 60Z'/%3E%3C/g%3E%3C/svg%3E");
+        opacity: 0.8;
     }
 
     @keyframes float {
-        0% { transform: translateY(0px) rotate(0deg); }
-        100% { transform: translateY(-100vh) rotate(360deg); }
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        33% { transform: translateY(-10px) rotate(1deg); }
+        66% { transform: translateY(10px) rotate(-1deg); }
     }
 
-    .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 0 20px;
+    .contact-header-content {
         position: relative;
         z-index: 1;
+        text-align: center;
     }
 
-    .page-header h1 {
+    .contact-title {
         font-size: clamp(2.5rem, 5vw, 4rem);
         font-weight: 800;
-        margin-bottom: 1rem;
-        background: linear-gradient(45deg, #ffffff, #f0f0f0);
+        margin-bottom: 1.5rem;
+        background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-primary) 50%, #8b5cf6 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
-        text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
-        animation: titleGlow 3s ease-in-out infinite alternate;
+        animation: shimmer 3s ease-in-out infinite;
+        background-size: 200% 200%;
     }
 
-    @keyframes titleGlow {
-        0% { text-shadow: 0 0 30px rgba(255, 255, 255, 0.5); }
-        100% { text-shadow: 0 0 50px rgba(255, 255, 255, 0.8); }
+    @keyframes shimmer {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
     }
 
-    .page-header p {
-        font-size: 1.25rem;
-        opacity: 1;
-        color: rgba(255, 255, 255, 0.95);
+    .contact-subtitle {
+        font-size: 1.2rem;
+        color: var(--text-secondary);
         max-width: 600px;
         margin: 0 auto;
-        animation: slideUp 1s ease-out 0.5s both;
+        line-height: 1.6;
     }
 
-    @keyframes slideUp {
-        from { opacity: 0; transform: translateY(30px); }
-        to { opacity: 0.9; transform: translateY(0); }
+    /* Main Contact Section */
+    .contact-main-section {
+        padding: 5rem 0;
     }
 
-    .contact-section {
-        padding: 100px 0;
-        background: var(--dark-bg);
+    .contact-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    /* Contact Info Card */
+    .contact-info-card {
+        background: var(--bg-secondary);
+        border-radius: 1.5rem;
+        padding: 3rem;
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow-lg);
         position: relative;
+        overflow: hidden;
+        height: fit-content;
     }
 
-    .contact-section::before {
+    .contact-info-card::before {
         content: '';
         position: absolute;
         top: 0;
         left: 0;
         right: 0;
-        bottom: 0;
-        background: radial-gradient(circle at 20% 80%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
-                    radial-gradient(circle at 80% 20%, rgba(118, 75, 162, 0.1) 0%, transparent 50%);
+        height: 4px;
+        background: linear-gradient(135deg, var(--accent-primary), #8b5cf6);
     }
 
-    .contact-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 60px;
-        align-items: start;
-        position: relative;
-        z-index: 1;
-    }
-
-    .contact-info {
-        animation: fadeInLeft 1s ease-out;
-    }
-
-    @keyframes fadeInLeft {
-        from { opacity: 0; transform: translateX(-50px); }
-        to { opacity: 1; transform: translateX(0); }
-    }
-
-    .contact-info h2 {
-        font-size: 2.5rem;
+    .contact-info-title {
+        font-size: 1.75rem;
         font-weight: 700;
         margin-bottom: 1.5rem;
-        background: var(--accent-gradient);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        color: var(--text-primary);
     }
 
-    .contact-info > p {
-        font-size: 1.1rem;
+    .contact-info-text {
         color: var(--text-secondary);
-        margin-bottom: 3rem;
-        line-height: 1.8;
+        margin-bottom: 2rem;
+        line-height: 1.7;
+        font-size: 1.05rem;
     }
 
     .contact-methods {
         display: flex;
         flex-direction: column;
-        gap: 2rem;
+        gap: 1.5rem;
     }
 
     .contact-method {
         display: flex;
         align-items: center;
-        gap: 1.5rem;
-        padding: 1.5rem;
-        background: var(--glass-bg);
-        border: 1px solid var(--glass-border);
-        border-radius: 16px;
-        backdrop-filter: blur(10px);
-        transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .contact-method::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-        transition: left 0.5s ease;
-    }
-
-    .contact-method:hover::before {
-        left: 100%;
+        gap: 1rem;
+        padding: 1rem;
+        background: var(--bg-tertiary);
+        border-radius: 1rem;
+        border: 1px solid var(--border-color);
+        transition: var(--transition);
     }
 
     .contact-method:hover {
-        transform: translateY(-5px);
-        box-shadow: var(--shadow-glow);
-        border-color: rgba(102, 126, 234, 0.5);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--accent-primary);
     }
 
-    .contact-method i {
-        font-size: 1.5rem;
-        color: #667eea;
-        min-width: 40px;
-        text-align: center;
+    .contact-method-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, var(--accent-primary), #8b5cf6);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+        flex-shrink: 0;
     }
 
-    .contact-method h4 {
+    .contact-method-info h4 {
         font-size: 1.1rem;
         font-weight: 600;
-        margin-bottom: 0.5rem;
         color: var(--text-primary);
+        margin-bottom: 0.25rem;
     }
 
-    .contact-method p {
+    .contact-method-info p {
         color: var(--text-secondary);
         margin: 0;
+        font-size: 0.95rem;
     }
 
-    .contact-form-container {
-        animation: fadeInRight 1s ease-out;
+    .contact-method-info a {
+        color: var(--accent-primary);
+        text-decoration: none;
+        transition: var(--transition);
     }
 
-    @keyframes fadeInRight {
-        from { opacity: 0; transform: translateX(50px); }
-        to { opacity: 1; transform: translateX(0); }
+    .contact-method-info a:hover {
+        color: var(--accent-hover);
     }
 
-    .contact-form {
-        background: var(--glass-bg);
-        border: 1px solid var(--glass-border);
-        border-radius: 20px;
-        padding: 2.5rem;
-        backdrop-filter: blur(15px);
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    /* Contact Form Card */
+    .contact-form-card {
+        background: var(--bg-secondary);
+        border-radius: 1.5rem;
+        padding: 3rem;
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow-lg);
         position: relative;
         overflow: hidden;
     }
 
-    .contact-form::before {
+    .contact-form-card::before {
         content: '';
         position: absolute;
         top: 0;
         left: 0;
         right: 0;
-        height: 2px;
-        background: var(--accent-gradient);
+        height: 4px;
+        background: linear-gradient(135deg, var(--accent-primary), #8b5cf6);
+    }
+
+    .contact-form-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        color: var(--text-primary);
+    }
+
+    /* Form Styling */
+    .contact-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
     }
 
     .form-group {
-        margin-bottom: 1.5rem;
         position: relative;
     }
 
-    .form-group label {
+    .form-label {
         display: block;
-        margin-bottom: 0.5rem;
         font-weight: 500;
         color: var(--text-primary);
-        font-size: 0.9rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
     }
 
-    .form-group input,
-    .form-group textarea {
+    .form-label.required::after {
+        content: ' *';
+        color: #ef4444;
+    }
+
+    .form-input,
+    .form-textarea {
         width: 100%;
-        padding: 1rem 1.5rem;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 12px;
+        padding: 1rem 1.25rem;
+        border: 2px solid var(--border-color);
+        border-radius: 0.75rem;
+        background: var(--bg-primary);
         color: var(--text-primary);
         font-size: 1rem;
-        transition: all 0.3s ease;
-        backdrop-filter: blur(10px);
+        transition: var(--transition);
+        outline: none;
+        font-family: inherit;
     }
 
-    .form-group input:focus,
-    .form-group textarea:focus {
-        outline: none;
-        border-color: #667eea;
-        box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
-        background: rgba(255, 255, 255, 0.08);
+    .form-input:focus,
+    .form-textarea:focus {
+        border-color: var(--accent-primary);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         transform: translateY(-2px);
     }
 
-    .form-group textarea {
-        min-height: 120px;
+    .form-textarea {
         resize: vertical;
+        min-height: 120px;
+        line-height: 1.6;
     }
 
-    .form-error {
-        color: #ff6b6b;
-        font-size: 0.85rem;
-        margin-top: 0.5rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
+    .form-input:invalid:not(:focus):not(:placeholder-shown),
+    .form-textarea:invalid:not(:focus):not(:placeholder-shown) {
+        border-color: #ef4444;
+        box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
     }
 
-    .form-error::before {
-        content: '⚠';
-        font-size: 1rem;
+    .form-input:valid:not(:focus):not(:placeholder-shown),
+    .form-textarea:valid:not(:focus):not(:placeholder-shown) {
+        border-color: #10b981;
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
     }
 
-    .btn-primary {
-        background: var(--primary-gradient);
-        color: white;
-        padding: 1rem 2.5rem;
-        border: none;
-        border-radius: 50px;
-        font-size: 1rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
-    }
-
-    .btn-primary::before {
-        content: '';
+    /* Security Features */
+    .honeypot {
         position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-        transition: left 0.5s ease;
+        left: -9999px;
+        opacity: 0;
+        pointer-events: none;
     }
 
-    .btn-primary:hover::before {
-        left: 100%;
-    }
-
-    .btn-primary:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
-    }
-
-    .btn-primary:active {
-        transform: translateY(-1px);
-    }
-
-    .alert {
-        padding: 1rem 1.5rem;
-        border-radius: 12px;
-        margin-bottom: 1.5rem;
+    .form-security {
         display: flex;
         align-items: center;
         gap: 0.75rem;
-        animation: slideDown 0.5s ease-out;
+        padding: 1rem;
+        background: var(--bg-tertiary);
+        border-radius: 0.75rem;
+        border: 1px solid var(--border-color);
+        font-size: 0.9rem;
+        color: var(--text-secondary);
     }
 
-    @keyframes slideDown {
-        from { opacity: 0; transform: translateY(-20px); }
-        to { opacity: 1; transform: translateY(0); }
+    .security-icon {
+        color: var(--accent-primary);
+        font-size: 1.1rem;
     }
 
-    .alert-success {
-        background: rgba(76, 175, 80, 0.1);
-        color: #4caf50;
-        border: 1px solid rgba(76, 175, 80, 0.3);
+    /* Submit Button */
+    .submit-button {
+        background: linear-gradient(135deg, var(--accent-primary), #8b5cf6);
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 0.75rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        min-height: 54px;
     }
 
-    .alert-error {
-        background: rgba(244, 67, 54, 0.1);
-        color: #f44336;
-        border: 1px solid rgba(244, 67, 54, 0.3);
+    .submit-button:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
     }
 
-    .alert::before {
-        content: '✓';
-        font-size: 1.2rem;
-        font-weight: bold;
+    .submit-button:active {
+        transform: translateY(0);
     }
 
-    .alert-error::before {
-        content: '✗';
-    }
-
-    /* Dark theme overrides */
-    .dark-theme .page-header {
-        background: var(--primary-gradient);
-    }
-
-    .dark-theme .page-header::before {
+    .submit-button:disabled {
         opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
     }
 
-    .dark-theme .contact-section {
-        background: var(--bg-primary);
+    .submit-button .spinner {
+        display: none;
+        width: 20px;
+        height: 20px;
+        border: 2px solid transparent;
+        border-top: 2px solid white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
     }
 
-    .dark-theme .contact-method {
-        background: rgba(31, 41, 55, 0.4);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
+    .submit-button.loading .spinner {
+        display: block;
     }
 
-    .dark-theme .contact-form {
-        background: rgba(31, 41, 55, 0.4);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
+    .submit-button.loading .submit-text {
+        display: none;
     }
 
-    .dark-theme .form-group input,
-    .dark-theme .form-group textarea {
-        background: rgba(17, 24, 39, 0.6);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        color: var(--text-primary);
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
     }
 
-    .dark-theme .form-group input:focus,
-    .dark-theme .form-group textarea:focus {
-        border-color: var(--primary-color);
-        background: rgba(17, 24, 39, 0.8);
+    /* Success/Error Messages */
+    .message-container {
+        position: fixed;
+        top: 100px;
+        right: 2rem;
+        z-index: 1000;
+        max-width: 400px;
     }
 
-    .dark-theme .contact-method:hover {
-        border-color: rgba(102, 126, 234, 0.3);
-        box-shadow: 0 0 30px rgba(102, 126, 234, 0.1);
+    .message {
+        padding: 1rem 1.5rem;
+        border-radius: 0.75rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        box-shadow: var(--shadow-lg);
+        animation: slideInRight 0.3s ease-out;
+        position: relative;
+        overflow: hidden;
     }
 
-    /* Keep the purple gradient visible in dark mode */
-    .dark-theme .page-header h1 {
-        background: linear-gradient(45deg, #a790ef, #a0aafb);
-        -webkit-background-clip: text;
-        background-clip: text;
-        -webkit-text-fill-color: transparent;
+    .message::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+    }
+
+    .message.success {
+        background: #f0fdf4;
+        color: #166534;
+        border: 1px solid #bbf7d0;
+    }
+
+    .message.success::before {
+        background: #16a34a;
+    }
+
+    [data-theme="dark"] .message.success {
+        background: #0f1f0f;
+        color: #4ade80;
+        border-color: #166534;
+    }
+
+    .message.error {
+        background: #fef2f2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+    }
+
+    .message.error::before {
+        background: #dc2626;
+    }
+
+    [data-theme="dark"] .message.error {
+        background: #1f0f0f;
+        color: #f87171;
+        border-color: #991b1b;
+    }
+
+    .message-icon {
+        font-size: 1.2rem;
+        flex-shrink: 0;
+    }
+
+    .message-close {
+        margin-left: auto;
+        background: none;
+        border: none;
+        color: inherit;
+        cursor: pointer;
+        font-size: 1.1rem;
+        padding: 0.25rem;
+        border-radius: 0.25rem;
+        transition: var(--transition);
+    }
+
+    .message-close:hover {
+        background: rgba(0, 0, 0, 0.1);
+    }
+
+    @keyframes slideInRight {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    /* Character Counter */
+    .char-counter {
+        text-align: right;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-top: 0.25rem;
+    }
+
+    .char-counter.warning {
+        color: #f59e0b;
+    }
+
+    .char-counter.danger {
+        color: #ef4444;
+    }
+
+    /* RTL Support */
+    [dir="rtl"] .contact-container {
+        direction: rtl;
+    }
+
+    [dir="rtl"] .contact-method {
+        flex-direction: row-reverse;
+    }
+
+    [dir="rtl"] .message-container {
+        right: auto;
+        left: 2rem;
+    }
+
+    [dir="rtl"] .message {
+        animation: slideInLeft 0.3s ease-out;
+    }
+
+    [dir="rtl"] .message::before {
+        left: auto;
+        right: 0;
+    }
+
+    [dir="rtl"] .message-close {
+        margin-left: 0;
+        margin-right: auto;
+    }
+
+    [dir="rtl"] .char-counter {
+        text-align: left;
+    }
+
+    @keyframes slideInLeft {
+        from {
+            transform: translateX(-100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
     }
 
     /* Responsive Design */
     @media (max-width: 768px) {
-        .contact-grid {
+        .contact-header-section {
+            padding: 4rem 0 3rem;
+        }
+
+        .contact-title {
+            font-size: 2.5rem;
+        }
+
+        .contact-container {
             grid-template-columns: 1fr;
-            gap: 40px;
+            gap: 2rem;
+            padding: 0 1rem;
         }
 
-        .page-header {
-            min-height: 40vh;
-            padding: 2rem 0;
-        }
-
-        .contact-section {
-            padding: 60px 0;
-        }
-
-        .contact-form {
+        .contact-info-card,
+        .contact-form-card {
             padding: 2rem;
         }
 
-        .contact-info h2 {
-            font-size: 2rem;
-        }
-
         .contact-methods {
-            gap: 1.5rem;
+            gap: 1rem;
         }
 
         .contact-method {
-            padding: 1.25rem;
+            padding: 0.75rem;
+        }
+
+        .contact-method-icon {
+            width: 40px;
+            height: 40px;
+            font-size: 1rem;
+        }
+
+        .message-container {
+            left: 1rem;
+            right: 1rem;
+            max-width: none;
+        }
+
+        .form-input,
+        .form-textarea {
+            padding: 0.875rem 1rem;
         }
     }
 
-    @media (max-width: 480px) {
-        .container {
-            padding: 0 15px;
-        }
+    /* Animation Classes */
+    .fade-in-up {
+        opacity: 0;
+        transform: translateY(30px);
+        animation: fadeInUp 0.6s ease-out forwards;
+    }
 
-        .contact-form {
-            padding: 1.5rem;
-        }
-
-        .page-header h1 {
-            font-size: 2rem;
-        }
-
-        .page-header p {
-            font-size: 1.1rem;
+    @keyframes fadeInUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
         }
     }
+
+    .stagger-1 { animation-delay: 0.1s; }
+    .stagger-2 { animation-delay: 0.2s; }
+    .stagger-3 { animation-delay: 0.3s; }
 </style>
+{% endblock %}
 
-<section class="page-header">
+{% block content %}
+<!-- Contact Header Section -->
+<section class="contact-header-section">
     <div class="container">
-        <h1>{% trans "Get In Touch" %}</h1>
-        <p>{% trans "Let's discuss your next project or opportunity" %}</p>
-    </div>
-</section>
-
-<section class="contact-section">
-    <div class="container">
-        <div class="contact-grid">
-            <div class="contact-info">
-                <h2>{% trans "Let's Connect" %}</h2>
-                <p>{% trans "I'm always interested in hearing about new opportunities and interesting projects. Whether you have a question or just want to say hi, feel free to reach out!" %}</p>
-
-                <div class="contact-methods">
-                    <div class="contact-method">
-                        <i class="fas fa-envelope"></i>
-                        <div>
-                            <h4>{% trans "Email" %}</h4>
-                            <p>najafgholipoorfatemeh@gmail.com</p>
-                        </div>
-                    </div>
-                    <div class="contact-method">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <div>
-                            <h4>{% trans "Location" %}</h4>
-                            <p>{% trans "Tabriz, Iran" %}</p>
-                        </div>
-                    </div>
-                    <div class="contact-method">
-                        <i class="fas fa-clock"></i>
-                        <div>
-                            <h4>{% trans "Response Time" %}</h4>
-                            <p>{% trans "Usually within 24 hours" %}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="contact-form-container">
-                {% if messages %}
-                    {% for message in messages %}
-                        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-                    {% endfor %}
+        <div class="contact-header-content fade-in-up">
+            <h1 class="contact-title">
+                {% if LANGUAGE_CODE == 'fa' %}
+                    تماس با من
+                {% else %}
+                    {% trans "Contact Me" %}
                 {% endif %}
-
-                <form method="post" class="contact-form">
-                    {% csrf_token %}
-                    <div class="form-group">
-                        <label for="{{ form.name.id_for_label }}">{% trans "Name" %}</label>
-                        {{ form.name }}
-                        {% if form.name.errors %}
-                            <div class="form-error">{{ form.name.errors.0 }}</div>
-                        {% endif %}
-                    </div>
-
-                    <div class="form-group">
-                        <label for="{{ form.email.id_for_label }}">{% trans "Email" %}</label>
-                        {{ form.email }}
-                        {% if form.email.errors %}
-                            <div class="form-error">{{ form.email.errors.0 }}</div>
-                        {% endif %}
-                    </div>
-
-                    <div class="form-group">
-                        <label for="{{ form.subject.id_for_label }}">{% trans "Subject" %}</label>
-                        {{ form.subject }}
-                        {% if form.subject.errors %}
-                            <div class="form-error">{{ form.subject.errors.0 }}</div>
-                        {% endif %}
-                    </div>
-
-                    <div class="form-group">
-                        <label for="{{ form.message.id_for_label }}">{% trans "Message" %}</label>
-                        {{ form.message }}
-                        {% if form.message.errors %}
-                            <div class="form-error">{{ form.message.errors.0 }}</div>
-                        {% endif %}
-                    </div>
-
-                    <button type="submit" class="btn btn-primary">{% trans "Send Message" %}</button>
-                </form>
-            </div>
+            </h1>
+            <p class="contact-subtitle">
+                {% if LANGUAGE_CODE == 'fa' %}
+                    آماده همکاری در پروژه‌های جدید و پاسخگویی به سوالات شما هستم
+                {% else %}
+                    {% trans "Ready to collaborate on new projects and answer your questions" %}
+                {% endif %}
+            </p>
         </div>
     </div>
 </section>
+
+<!-- Message Container for Success/Error Messages -->
+<div class="message-container" id="messageContainer">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="message {{ message.tags }} fade-in-up" data-auto-dismiss="5000">
+                <i class="message-icon fas {% if message.tags == 'success' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %}"></i>
+                <span>{{ message }}</span>
+                <button type="button" class="message-close" onclick="this.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+
+<!-- Main Contact Section -->
+<section class="contact-main-section">
+    <div class="contact-container">
+        <!-- Contact Information -->
+        <div class="contact-info-card fade-in-up stagger-1">
+            <h2 class="contact-info-title">
+                {% if LANGUAGE_CODE == 'fa' %}
+                    راه‌های ارتباط
+                {% else %}
+                    {% trans "Get in Touch" %}
+                {% endif %}
+            </h2>
+            <p class="contact-info-text">
+                {% if LANGUAGE_CODE == 'fa' %}
+                    از طریق فرم تماس یا راه‌های زیر می‌توانید با من در ارتباط باشید. سعی می‌کنم در کمترین زمان ممکن پاسخ شما را بدهم.
+                {% else %}
+                    {% trans "Feel free to reach out through the contact form or via the methods below. I'll try to respond as quickly as possible." %}
+                {% endif %}
+            </p>
+
+            <div class="contact-methods">
+                <div class="contact-method">
+                    <div class="contact-method-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <div class="contact-method-info">
+                        <h4>
+                            {% if LANGUAGE_CODE == 'fa' %}
+                                ایمیل
+                            {% else %}
+                                Email
+                            {% endif %}
+                        </h4>
+                        <p>
+                            <a href="mailto:fatemeh@example.com">fatemeh@example.com</a>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="contact-method">
+                    <div class="contact-method-icon">
+                        <i class="fab fa-linkedin-in"></i>
+                    </div>
+                    <div class="contact-method-info">
+                        <h4>LinkedIn</h4>
+                        <p>
+                            <a href="https://linkedin.com/in/fatemehnhp" target="_blank" rel="noopener noreferrer">
+                                linkedin.com/in/fatemehnhp
+                            </a>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="contact-method">
+                    <div class="contact-method-icon">
+                        <i class="fab fa-github"></i>
+                    </div>
+                    <div class="contact-method-info">
+                        <h4>GitHub</h4>
+                        <p>
+                            <a href="https://github.com/fatemehnhp" target="_blank" rel="noopener noreferrer">
+                                github.com/fatemehnhp
+                            </a>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="contact-method">
+                    <div class="contact-method-icon">
+                        <i class="fab fa-telegram-plane"></i>
+                    </div>
+                    <div class="contact-method-info">
+                        <h4>Telegram</h4>
+                        <p>
+                            <a href="https://t.me/fatemehnhp" target="_blank" rel="noopener noreferrer">
+                                @fatemehnhp
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Form -->
+        <div class="contact-form-card fade-in-up stagger-2">
+            <h2 class="contact-form-title">
+                {% if LANGUAGE_CODE == 'fa' %}
+                    ارسال پیام
+                {% else %}
+                    {% trans "Send Message" %}
+                {% endif %}
+            </h2>
+
+            <form method="post" class="contact-form" id="contactForm" novalidate>
+                {% csrf_token %}
+
+                <!-- Honeypot for bot protection -->
+                <input type="text" name="honeypot" class="honeypot" tabindex="-1" autocomplete="off">
+
+                <!-- Name Field -->
+                <div class="form-group">
+                    <label for="{{ form.name.id_for_label }}" class="form-label required">
+                        {% if LANGUAGE_CODE == 'fa' %}
+                            نام و نام خانوادگی
+                        {% else %}
+                            {% trans "Full Name" %}
+                        {% endif %}
+                    </label>
+                    <input type="text"
+                           id="{{ form.name.id_for_label }}"
+                           name="{{ form.name.name }}"
+                           class="form-input"
+                           required
+                           maxlength="100"
+                           autocomplete="name"
+                           placeholder="{% if LANGUAGE_CODE == 'fa' %}نام شما...{% else %}Your name...{% endif %}">
+                </div>
+
+                <!-- Email Field -->
+                <div class="form-group">
+                    <label for="{{ form.email.id_for_label }}" class="form-label required">
+                        {% if LANGUAGE_CODE == 'fa' %}
+                            آدرس ایمیل
+                        {% else %}
+                            {% trans "Email Address" %}
+                        {% endif %}
+                    </label>
+                    <input type="email"
+                           id="{{ form.email.id_for_label }}"
+                           name="{{ form.email.name }}"
+                           class="form-input"
+                           required
+                           autocomplete="email"
+                           placeholder="{% if LANGUAGE_CODE == 'fa' %}example@email.com{% else %}your.email@example.com{% endif %}">
+                </div>
+
+                <!-- Subject Field -->
+                <div class="form-group">
+                    <label for="{{ form.subject.id_for_label }}" class="form-label required">
+                        {% if LANGUAGE_CODE == 'fa' %}
+                            موضوع پیام
+                        {% else %}
+                            {% trans "Subject" %}
+                        {% endif %}
+                    </label>
+                    <input type="text"
+                           id="{{ form.subject.id_for_label }}"
+                           name="{{ form.subject.name }}"
+                           class="form-input"
+                           required
+                           maxlength="200"
+                           placeholder="{% if LANGUAGE_CODE == 'fa' %}موضوع پیام شما...{% else %}Message subject...{% endif %}">
+                </div>
+
+                <!-- Message Field -->
+                <div class="form-group">
+                    <label for="{{ form.message.id_for_label }}" class="form-label required">
+                        {% if LANGUAGE_CODE == 'fa' %}
+                            پیام شما
+                        {% else %}
+                            {% trans "Your Message" %}
+                        {% endif %}
+                    </label>
+                    <textarea id="{{ form.message.id_for_label }}"
+                              name="{{ form.message.name }}"
+                              class="form-textarea"
+                              required
+                              maxlength="5000"
+                              rows="6"
+                              placeholder="{% if LANGUAGE_CODE == 'fa' %}پیام خود را اینجا بنویسید...{% else %}Write your message here...{% endif %}"></textarea>
+                    <div class="char-counter" id="messageCounter">0 / 5000</div>
+                </div>
+
+                <!-- Security Notice -->
+                <div class="form-security">
+                    <i class="fas fa-shield-alt security-icon"></i>
+                    <span>
+                        {% if LANGUAGE_CODE == 'fa' %}
+                            اطلاعات شما با رمزنگاری SSL محافظت می‌شود
+                        {% else %}
+                            {% trans "Your information is protected with SSL encryption" %}
+                        {% endif %}
+                    </span>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="submit-button" id="submitButton">
+                    <div class="spinner"></div>
+                    <span class="submit-text">
+                        <i class="fas fa-paper-plane"></i>
+                        {% if LANGUAGE_CODE == 'fa' %}
+                            ارسال پیام
+                        {% else %}
+                            {% trans "Send Message" %}
+                        {% endif %}
+                    </span>
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Animation Observer
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                entry.target.style.animationPlayState = 'running';
+                observer.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+
+    // Observe all animation elements
+    document.querySelectorAll('.fade-in-up').forEach(el => {
+        el.style.animationPlayState = 'paused';
+        observer.observe(el);
+    });
+
+    // Form Elements
+    const contactForm = document.getElementById('contactForm');
+    const submitButton = document.getElementById('submitButton');
+    const messageTextarea = document.querySelector('textarea[name="message"]');
+    const messageCounter = document.getElementById('messageCounter');
+
+    // Character Counter
+    if (messageTextarea && messageCounter) {
+        function updateCharCounter() {
+            const currentLength = messageTextarea.value.length;
+            const maxLength = 5000;
+            messageCounter.textContent = `${currentLength} / ${maxLength}`;
+
+            // Update counter color based on usage
+            if (currentLength > maxLength * 0.9) {
+                messageCounter.className = 'char-counter danger';
+            } else if (currentLength > maxLength * 0.7) {
+                messageCounter.className = 'char-counter warning';
+            } else {
+                messageCounter.className = 'char-counter';
+            }
+        }
+
+        messageTextarea.addEventListener('input', updateCharCounter);
+        updateCharCounter();
+    }
+
+    // Form Validation
+    function validateForm() {
+        const formInputs = contactForm.querySelectorAll('input[required], textarea[required]');
+        let isValid = true;
+        let firstInvalidField = null;
+
+        formInputs.forEach(input => {
+            const value = input.value.trim();
+            let fieldValid = true;
+
+            // Basic required field validation
+            if (!value) {
+                fieldValid = false;
+            }
+
+            // Email validation
+            if (input.type === 'email' && value) {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(value)) {
+                    fieldValid = false;
+                }
+            }
+
+            // Name validation (no numbers or special characters)
+            if (input.name === 'name' && value) {
+                const nameRegex = /^[a-zA-Zآ-ی\s]+$/u;
+                if (!nameRegex.test(value)) {
+                    fieldValid = false;
+                }
+            }
+
+            // Update field styling
+            if (!fieldValid) {
+                input.style.borderColor = '#ef4444';
+                input.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.1)';
+                if (!firstInvalidField) {
+                    firstInvalidField = input;
+                }
+                isValid = false;
+            } else {
+                input.style.borderColor = '#10b981';
+                input.style.boxShadow = '0 0 0 3px rgba(16, 185, 129, 0.1)';
+            }
+        });
+
+        // Focus first invalid field
+        if (firstInvalidField) {
+            firstInvalidField.focus();
+            firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        return isValid;
+    }
+
+    // Security: Honeypot check
+    function checkHoneypot() {
+        const honeypot = contactForm.querySelector('input[name="honeypot"]');
+        return !honeypot || honeypot.value === '';
+    }
+
+    // Security: Rate limiting (simple client-side check)
+    function checkRateLimit() {
+        const lastSubmission = localStorage.getItem('lastContactSubmission');
+        const now = Date.now();
+        const cooldownPeriod = 60000; // 1 minute
+
+        if (lastSubmission && (now - parseInt(lastSubmission)) < cooldownPeriod) {
+            showMessage('error', '{% if LANGUAGE_CODE == "fa" %}لطفاً کمی صبر کنید و دوباره تلاش کنید.{% else %}Please wait a moment before submitting again.{% endif %}');
+            return false;
+        }
+
+        localStorage.setItem('lastContactSubmission', now.toString());
+        return true;
+    }
+
+    // Form Submission
+    if (contactForm) {
+        contactForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            // Security checks
+            if (!checkHoneypot()) {
+                console.warn('Honeypot triggered');
+                return;
+            }
+
+            if (!checkRateLimit()) {
+                return;
+            }
+
+            // Validate form
+            if (!validateForm()) {
+                showMessage('error', '{% if LANGUAGE_CODE == "fa" %}لطفاً تمام فیلدهای ضروری را به درستی پر کنید.{% else %}Please fill in all required fields correctly.{% endif %}');
+                return;
+            }
+
+            // Show loading state
+            submitButton.classList.add('loading');
+            submitButton.disabled = true;
+
+            try {
+                // Submit form
+                const formData = new FormData(contactForm);
+
+                const response = await fetch(contactForm.action || window.location.href, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                    }
+                });
+
+                if (response.ok) {
+                    // Success
+                    showMessage('success', '{% if LANGUAGE_CODE == "fa" %}پیام شما با موفقیت ارسال شد!{% else %}Your message has been sent successfully!{% endif %}');
+                    contactForm.reset();
+                    updateCharCounter();
+
+                    // Reset field styling
+                    contactForm.querySelectorAll('input, textarea').forEach(field => {
+                        field.style.borderColor = '';
+                        field.style.boxShadow = '';
+                    });
+
+                    // Add success animation
+                    contactForm.style.transform = 'scale(0.98)';
+                    setTimeout(() => {
+                        contactForm.style.transform = '';
+                    }, 200);
+                } else {
+                    throw new Error('Network response was not ok');
+                }
+            } catch (error) {
+                console.error('Form submission error:', error);
+                showMessage('error', '{% if LANGUAGE_CODE == "fa" %}خطایی در ارسال پیام رخ داد. لطفاً دوباره تلاش کنید.{% else %}An error occurred while sending your message. Please try again.{% endif %}');
+            } finally {
+                // Hide loading state
+                submitButton.classList.remove('loading');
+                submitButton.disabled = false;
+            }
+        });
+    }
+
+    // Real-time validation
+    contactForm.querySelectorAll('input, textarea').forEach(field => {
+        field.addEventListener('blur', function() {
+            if (this.value.trim()) {
+                validateField(this);
+            }
+        });
+
+        field.addEventListener('input', function() {
+            // Clear error styling when user starts typing
+            if (this.style.borderColor === 'rgb(239, 68, 68)') {
+                this.style.borderColor = '';
+                this.style.boxShadow = '';
+            }
+        });
+    });
+
+    function validateField(field) {
+        const value = field.value.trim();
+        let isValid = true;
+
+        if (field.hasAttribute('required') && !value) {
+            isValid = false;
+        }
+
+        if (field.type === 'email' && value) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(value)) {
+                isValid = false;
+            }
+        }
+
+        if (field.name === 'name' && value) {
+            const nameRegex = /^[a-zA-Zآ-ی\s]+$/u;
+            if (!nameRegex.test(value)) {
+                isValid = false;
+            }
+        }
+
+        if (isValid) {
+            field.style.borderColor = '#10b981';
+            field.style.boxShadow = '0 0 0 3px rgba(16, 185, 129, 0.1)';
+        } else {
+            field.style.borderColor = '#ef4444';
+            field.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.1)';
+        }
+
+        return isValid;
+    }
+
+    // Message Display Function
+    function showMessage(type, text) {
+        const messageContainer = document.getElementById('messageContainer');
+        const messageEl = document.createElement('div');
+        messageEl.className = `message ${type} fade-in-up`;
+        messageEl.innerHTML = `
+            <i class="message-icon fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+            <span>${text}</span>
+            <button type="button" class="message-close" onclick="this.parentElement.remove()">
+                <i class="fas fa-times"></i>
+            </button>
+        `;
+
+        messageContainer.appendChild(messageEl);
+
+        // Auto dismiss after 5 seconds
+        setTimeout(() => {
+            if (messageEl.parentElement) {
+                messageEl.style.animation = 'slideOutRight 0.3s ease-in forwards';
+                setTimeout(() => messageEl.remove(), 300);
+            }
+        }, 5000);
+    }
+
+    // Auto-dismiss existing messages
+    document.querySelectorAll('.message[data-auto-dismiss]').forEach(message => {
+        const dismissTime = parseInt(message.dataset.autoDismiss);
+        setTimeout(() => {
+            if (message.parentElement) {
+                message.style.animation = 'slideOutRight 0.3s ease-in forwards';
+                setTimeout(() => message.remove(), 300);
+            }
+        }, dismissTime);
+    });
+
+    // Enhanced accessibility
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add skip link for keyboard users
+        const skipLink = document.createElement('a');
+        skipLink.href = '#contactForm';
+        skipLink.textContent = '{% if LANGUAGE_CODE == "fa" %}رفتن به فرم تماس{% else %}Skip to contact form{% endif %}';
+        skipLink.style.cssText = `
+            position: absolute;
+            top: -40px;
+            left: 6px;
+            background: var(--accent-primary);
+            color: white;
+            padding: 8px;
+            text-decoration: none;
+            border-radius: 4px;
+            z-index: 10000;
+            transition: top 0.3s;
+        `;
+
+        skipLink.addEventListener('focus', function() {
+            this.style.top = '6px';
+        });
+
+        skipLink.addEventListener('blur', function() {
+            this.style.top = '-40px';
+        });
+
+        document.body.insertBefore(skipLink, document.body.firstChild);
+
+        // Improve form accessibility
+        contactForm.setAttribute('novalidate', 'true');
+        contactForm.setAttribute('aria-label', '{% if LANGUAGE_CODE == "fa" %}فرم تماس{% else %}Contact form{% endif %}');
+
+        // Add ARIA labels for better screen reader support
+        const nameField = document.querySelector('input[name="name"]');
+        const emailField = document.querySelector('input[name="email"]');
+        const subjectField = document.querySelector('input[name="subject"]');
+        const messageField = document.querySelector('textarea[name="message"]');
+
+        if (nameField) nameField.setAttribute('aria-describedby', 'name-help');
+        if (emailField) emailField.setAttribute('aria-describedby', 'email-help');
+        if (subjectField) subjectField.setAttribute('aria-describedby', 'subject-help');
+        if (messageField) messageField.setAttribute('aria-describedby', 'message-help');
+    });
+
+    // Keyboard navigation improvements
+    document.addEventListener('keydown', function(e) {
+        // ESC key to clear form
+        if (e.key === 'Escape' && e.target.closest('#contactForm')) {
+            if (confirm('{% if LANGUAGE_CODE == "fa" %}آیا می‌خواهید فرم را پاک کنید؟{% else %}Are you sure you want to clear the form?{% endif %}')) {
+                contactForm.reset();
+                updateCharCounter();
+                contactForm.querySelectorAll('input, textarea').forEach(field => {
+                    field.style.borderColor = '';
+                    field.style.boxShadow = '';
+                });
+            }
+        }
+
+        // Ctrl/Cmd + Enter to submit form
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter' && e.target.closest('#contactForm')) {
+            e.preventDefault();
+            contactForm.dispatchEvent(new Event('submit'));
+        }
+    });
+
+    // Add loading animation styles
+    const loadingStyles = document.createElement('style');
+    loadingStyles.textContent = `
+        @keyframes slideOutRight {
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        .form-input:focus,
+        .form-textarea:focus {
+            animation: focusPulse 0.3s ease-out;
+        }
+
+        @keyframes focusPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        .contact-method:hover .contact-method-icon {
+            animation: iconBounce 0.6s ease-out;
+        }
+
+        @keyframes iconBounce {
+            0%, 20%, 60%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            80% { transform: translateY(-5px); }
+        }
+    `;
+    document.head.appendChild(loadingStyles);
+
+    // Security: Basic XSS protection for form inputs
+    function sanitizeInput(input) {
+        const div = document.createElement('div');
+        div.textContent = input;
+        return div.innerHTML;
+    }
+
+    // Add input sanitization
+    contactForm.querySelectorAll('input[type="text"], input[type="email"], textarea').forEach(field => {
+        field.addEventListener('input', function() {
+            // Remove potentially dangerous characters
+            this.value = this.value.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+        });
+    });
+
+    // Performance optimization: Debounce validation
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
+    // Debounced validation for better performance
+    const debouncedValidation = debounce(validateField, 300);
+
+    contactForm.querySelectorAll('input, textarea').forEach(field => {
+        field.addEventListener('input', () => debouncedValidation(field));
+    });
+
+    // Add copy email functionality
+    document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const email = this.textContent;
+
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(email).then(() => {
+                    showMessage('success', '{% if LANGUAGE_CODE == "fa" %}آدرس ایمیل کپی شد!{% else %}Email address copied!{% endif %}');
+                });
+            } else {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = email;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showMessage('success', '{% if LANGUAGE_CODE == "fa" %}آدرس ایمیل کپی شد!{% else %}Email address copied!{% endif %}');
+            }
+        });
+    });
+
+    // Analytics tracking for form interactions
+    function trackFormInteraction(action, label) {
+        if (typeof gtag !== 'undefined') {
+            gtag('event', action, {
+                'event_category': 'Contact Form',
+                'event_label': label
+            });
+        }
+    }
+
+    // Track form field focus
+    contactForm.querySelectorAll('input, textarea').forEach(field => {
+        field.addEventListener('focus', () => {
+            trackFormInteraction('field_focus', field.name);
+        });
+    });
+
+    // Track form submission attempts
+    contactForm.addEventListener('submit', () => {
+        trackFormInteraction('form_submit', 'attempt');
+    });
+
+    // Enhanced mobile experience
+    if ('ontouchstart' in window) {
+        // Add touch-friendly interactions
+        document.querySelectorAll('.contact-method').forEach(method => {
+            method.addEventListener('touchstart', function() {
+                this.style.transform = 'scale(0.98)';
+            });
+
+            method.addEventListener('touchend', function() {
+                this.style.transform = '';
+            });
+        });
+    }
+
+    // Intersection observer for method cards animation
+    const methodObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry, index) => {
+            if (entry.isIntersecting) {
+                setTimeout(() => {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }, index * 100);
+                methodObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.contact-method').forEach(method => {
+        method.style.opacity = '0';
+        method.style.transform = 'translateY(20px)';
+        method.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        methodObserver.observe(method);
+    });
+</script>
 {% endblock %}

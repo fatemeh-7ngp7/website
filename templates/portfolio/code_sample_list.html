@@ -1,554 +1,1669 @@
-<!-- templates/portfolio/code_sample_list.html -->
 {% extends 'base.html' %}
+{% load static %}
 {% load i18n %}
 
-{% block title %}Code Samples - Fatemeh NGP{% endblock %}
+{% block title %}
+    {% if LANGUAGE_CODE == 'fa' %}
+        نمونه کدها - فاطمه NGP
+    {% else %}
+        Code Samples - Fatemeh NGP
+    {% endif %}
+{% endblock %}
 
-{% block description %}Browse my code samples and snippets showcasing various programming languages and techniques{% endblock %}
+{% block extra_css %}
+<!-- Prism.js for syntax highlighting -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css" rel="stylesheet">
+
+<style>
+    /* Page Header */
+    .code-header {
+        background: linear-gradient(135deg,
+            var(--bg-primary) 0%,
+            var(--bg-secondary) 25%,
+            rgba(59, 130, 246, 0.1) 50%,
+            rgba(168, 85, 247, 0.1) 75%,
+            var(--bg-tertiary) 100%);
+        padding: 6rem 0 4rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    [data-theme="dark"] .code-header {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 25%, #0f3460 50%, #533483 75%, #7209b7 100%);
+    }
+
+    .code-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background:
+            radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(168, 85, 247, 0.12) 0%, transparent 50%);
+
+    }
+
+    [data-theme="dark"] .code-header::before {
+        background:
+            radial-gradient(circle at 20% 50%, rgba(114, 9, 183, 0.4) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(59, 130, 246, 0.3) 0%, transparent 50%);
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        33% { transform: translateY(-10px) rotate(1deg); }
+        66% { transform: translateY(10px) rotate(-1deg); }
+    }
+
+    .code-header-content {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+    }
+
+    .page-title {
+        font-size: clamp(2.5rem, 5vw, 4rem);
+        font-weight: 800;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-primary) 50%, #8b5cf6 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .page-subtitle {
+        font-size: 1.2rem;
+        color: var(--text-secondary);
+        max-width: 600px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    /* Enhanced Filter Section - Mobile Optimized */
+    .filters-section {
+        background: var(--bg-secondary);
+        padding: 1rem 0;
+        border-bottom: 1px solid var(--border-color);
+        position: sticky;
+        top: 80px;
+        z-index: 100;
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+    }
+
+    .filters-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .filter-tags {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .filter-tag {
+        padding: 0.4rem 1rem;
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        background: var(--bg-primary);
+        color: var(--text-secondary);
+        text-decoration: none;
+        font-size: 0.85rem;
+        transition: var(--transition);
+        cursor: pointer;
+        white-space: nowrap;
+    }
+
+    .filter-tag:hover,
+    .filter-tag.active {
+        background: var(--accent-primary);
+        color: white;
+        border-color: var(--accent-primary);
+        transform: translateY(-1px);
+    }
+
+    .search-container {
+        position: relative;
+        min-width: 200px;
+        flex-shrink: 0;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 0.6rem 1rem 0.6rem 2.2rem;
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        font-size: 0.85rem;
+        outline: none;
+        transition: var(--transition);
+    }
+
+    .search-input:focus {
+        border-color: var(--accent-primary);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 0.6rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+        font-size: 0.8rem;
+        cursor: pointer;
+    }
+
+    /* Filter toggle for very small screens */
+    .filter-toggle {
+        display: none;
+        background: var(--accent-primary);
+        color: white;
+        border: none;
+        padding: 0.4rem 0.8rem;
+        border-radius: 15px;
+        font-size: 0.75rem;
+        cursor: pointer;
+        margin-bottom: 0.5rem;
+    }
+
+    /* Code Samples Grid */
+    .code-samples-section {
+        padding: 2rem 0 4rem;
+    }
+
+    .code-samples-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+        gap: 2.5rem;
+        margin-bottom: 3rem;
+    }
+
+    .code-sample-card {
+        background: var(--bg-secondary);
+        border-radius: 1.5rem;
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        backdrop-filter: blur(10px);
+    }
+
+    .code-sample-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(135deg, var(--accent-primary), #8b5cf6);
+        transform: scaleX(0);
+        transition: transform 0.4s ease;
+    }
+
+    .code-sample-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        border-color: var(--accent-primary);
+    }
+
+    .code-sample-card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .sample-header {
+        padding: 2rem 2rem 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .sample-info {
+        flex: 1;
+    }
+
+    .sample-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+        line-height: 1.3;
+    }
+
+    .sample-title a {
+        color: inherit;
+        text-decoration: none;
+        transition: var(--transition);
+    }
+
+    .sample-title a:hover {
+        color: var(--accent-primary);
+    }
+
+    .sample-meta {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+    }
+
+    .meta-item i {
+        font-size: 0.8rem;
+    }
+
+    .sample-description {
+        color: var(--text-secondary);
+        line-height: 1.6;
+        margin-bottom: 1rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .sample-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .tag {
+        background: var(--bg-tertiary);
+        color: var(--text-secondary);
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-size: 0.8rem;
+        border: 1px solid var(--border-color);
+    }
+
+    .language-badge {
+        background: linear-gradient(135deg, var(--accent-primary), #8b5cf6);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        white-space: nowrap;
+    }
+
+    .code-preview {
+        margin: 0 2rem 1rem;
+        border-radius: 1rem;
+        overflow: hidden;
+        background: #2d3748;
+        position: relative;
+        border: 1px solid var(--border-color);
+    }
+
+    .code-header-bar {
+        background: #1a202c;
+        padding: 0.75rem 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #4a5568;
+    }
+
+    .code-header-dots {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+    }
+
+    .dot.red { background: #ff5f57; }
+    .dot.yellow { background: #ffbd2e; }
+    .dot.green { background: #28ca42; }
+
+    .code-filename {
+        color: #a0aec0;
+        font-size: 0.85rem;
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    }
+
+    .copy-button {
+        background: none;
+        border: none;
+        color: #a0aec0;
+        cursor: pointer;
+        padding: 0.25rem;
+        border-radius: 0.25rem;
+        transition: var(--transition);
+        font-size: 0.9rem;
+    }
+
+    .copy-button:hover {
+        color: var(--accent-primary);
+        background: rgba(59, 130, 246, 0.1);
+    }
+
+    .code-content {
+        max-height: 300px;
+        overflow-y: auto;
+        font-size: 0.9rem;
+    }
+
+    .code-content pre {
+        margin: 0 !important;
+        background: transparent !important;
+        padding: 1rem !important;
+        border-radius: 0 !important;
+    }
+
+    .code-content code {
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace !important;
+        font-size: 0.85rem !important;
+        line-height: 1.5 !important;
+        direction: ltr !important;
+        text-align: left !important;
+        unicode-bidi: bidi-override !important;
+    }
+
+    /* Force LTR for all code-related elements */
+    .code-preview,
+    .code-content,
+    .code-content pre,
+    .code-content code,
+    .code-filename,
+    pre[class*="language-"],
+    code[class*="language-"] {
+        direction: ltr !important;
+        text-align: left !important;
+        unicode-bidi: embed !important;
+    }
+
+    /* Ensure code blocks are not affected by page RTL */
+    [dir="rtl"] .code-preview,
+    [dir="rtl"] .code-content,
+    [dir="rtl"] .code-content pre,
+    [dir="rtl"] .code-content code,
+    [dir="rtl"] .code-filename,
+    [dir="rtl"] pre[class*="language-"],
+    [dir="rtl"] code[class*="language-"] {
+        direction: ltr !important;
+        text-align: left !important;
+        unicode-bidi: bidi-override !important;
+    }
+
+    /* Fix for browser translation affecting code */
+    .code-content *,
+    .code-preview * {
+        direction: ltr !important;
+        text-align: left !important;
+    }
+
+    .sample-footer {
+        padding: 0 2rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .sample-stats {
+        display: flex;
+        gap: 1rem;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+    }
+
+    .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+
+    .view-details {
+        color: var(--accent-primary);
+        text-decoration: none;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: var(--transition);
+    }
+
+    .view-details:hover {
+        color: var(--accent-hover);
+        transform: translateX(5px);
+    }
+
+    /* Difficulty indicators */
+    .difficulty-beginner { border-left: 4px solid #10b981; }
+    .difficulty-intermediate { border-left: 4px solid #f59e0b; }
+    .difficulty-advanced { border-left: 4px solid #ef4444; }
+
+    /* Pagination */
+    .pagination-wrapper {
+        display: flex;
+        justify-content: center;
+        margin-top: 3rem;
+    }
+
+    .pagination {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .pagination a,
+    .pagination span {
+        padding: 0.75rem 1rem;
+        border: 1px solid var(--border-color);
+        border-radius: 0.5rem;
+        text-decoration: none;
+        color: var(--text-secondary);
+        transition: var(--transition);
+        min-width: 44px;
+        text-align: center;
+    }
+
+    .pagination a:hover {
+        background: var(--accent-primary);
+        color: white;
+        border-color: var(--accent-primary);
+    }
+
+    .pagination .current {
+        background: var(--accent-primary);
+        color: white;
+        border-color: var(--accent-primary);
+    }
+
+    .pagination .disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: var(--text-secondary);
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        color: var(--text-muted);
+    }
+
+    .empty-state h3 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        color: var(--text-primary);
+    }
+
+    /* Stats Section */
+    .stats-section {
+        background: var(--bg-secondary);
+        padding: 3rem 0;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 2rem;
+        text-align: center;
+    }
+
+    .stat-card {
+        padding: 1.5rem;
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--accent-primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Mobile-specific optimizations */
+    @media (max-width: 768px) {
+        .filters-section {
+            padding: 0.75rem 0;
+            top: 60px;
+        }
+
+        .filters-container {
+            flex-direction: column;
+            gap: 0.75rem;
+            align-items: stretch;
+        }
+
+        .filter-tags {
+            justify-content: flex-start;
+            gap: 0.4rem;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            padding-bottom: 0.25rem;
+        }
+
+        .filter-tags::-webkit-scrollbar {
+            display: none;
+        }
+
+        .filter-tag {
+            padding: 0.35rem 0.8rem;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+
+        .search-container {
+            min-width: auto;
+            width: 100%;
+            order: -1;
+        }
+
+        .search-input {
+            padding: 0.5rem 0.8rem 0.5rem 2rem;
+            font-size: 0.8rem;
+        }
+
+        .search-icon {
+            left: 0.6rem;
+            font-size: 0.8rem;
+        }
+
+        .filter-tags .filter-label {
+            font-size: 0.8rem;
+            margin-right: 0.5rem;
+            white-space: nowrap;
+        }
+
+        .code-samples-section {
+            padding: 1.5rem 0 3rem;
+        }
+
+        .code-samples-grid {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        .sample-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .language-badge {
+            align-self: flex-start;
+        }
+
+        .sample-footer {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    /* Extra small devices */
+    @media (max-width: 480px) {
+        .filters-section {
+            padding: 0.5rem 0;
+        }
+
+        .filters-container {
+            gap: 0.5rem;
+        }
+
+        .filter-tags {
+            gap: 0.3rem;
+        }
+
+        .filter-tag {
+            padding: 0.3rem 0.6rem;
+            font-size: 0.75rem;
+            border-radius: 15px;
+        }
+
+        .search-input {
+            padding: 0.45rem 0.7rem 0.45rem 1.8rem;
+            font-size: 0.75rem;
+        }
+
+        .filter-tags .filter-label {
+            display: none;
+        }
+
+        .code-samples-section {
+            padding: 1rem 0 2rem;
+        }
+    }
+
+    /* Collapsible filter option for very small screens */
+    @media (max-width: 400px) {
+        .filters-section {
+            padding: 0.4rem 0;
+        }
+
+        .filter-toggle {
+            display: block;
+        }
+
+        .filter-tags {
+            display: none;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .filter-tags.expanded {
+            display: flex;
+            max-height: 200px;
+        }
+    }
+
+    /* Animation Classes */
+    .fade-in-up {
+        opacity: 0;
+        transform: translateY(30px);
+        animation: fadeInUp 0.6s ease-out forwards;
+    }
+
+    @keyframes fadeInUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .stagger-1 { animation-delay: 0.1s; }
+    .stagger-2 { animation-delay: 0.2s; }
+    .stagger-3 { animation-delay: 0.3s; }
+    .stagger-4 { animation-delay: 0.4s; }
+    .stagger-5 { animation-delay: 0.5s; }
+    .stagger-6 { animation-delay: 0.6s; }
+
+    /* Custom Prism theme adjustments */
+    .code-content .token.comment,
+    .code-content .token.prolog,
+    .code-content .token.doctype,
+    .code-content .token.cdata {
+        color: #6c7293;
+    }
+
+    .code-content .token.punctuation {
+        color: #c5c8c6;
+    }
+
+    .code-content .token.property,
+    .code-content .token.tag,
+    .code-content .token.boolean,
+    .code-content .token.number,
+    .code-content .token.constant,
+    .code-content .token.symbol,
+    .code-content .token.deleted {
+        color: #f96c5b;
+    }
+
+    .code-content .token.selector,
+    .code-content .token.attr-name,
+    .code-content .token.string,
+    .code-content .token.char,
+    .code-content .token.builtin,
+    .code-content .token.inserted {
+        color: #8cc85f;
+    }
+
+    .code-content .token.operator,
+    .code-content .token.entity,
+    .code-content .token.url,
+    .language-css .token.string,
+    .style .token.string {
+        color: #67cdcc;
+    }
+
+    .code-content .token.atrule,
+    .code-content .token.attr-value,
+    .code-content .token.keyword {
+        color: #c5c8c6;
+    }
+
+    .code-content .token.function,
+    .code-content .token.class-name {
+        color: #f7ca88;
+    }
+
+    .code-content .token.regex,
+    .code-content .token.important,
+    .code-content .token.variable {
+        color: #ab7967;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
+<!-- Code Header Section -->
+<section class="code-header">
+    <div class="container">
+        <div class="code-header-content fade-in-up">
+            <h1 class="page-title">
+                {% if LANGUAGE_CODE == 'fa' %}
+                    نمونه کدهای من
+                {% else %}
+                    My Code Samples
+                {% endif %}
+            </h1>
+            <p class="page-subtitle">
+                {% if LANGUAGE_CODE == 'fa' %}
+                    مجموعه‌ای از کدهای تمیز و بهینه که نوشته‌ام
+                {% else %}
+                    A collection of clean, efficient code samples I've written
+                {% endif %}
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Enhanced Filters Section - Mobile Optimized -->
+<section class="filters-section" role="navigation" aria-label="Code sample filters">
+    <div class="container">
+        <div class="filters-container fade-in-up stagger-1">
+            <!-- Search moved to top for mobile -->
+            <div class="search-container">
+                <i class="fas fa-search search-icon" aria-hidden="true"></i>
+                <input type="text"
+                       class="search-input"
+                       id="searchInput"
+                       placeholder="{% if LANGUAGE_CODE == 'fa' %}جستجو در کدها...{% else %}Search code samples...{% endif %}"
+                       aria-label="{% if LANGUAGE_CODE == 'fa' %}جستجو در نمونه کدها{% else %}Search code samples{% endif %}">
+            </div>
+
+            <div class="filter-tags" role="group" aria-label="{% if LANGUAGE_CODE == 'fa' %}فیلتر زبان برنامه‌نویسی{% else %}Programming language filters{% endif %}">
+                <span class="filter-label" style="color: var(--text-secondary); margin-right: 1rem;">
+                    {% if LANGUAGE_CODE == 'fa' %}
+                        فیلتر:
+                    {% else %}
+                        Filter:
+                    {% endif %}
+                </span>
+
+                <a href="{% url 'code_sample_list' %}"
+                   class="filter-tag active"
+                   data-filter="all"
+                   aria-pressed="true">
+                    {% if LANGUAGE_CODE == 'fa' %}
+                        همه
+                    {% else %}
+                        All
+                    {% endif %}
+                </a>
+
+                <a href="?language=python"
+                   class="filter-tag"
+                   data-filter="python"
+                   aria-pressed="false">Python</a>
+
+                <a href="?language=django"
+                   class="filter-tag"
+                   data-filter="django"
+                   aria-pressed="false">Django</a>
+
+                <a href="?language=javascript"
+                   class="filter-tag"
+                   data-filter="javascript"
+                   aria-pressed="false">JavaScript</a>
+
+                <a href="?language=html-css"
+                   class="filter-tag"
+                   data-filter="html-css"
+                   aria-pressed="false">HTML/CSS</a>
+
+                <a href="?language=algorithms"
+                   class="filter-tag"
+                   data-filter="algorithms"
+                   aria-pressed="false">
+                    {% if LANGUAGE_CODE == 'fa' %}
+                        الگوریتم‌ها
+                    {% else %}
+                        Algorithms
+                    {% endif %}
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Code Samples Section -->
 <section class="code-samples-section">
     <div class="container">
-        <div class="section-header">
-            <h1>{% trans "Code Samples" %}</h1>
-            <p>{% trans "A collection of code snippets, algorithms, and programming solutions" %}</p>
-        </div>
-
-        <!-- Filter Tabs -->
-        <div class="filter-tabs">
-            <button class="filter-btn active" data-filter="all">All</button>
-            <button class="filter-btn" data-filter="python">Python</button>
-            <button class="filter-btn" data-filter="javascript">JavaScript</button>
-            <button class="filter-btn" data-filter="html-css">HTML/CSS</button>
-            <button class="filter-btn" data-filter="django">Django</button>
-            <button class="filter-btn" data-filter="algorithms">Algorithms</button>
-        </div>
-
         {% if code_sample_list %}
-            <div class="code-grid" id="code-grid">
+            <div class="code-samples-grid" id="codeGrid">
                 {% for sample in code_sample_list %}
-                    <div class="code-card" data-category="{{ sample.language|lower }}">
-                        <div class="code-header">
-                            <div class="code-info">
-                                <h3 class="code-title">
-                                    <a href="{% url 'code_sample_detail' sample.slug %}">{{ sample.title }}</a>
-                                </h3>
-                                <div class="code-meta">
-                                    <span class="language-tag {{ sample.language|lower }}">
-                                        <i class="fas fa-code"></i>
-                                        {{ sample.language }}
-                                    </span>
-                                    <span class="date-tag">
-                                        <i class="fas fa-calendar-alt"></i>
-                                        {{ sample.created_at|date:"M d, Y" }}
-                                    </span>
-                                    {% if sample.difficulty %}
-                                        <span class="difficulty-tag difficulty-{{ sample.difficulty|lower }}">
-                                            <i class="fas fa-signal"></i>
-                                            {{ sample.difficulty }}
-                                        </span>
-                                    {% endif %}
+                <article class="code-sample-card fade-in-up stagger-{{ forloop.counter|add:1 }}
+                        {% if sample.difficulty == 'beginner' %}difficulty-beginner
+                        {% elif sample.difficulty == 'intermediate' %}difficulty-intermediate
+                        {% elif sample.difficulty == 'advanced' %}difficulty-advanced{% endif %}"
+                        data-language="{{ sample.language }}" data-difficulty="{{ sample.difficulty }}"
+                        data-tags="{{ sample.tags }}">
+
+                    <div class="sample-header">
+                        <div class="sample-info">
+                            <h3 class="sample-title">
+                                <a href="{{ sample.get_absolute_url }}">{{ sample.title }}</a>
+                            </h3>
+
+                            <div class="sample-meta">
+                                <div class="meta-item">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <span>{{ sample.created_at|date:"M d, Y" }}</span>
                                 </div>
-                            </div>
-                            <div class="code-actions">
-                                <a href="{% url 'code_sample_detail' sample.slug %}"
-                                   class="view-btn"
-                                   title="View Code">
-                                    <i class="fas fa-eye"></i>
-                                </a>
-                                {% if sample.github_url %}
-                                    <a href="{{ sample.github_url }}"
-                                       target="_blank"
-                                       rel="noopener noreferrer"
-                                       class="github-btn"
-                                       title="View on GitHub">
-                                        <i class="fab fa-github"></i>
-                                    </a>
-                                {% endif %}
-                            </div>
-                        </div>
-
-                        <div class="code-description">
-                            <p>{{ sample.description|truncatewords:20 }}</p>
-                        </div>
-
-                        <div class="code-preview">
-                            <pre><code class="language-{{ sample.language|lower }}">{{ sample.code|truncatechars:200 }}{% if sample.code|length > 200 %}...{% endif %}</code></pre>
-                        </div>
-
-                        {% if sample.get_tags_list %}
-                            <div class="code-tags">
-                                {% for tag in sample.get_tags_list %}
-                                    <span class="tag">{{ tag.name }}</span>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-
-                        <div class="code-footer">
-                            <div class="stats">
                                 {% if sample.lines_of_code %}
-                                    <span class="stat">
-                                        <i class="fas fa-list-ol"></i>
-                                        {{ sample.lines_of_code }} lines
+                                <div class="meta-item">
+                                    <i class="fas fa-code"></i>
+                                    <span>{{ sample.lines_of_code }}
+                                        {% if LANGUAGE_CODE == 'fa' %}خط{% else %}lines{% endif %}
                                     </span>
+                                </div>
+                                {% endif %}
+                                {% if sample.difficulty %}
+                                <div class="meta-item">
+                                    <i class="fas fa-signal"></i>
+                                    <span>{{ sample.get_difficulty_display }}</span>
+                                </div>
                                 {% endif %}
                                 {% if sample.complexity %}
-                                    <span class="stat">
-                                        <i class="fas fa-brain"></i>
-                                        O({{ sample.complexity }})
-                                    </span>
+                                <div class="meta-item">
+                                    <i class="fas fa-chart-line"></i>
+                                    <span>O({{ sample.complexity }})</span>
+                                </div>
                                 {% endif %}
                             </div>
-                            <a href="{% url 'code_sample_detail' sample.slug %}" class="read-more">
-                                View Details <i class="fas fa-arrow-right"></i>
-                            </a>
+
+                            <p class="sample-description">{{ sample.description|truncatewords:25 }}</p>
+
+                            {% if sample.tags %}
+                            <div class="sample-tags">
+                                {% for tag in sample.get_tags_list %}
+                                <span class="tag">{{ tag.name }}</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="language-badge">
+                            {{ sample.get_language_display }}
                         </div>
                     </div>
+
+                    <!-- Code Preview -->
+                    {% if sample.code %}
+                    <div class="code-preview">
+                        <div class="code-header-bar">
+                            <div class="code-header-dots">
+                                <div class="dot red"></div>
+                                <div class="dot yellow"></div>
+                                <div class="dot green"></div>
+                            </div>
+                            <div class="code-filename">
+                                {{ sample.filename|default:"code.py" }}
+                            </div>
+                            <button class="copy-button" onclick="copyCode(this, {{ forloop.counter }})" title="Copy code">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+
+                        <div class="code-content">
+                            <pre class="line-numbers"><code class="language-{{ sample.language|lower }}" id="code-{{ forloop.counter }}">{{ sample.code|slice:":400" }}{% if sample.code|length > 400 %}...{% endif %}</code></pre>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="sample-footer">
+                        <div class="sample-stats">
+                            {% if sample.github_url %}
+                            <a href="{{ sample.github_url }}" class="stat-item" target="_blank" style="color: inherit;">
+                                <i class="fab fa-github"></i>
+                                <span>GitHub</span>
+                            </a>
+                            {% endif %}
+                            <div class="stat-item">
+                                <i class="fas fa-eye"></i>
+                                <span>{{ forloop.counter|add:23 }}</span>
+                            </div>
+                        </div>
+
+                        <a href="{{ sample.get_absolute_url }}" class="view-details">
+                            {% if LANGUAGE_CODE == 'fa' %}
+                                جزئیات بیشتر
+                            {% else %}
+                                View Details
+                            {% endif %}
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </article>
                 {% endfor %}
             </div>
 
             <!-- Pagination -->
             {% if is_paginated %}
-                <div class="pagination-wrapper">
-                    <nav aria-label="Code samples pagination">
-                        <ul class="pagination">
-                            {% if page_obj.has_previous %}
-                                <li class="page-item">
-                                    <a class="page-link" href="?page=1" aria-label="First">
-                                        <i class="fas fa-angle-double-left"></i>
-                                    </a>
-                                </li>
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
-                                        <i class="fas fa-angle-left"></i>
-                                    </a>
-                                </li>
-                            {% endif %}
+            <div class="pagination-wrapper fade-in-up">
+                <div class="pagination">
+                    {% if page_obj.has_previous %}
+                        <a href="?page=1" title="{% trans 'First page' %}">
+                            <i class="fas fa-angle-double-left"></i>
+                        </a>
+                        <a href="?page={{ page_obj.previous_page_number }}" title="{% trans 'Previous page' %}">
+                            <i class="fas fa-angle-left"></i>
+                        </a>
+                    {% else %}
+                        <span class="disabled">
+                            <i class="fas fa-angle-double-left"></i>
+                        </span>
+                        <span class="disabled">
+                            <i class="fas fa-angle-left"></i>
+                        </span>
+                    {% endif %}
 
-                            {% for num in page_obj.paginator.page_range %}
-                                {% if page_obj.number == num %}
-                                    <li class="page-item active">
-                                        <span class="page-link">{{ num }}</span>
-                                    </li>
-                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                                    <li class="page-item">
-                                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-                                    </li>
-                                {% endif %}
-                            {% endfor %}
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <span class="current">{{ num }}</span>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <a href="?page={{ num }}">{{ num }}</a>
+                        {% endif %}
+                    {% endfor %}
 
-                            {% if page_obj.has_next %}
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
-                                        <i class="fas fa-angle-right"></i>
-                                    </a>
-                                </li>
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Last">
-                                        <i class="fas fa-angle-double-right"></i>
-                                    </a>
-                                </li>
-                            {% endif %}
-                        </ul>
-                    </nav>
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}" title="{% trans 'Next page' %}">
+                            <i class="fas fa-angle-right"></i>
+                        </a>
+                        <a href="?page={{ page_obj.paginator.num_pages }}" title="{% trans 'Last page' %}">
+                            <i class="fas fa-angle-double-right"></i>
+                        </a>
+                    {% else %}
+                        <span class="disabled">
+                            <i class="fas fa-angle-right"></i>
+                        </span>
+                        <span class="disabled">
+                            <i class="fas fa-angle-double-right"></i>
+                        </span>
+                    {% endif %}
                 </div>
+            </div>
             {% endif %}
+
         {% else %}
-            <div class="empty-state">
-                <div class="empty-icon">
-                    <i class="fas fa-code"></i>
-                </div>
-                <h3>No Code Samples Yet</h3>
-                <p>I'm working on adding some interesting code samples. Check back soon!</p>
+            <!-- Empty State -->
+            <div class="empty-state fade-in-up">
+                <i class="fas fa-code"></i>
+                <h3>
+                    {% if LANGUAGE_CODE == 'fa' %}
+                        هنوز نمونه کدی اضافه نشده
+                    {% else %}
+                        No Code Samples Yet
+                    {% endif %}
+                </h3>
+                <p>
+                    {% if LANGUAGE_CODE == 'fa' %}
+                        به زودی نمونه کدهای جالب و کاربردی اضافه خواهند شد.
+                    {% else %}
+                        Exciting and useful code samples will be added soon.
+                    {% endif %}
+                </p>
             </div>
         {% endif %}
     </div>
 </section>
 
-<style>
-.code-samples-section {
-    padding: 80px 0;
-    min-height: 70vh;
-}
+<!-- Stats Section -->
+<section class="stats-section">
+    <div class="container">
+        <div class="stats-grid fade-in-up">
+            <div class="stat-card">
+                <div class="stat-number">{{ code_sample_list|length|default:"0" }}</div>
+                <div class="stat-label">
+                    {% if LANGUAGE_CODE == 'fa' %}
+                        نمونه کد
+                    {% else %}
+                        Code Samples
+                    {% endif %}
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">6+</div>
+                <div class="stat-label">
+                    {% if LANGUAGE_CODE == 'fa' %}
+                        زبان برنامه‌نویسی
+                    {% else %}
+                        Programming Languages
+                    {% endif %}
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">1000+</div>
+                <div class="stat-label">
+                    {% if LANGUAGE_CODE == 'fa' %}
+                        خط کد
+                    {% else %}
+                        Lines of Code
+                    {% endif %}
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">100%</div>
+                <div class="stat-label">
+                    {% if LANGUAGE_CODE == 'fa' %}
+                        تست شده
+                    {% else %}
+                        Tested
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
 
-.section-header {
-    text-align: center;
-    margin-bottom: 60px;
-}
-
-.section-header h1 {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    color: var(--primary-color, #333);
-}
-
-.section-header p {
-    font-size: 1.2rem;
-    color: var(--text-muted, #666);
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-.filter-tabs {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    margin-bottom: 3rem;
-    flex-wrap: wrap;
-}
-
-.filter-btn {
-    padding: 0.5rem 1.5rem;
-    border: 2px solid var(--accent-color, #007bff);
-    background: transparent;
-    color: var(--accent-color, #007bff);
-    border-radius: 25px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-weight: 500;
-}
-
-.filter-btn:hover,
-.filter-btn.active {
-    background: var(--accent-color, #007bff);
-    color: white;
-}
-
-.code-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-    gap: 2rem;
-    margin-bottom: 3rem;
-}
-
-.code-card {
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border: 1px solid #e9ecef;
-}
-
-.code-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-}
-
-.code-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    padding: 1.5rem 1.5rem 1rem;
-    background: #f8f9fa;
-    border-bottom: 1px solid #e9ecef;
-}
-
-.code-title {
-    margin: 0 0 0.5rem;
-    font-size: 1.3rem;
-}
-
-.code-title a {
-    color: var(--primary-color, #333);
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-
-.code-title a:hover {
-    color: var(--accent-color, #007bff);
-}
-
-.code-meta {
-    display: flex;
-    gap: 0.75rem;
-    flex-wrap: wrap;
-}
-
-.language-tag,
-.date-tag,
-.difficulty-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    font-weight: 500;
-}
-
-.language-tag {
-    background: var(--accent-color, #007bff);
-    color: white;
-}
-
-.language-tag.python { background: #3776ab; }
-.language-tag.javascript { background: #f7df1e; color: #333; }
-.language-tag.html-css { background: #e34f26; }
-.language-tag.django { background: #092e20; }
-
-.date-tag {
-    background: #6c757d;
-    color: white;
-}
-
-.difficulty-tag {
-    color: white;
-}
-
-.difficulty-beginner { background: #28a745; }
-.difficulty-intermediate { background: #ffc107; color: #333; }
-.difficulty-advanced { background: #dc3545; }
-
-.code-actions {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.view-btn,
-.github-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 35px;
-    height: 35px;
-    border-radius: 6px;
-    text-decoration: none;
-    transition: all 0.3s ease;
-}
-
-.view-btn {
-    background: var(--accent-color, #007bff);
-    color: white;
-}
-
-.github-btn {
-    background: #333;
-    color: white;
-}
-
-.view-btn:hover,
-.github-btn:hover {
-    transform: scale(1.1);
-}
-
-.code-description {
-    padding: 1rem 1.5rem;
-    border-bottom: 1px solid #f0f0f0;
-}
-
-.code-description p {
-    margin: 0;
-    color: var(--text-muted, #666);
-    line-height: 1.5;
-}
-
-.code-preview {
-    padding: 1rem;
-    background: #2d3748;
-    overflow-x: auto;
-}
-
-.code-preview pre {
-    margin: 0;
-    background: none;
-    padding: 0;
-}
-
-.code-preview code {
-    color: #e2e8f0;
-    font-family: 'Courier New', monospace;
-    font-size: 0.9rem;
-    line-height: 1.4;
-    background: none;
-}
-
-.code-tags {
-    padding: 1rem 1.5rem;
-    border-top: 1px solid #f0f0f0;
-}
-
-.tag {
-    display: inline-block;
-    background: #e9ecef;
-    color: #495057;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    margin-right: 0.5rem;
-    margin-bottom: 0.25rem;
-}
-
-.code-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 1.5rem;
-    background: #f8f9fa;
-    border-top: 1px solid #e9ecef;
-}
-
-.stats {
-    display: flex;
-    gap: 1rem;
-}
-
-.stat {
-    font-size: 0.8rem;
-    color: var(--text-muted, #666);
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-}
-
-.read-more {
-    color: var(--accent-color, #007bff);
-    text-decoration: none;
-    font-weight: 500;
-    font-size: 0.9rem;
-    transition: color 0.3s ease;
-}
-
-.read-more:hover {
-    color: var(--primary-color, #333);
-}
-
-.read-more i {
-    margin-left: 0.25rem;
-    transition: transform 0.3s ease;
-}
-
-.read-more:hover i {
-    transform: translateX(3px);
-}
-
-.empty-state {
-    text-align: center;
-    padding: 4rem 2rem;
-    color: var(--text-muted, #666);
-}
-
-.empty-icon {
-    font-size: 4rem;
-    margin-bottom: 1rem;
-    opacity: 0.5;
-}
-
-.empty-state h3 {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-    color: var(--primary-color, #333);
-}
-
-.pagination-wrapper {
-    display: flex;
-    justify-content: center;
-    margin-top: 3rem;
-}
-
-.pagination {
-    display: flex;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    gap: 0.5rem;
-}
-
-.page-item {
-    display: flex;
-}
-
-.page-link {
-    padding: 0.5rem 0.75rem;
-    text-decoration: none;
-    color: var(--accent-color, #007bff);
-    border: 1px solid #dee2e6;
-    border-radius: 4px;
-    transition: all 0.3s ease;
-}
-
-.page-link:hover {
-    background-color: var(--accent-color, #007bff);
-    color: white;
-}
-
-.page-item.active .page-link {
-    background-color: var(--accent-color, #007bff);
-    color: white;
-    border-color: var(--accent-color, #007bff);
-}
-
-@media (max-width: 768px) {
-    .code-grid {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-    }
-
-    .section-header h1 {
-        font-size: 2rem;
-    }
-
-    .code-header {
-        flex-direction: column;
-        gap: 1rem;
-    }
-
-    .code-actions {
-        align-self: flex-end;
-    }
-
-    .code-footer {
-        flex-direction: column;
-        gap: 1rem;
-        align-items: stretch;
-    }
-
-    .stats {
-        justify-content: center;
-    }
-}
-
-/* Filter Animation */
-.code-card.hidden {
-    display: none;
-}
-
-.code-card.show {
-    animation: fadeIn 0.5s ease;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-</style>
+{% block extra_js %}
+<!-- Prism.js for syntax highlighting -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
 
 <script>
-// Filter functionality
-document.addEventListener('DOMContentLoaded', function() {
-    const filterBtns = document.querySelectorAll('.filter-btn');
-    const codeCards = document.querySelectorAll('.code-card');
+    // Immediate mobile optimization
+    (function() {
+        // Adjust navbar compensation
+        function adjustFilterPosition() {
+            const filtersSection = document.querySelector('.filters-section');
+            const navbar = document.querySelector('.navbar, nav, header');
 
-    filterBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-            const filter = this.getAttribute('data-filter');
+            if (filtersSection) {
+                let navHeight = 80;
+                if (navbar) {
+                    navHeight = navbar.offsetHeight;
+                }
 
-            // Update active button
-            filterBtns.forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
+                // Reduce for mobile
+                if (window.innerWidth <= 768) {
+                    navHeight = Math.min(navHeight, 60);
+                }
 
-            // Filter cards
-            codeCards.forEach(card => {
-                if (filter === 'all' || card.getAttribute('data-category').includes(filter)) {
-                    card.classList.remove('hidden');
-                    card.classList.add('show');
+                filtersSection.style.top = `${navHeight}px`;
+            }
+        }
+
+        // Run on load and resize
+        adjustFilterPosition();
+        window.addEventListener('resize', adjustFilterPosition);
+
+        // Ensure proper scrolling behavior
+        window.addEventListener('scroll', function() {
+            const filtersSection = document.querySelector('.filters-section');
+            if (filtersSection && window.innerWidth <= 768) {
+                // Add subtle shadow when scrolling
+                if (window.scrollY > 100) {
+                    filtersSection.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
                 } else {
-                    card.classList.add('hidden');
-                    card.classList.remove('show');
+                    filtersSection.style.boxShadow = '';
+                }
+            }
+        }, { passive: true });
+    })();
+
+    // Enhanced mobile filter functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        // Create collapsible filter for very small screens
+        if (window.innerWidth <= 400) {
+            createCollapsibleFilter();
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth <= 400) {
+                createCollapsibleFilter();
+            } else {
+                removeCollapsibleFilter();
+            }
+        });
+
+        // Optimize sticky positioning
+        optimizeStickyPosition();
+
+        // Initialize mobile search enhancements
+        enhanceMobileSearch();
+
+        // Initialize scroll compensation
+        compensateForStickyFilter();
+
+        // Initialize scroll optimizations
+        optimizeScrollPerformance();
+    });
+
+    function createCollapsibleFilter() {
+        const filtersContainer = document.querySelector('.filters-container');
+        const filterTags = document.querySelector('.filter-tags');
+
+        if (!filtersContainer || !filterTags || document.querySelector('.filter-toggle')) {
+            return;
+        }
+
+        // Create toggle button
+        const toggleButton = document.createElement('button');
+        toggleButton.className = 'filter-toggle';
+        toggleButton.textContent = '{% if LANGUAGE_CODE == "fa" %}فیلترها{% else %}Filters{% endif %}';
+        toggleButton.setAttribute('aria-expanded', 'false');
+
+        // Insert before filter tags
+        filtersContainer.insertBefore(toggleButton, filterTags);
+
+        // Add click handler
+        toggleButton.addEventListener('click', function() {
+            const isExpanded = filterTags.classList.contains('expanded');
+
+            if (isExpanded) {
+                filterTags.classList.remove('expanded');
+                toggleButton.textContent = '{% if LANGUAGE_CODE == "fa" %}فیلترها{% else %}Filters{% endif %}';
+                toggleButton.setAttribute('aria-expanded', 'false');
+            } else {
+                filterTags.classList.add('expanded');
+                toggleButton.textContent = '{% if LANGUAGE_CODE == "fa" %}مخفی کردن{% else %}Hide Filters{% endif %}';
+                toggleButton.setAttribute('aria-expanded', 'true');
+            }
+        });
+
+        // Auto-collapse when a filter is selected
+        filterTags.addEventListener('click', function(e) {
+            if (e.target.classList.contains('filter-tag')) {
+                setTimeout(() => {
+                    filterTags.classList.remove('expanded');
+                    toggleButton.textContent = '{% if LANGUAGE_CODE == "fa" %}فیلترها{% else %}Filters{% endif %}';
+                    toggleButton.setAttribute('aria-expanded', 'false');
+                }, 300);
+            }
+        });
+    }
+
+    function removeCollapsibleFilter() {
+        const toggleButton = document.querySelector('.filter-toggle');
+        const filterTags = document.querySelector('.filter-tags');
+
+        if (toggleButton) {
+            toggleButton.remove();
+        }
+
+        if (filterTags) {
+            filterTags.classList.remove('expanded');
+            filterTags.style.display = '';
+            filterTags.style.maxHeight = '';
+        }
+    }
+
+    function optimizeStickyPosition() {
+        const filtersSection = document.querySelector('.filters-section');
+        const navbar = document.querySelector('.navbar') || document.querySelector('nav') || document.querySelector('header');
+
+        if (!filtersSection) return;
+
+        function updateStickyPosition() {
+            let navbarHeight = 80; // Default
+
+            if (navbar) {
+                navbarHeight = navbar.offsetHeight;
+            }
+
+            // Adjust for mobile
+            if (window.innerWidth <= 768) {
+                navbarHeight = Math.min(navbarHeight, 60);
+            }
+
+            filtersSection.style.top = `${navbarHeight}px`;
+        }
+
+        updateStickyPosition();
+        window.addEventListener('resize', updateStickyPosition);
+    }
+
+    // Enhanced search functionality for mobile
+    function enhanceMobileSearch() {
+        const searchInput = document.getElementById('searchInput');
+        const filterTags = document.querySelector('.filter-tags');
+
+        if (!searchInput) return;
+
+        // Add search icon tap functionality for mobile
+        const searchIcon = document.querySelector('.search-icon');
+        if (searchIcon) {
+            searchIcon.addEventListener('click', function() {
+                searchInput.focus();
+            });
+        }
+
+        // Optimize search for mobile keyboards
+        searchInput.addEventListener('focus', function() {
+            // Scroll to make sure search is visible
+            if (window.innerWidth <= 768) {
+                setTimeout(() => {
+                    this.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                }, 300);
+            }
+        });
+
+        // Auto-hide filter tags when searching on mobile
+        if (window.innerWidth <= 480) {
+            searchInput.addEventListener('input', function() {
+                if (this.value.length > 0 && filterTags) {
+                    filterTags.style.opacity = '0.5';
+                    filterTags.style.pointerEvents = 'none';
+                } else if (filterTags) {
+                    filterTags.style.opacity = '';
+                    filterTags.style.pointerEvents = '';
+                }
+            });
+        }
+    }
+
+    // Smooth scroll compensation for sticky filter
+    function compensateForStickyFilter() {
+        const links = document.querySelectorAll('a[href^="#"]');
+        const filtersSection = document.querySelector('.filters-section');
+
+        if (!filtersSection) return;
+
+        links.forEach(link => {
+            link.addEventListener('click', function(e) {
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+
+                if (targetElement) {
+                    e.preventDefault();
+
+                    const filterHeight = filtersSection.offsetHeight;
+                    const navbarHeight = parseInt(filtersSection.style.top) || 80;
+                    const totalOffset = filterHeight + navbarHeight + 20; // 20px extra margin
+
+                    const targetPosition = targetElement.offsetTop - totalOffset;
+
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
                 }
             });
         });
+    }
+
+    // Performance optimization: Throttle scroll events
+    let ticking = false;
+
+    function optimizeScrollPerformance() {
+        function updateOnScroll() {
+            // Add any scroll-based optimizations here
+            ticking = false;
+        }
+
+        function requestTick() {
+            if (!ticking) {
+                requestAnimationFrame(updateOnScroll);
+                ticking = true;
+            }
+        }
+
+        window.addEventListener('scroll', requestTick, { passive: true });
+    }
+
+    // Animation Observer
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                entry.target.style.animationPlayState = 'running';
+                observer.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+
+    // Observe all animation elements
+    document.querySelectorAll('.fade-in-up').forEach(el => {
+        el.style.animationPlayState = 'paused';
+        observer.observe(el);
     });
-});
+
+    // Copy code functionality
+    function copyCode(button, codeId) {
+        const codeElement = document.getElementById(`code-${codeId}`);
+        const code = codeElement.textContent;
+
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(code).then(() => {
+                const icon = button.querySelector('i');
+                const originalClass = icon.className;
+
+                // Change icon to checkmark
+                icon.className = 'fas fa-check';
+                button.style.color = '#10b981';
+
+                // Show toast
+                showToast('{% if LANGUAGE_CODE == "fa" %}کد کپی شد!{% else %}Code copied to clipboard!{% endif %}');
+
+                // Reset icon after 2 seconds
+                setTimeout(() => {
+                    icon.className = originalClass;
+                    button.style.color = '';
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy code: ', err);
+                showToast('{% if LANGUAGE_CODE == "fa" %}خطا در کپی کردن{% else %}Failed to copy code{% endif %}', 'error');
+            });
+        } else {
+            // Fallback for browsers that don't support clipboard API
+            const textArea = document.createElement('textarea');
+            textArea.value = code;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            showToast('{% if LANGUAGE_CODE == "fa" %}کد کپی شد!{% else %}Code copied to clipboard!{% endif %}');
+        }
+    }
+
+    // Search functionality
+    const searchInput = document.getElementById('searchInput');
+    const codeGrid = document.getElementById('codeGrid');
+
+    if (searchInput && codeGrid) {
+        searchInput.addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const cards = codeGrid.querySelectorAll('.code-sample-card');
+
+            cards.forEach(card => {
+                const title = card.querySelector('.sample-title').textContent.toLowerCase();
+                const description = card.querySelector('.sample-description').textContent.toLowerCase();
+                const tags = card.dataset.tags.toLowerCase();
+
+                const isVisible = title.includes(searchTerm) ||
+                                description.includes(searchTerm) ||
+                                tags.includes(searchTerm);
+
+                if (isVisible) {
+                    card.style.display = 'block';
+                    card.style.animation = 'fadeInUp 0.4s ease-out forwards';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            // Show/hide empty state
+            const visibleCards = codeGrid.querySelectorAll('.code-sample-card[style*="block"]');
+            if (visibleCards.length === 0 && searchTerm.trim() !== '') {
+                showEmptyState();
+            } else {
+                hideEmptyState();
+            }
+        });
+    }
+
+    // Filter functionality
+    document.querySelectorAll('.filter-tag').forEach(tag => {
+        tag.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            // Remove active class from all tags
+            document.querySelectorAll('.filter-tag').forEach(t => {
+                t.classList.remove('active');
+                t.setAttribute('aria-pressed', 'false');
+            });
+
+            // Add active class to clicked tag
+            this.classList.add('active');
+            this.setAttribute('aria-pressed', 'true');
+
+            const filterLanguage = this.getAttribute('href').includes('language=') ?
+                                 this.getAttribute('href').split('language=')[1] : 'all';
+
+            if (codeGrid) {
+                const cards = codeGrid.querySelectorAll('.code-sample-card');
+
+                cards.forEach(card => {
+                    const cardLanguage = card.dataset.language;
+
+                    if (filterLanguage === 'all' || cardLanguage === filterLanguage) {
+                        card.style.display = 'block';
+                        card.style.animation = 'fadeInUp 0.4s ease-out forwards';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            }
+        });
+    });
+
+    // Toast notification function
+    function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.textContent = message;
+
+        const bgColor = type === 'error' ? '#ef4444' : '#10b981';
+
+        toast.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: ${bgColor};
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            z-index: 10000;
+            font-size: 0.9rem;
+            font-weight: 500;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-lg);
+        `;
+
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+            toast.style.opacity = '1';
+            toast.style.transform = 'translateY(0)';
+        }, 100);
+
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                if (document.body.contains(toast)) {
+                    document.body.removeChild(toast);
+                }
+            }, 300);
+        }, 3000);
+    }
+
+    // Empty state functions
+    function showEmptyState() {
+        if (!document.getElementById('searchEmptyState')) {
+            const emptyState = document.createElement('div');
+            emptyState.id = 'searchEmptyState';
+            emptyState.className = 'empty-state';
+            emptyState.innerHTML = `
+                <i class="fas fa-search"></i>
+                <h3>{% if LANGUAGE_CODE == 'fa' %}هیچ نتیجه‌ای یافت نشد{% else %}No Results Found{% endif %}</h3>
+                <p>{% if LANGUAGE_CODE == 'fa' %}لطفاً کلیدواژه‌های دیگری امتحان کنید{% else %}Try different keywords{% endif %}</p>
+            `;
+            codeGrid.parentNode.appendChild(emptyState);
+        }
+    }
+
+    function hideEmptyState() {
+        const emptyState = document.getElementById('searchEmptyState');
+        if (emptyState) {
+            emptyState.remove();
+        }
+    }
+
+    // Smooth scroll animations
+    let scrollTicking = false;
+
+    function updateAnimations() {
+        const scrollTop = window.pageYOffset;
+        const header = document.querySelector('.code-header');
+
+
+
+        scrollTicking = false;
+    }
+
+    function requestScrollTick() {
+        if (!scrollTicking) {
+            requestAnimationFrame(updateAnimations);
+            scrollTicking = true;
+        }
+    }
+
+    window.addEventListener('scroll', requestScrollTick);
+
+    // Enhanced code preview interactions
+    document.querySelectorAll('.code-sample-card').forEach(card => {
+        const codePreview = card.querySelector('.code-preview');
+
+        if (codePreview) {
+            card.addEventListener('mouseenter', () => {
+                codePreview.style.maxHeight = '400px';
+                codePreview.style.transition = 'max-height 0.3s ease-out';
+            });
+
+            card.addEventListener('mouseleave', () => {
+                codePreview.style.maxHeight = '300px';
+                codePreview.style.transition = 'max-height 0.3s ease-in';
+            });
+        }
+    });
+
+    // Initialize Prism highlighting
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof Prism !== 'undefined') {
+            Prism.highlightAll();
+        }
+
+        // Force LTR direction for all code elements
+        forceCodeLTR();
+    });
+
+    // Function to force LTR direction for code elements
+    function forceCodeLTR() {
+        const codeElements = document.querySelectorAll(`
+            .code-preview,
+            .code-content,
+            .code-content pre,
+            .code-content code,
+            .code-filename,
+            pre[class*="language-"],
+            code[class*="language-"],
+            .code-header-bar,
+            .code-header-dots,
+            .sample-title a
+        `);
+
+        codeElements.forEach(element => {
+            element.style.direction = 'ltr';
+            element.style.textAlign = 'left';
+            element.style.unicodeBidi = 'bidi-override';
+
+            // Add attribute to prevent translation services from affecting direction
+            element.setAttribute('translate', 'no');
+            element.setAttribute('dir', 'ltr');
+        });
+    }
+
+    // Re-apply LTR direction after any DOM changes (like search filtering)
+    const mutationObserver = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                // Small delay to ensure elements are rendered
+                setTimeout(forceCodeLTR, 100);
+            }
+        });
+    });
+
+    // Start observing
+    mutationObserver.observe(document.body, { childList: true, subtree: true });
+
+    // Animated counter for stats
+    function animateValue(element, start, end, duration) {
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            const currentValue = Math.floor(progress * (end - start) + start);
+
+            if (element.textContent.includes('+')) {
+                element.textContent = currentValue + '+';
+            } else if (element.textContent.includes('%')) {
+                element.textContent = currentValue + '%';
+            } else {
+                element.textContent = currentValue;
+            }
+
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
+
+    // Trigger counter animation when stats come into view
+    const statsObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                const statNumbers = entry.target.querySelectorAll('.stat-number');
+                statNumbers.forEach(stat => {
+                    const text = stat.textContent;
+                    const value = parseInt(text.match(/\d+/)[0]);
+                    animateValue(stat, 0, value, 2000);
+                });
+                statsObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.5 });
+
+    const statsSection = document.querySelector('.stats-section');
+    if (statsSection) {
+        statsObserver.observe(statsSection);
+    }
 </script>
 {% endblock %}

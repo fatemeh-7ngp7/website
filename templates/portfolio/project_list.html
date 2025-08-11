@@ -1,64 +1,807 @@
 {% extends 'base.html' %}
+{% load static %}
 {% load i18n %}
 
-{% block title %}Projects - Fatemeh NGP{% endblock %}
+{% block title %}
+    {% if LANGUAGE_CODE == 'fa' %}
+        پروژه‌ها - فاطمه NGP
+    {% else %}
+        Projects - Fatemeh NGP
+    {% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Page Header */
+    .page-header {
+        background: linear-gradient(135deg,
+            var(--bg-primary) 0%,
+            var(--bg-secondary) 25%,
+            rgba(59, 130, 246, 0.1) 50%,
+            rgba(168, 85, 247, 0.1) 75%,
+            var(--bg-tertiary) 100%);
+        padding: 6rem 0 4rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    [data-theme="dark"] .page-header {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 25%, #0f3460 50%, #533483 75%, #7209b7 100%);
+    }
+
+    .page-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background:
+            radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(168, 85, 247, 0.12) 0%, transparent 50%);
+        animation: float 8s ease-in-out infinite;
+    }
+
+    [data-theme="dark"] .page-header::before {
+        background:
+            radial-gradient(circle at 20% 50%, rgba(114, 9, 183, 0.4) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(59, 130, 246, 0.3) 0%, transparent 50%);
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        33% { transform: translateY(-10px) rotate(1deg); }
+        66% { transform: translateY(10px) rotate(-1deg); }
+    }
+
+    .page-header-content {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+    }
+
+    .page-title {
+        font-size: clamp(2.5rem, 5vw, 4rem);
+        font-weight: 800;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-primary) 50%, #8b5cf6 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .page-subtitle {
+        font-size: 1.2rem;
+        color: var(--text-secondary);
+        max-width: 600px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    /* Filter Section */
+    .filters-section {
+        background: var(--bg-secondary);
+        padding: 2rem 0;
+        border-bottom: 1px solid var(--border-color);
+        position: sticky;
+        top: 80px;
+        z-index: 100;
+        backdrop-filter: blur(10px);
+    }
+
+    .filters-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .filter-tags {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .filter-tag {
+        padding: 0.5rem 1.2rem;
+        border: 1px solid var(--border-color);
+        border-radius: 25px;
+        background: var(--bg-primary);
+        color: var(--text-secondary);
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: var(--transition);
+        cursor: pointer;
+    }
+
+    .filter-tag:hover,
+    .filter-tag.active {
+        background: var(--accent-primary);
+        color: white;
+        border-color: var(--accent-primary);
+        transform: translateY(-2px);
+    }
+
+    .sort-dropdown {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .sort-select {
+        padding: 0.5rem 1rem;
+        border: 1px solid var(--border-color);
+        border-radius: 0.5rem;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        font-size: 0.9rem;
+        cursor: pointer;
+    }
+
+    /* Projects Grid */
+    .projects-section {
+        padding: 4rem 0;
+    }
+
+    .projects-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+        gap: 2.5rem;
+        margin-bottom: 3rem;
+    }
+
+    .project-card {
+        background: var(--bg-secondary);
+        border-radius: 1.5rem;
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        backdrop-filter: blur(10px);
+        cursor: pointer;
+    }
+
+    .project-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        border-color: var(--accent-primary);
+    }
+
+    .project-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(135deg, var(--accent-primary), #8b5cf6);
+        transform: scaleX(0);
+        transition: transform 0.4s ease;
+    }
+
+    .project-card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .project-image {
+        width: 100%;
+        height: 240px;
+        background: linear-gradient(135deg, var(--accent-primary) 0%, #8b5cf6 50%, #ec4899 100%);
+        display: flex;
+        alignss-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 4rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .project-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.4s ease;
+    }
+
+    .project-card:hover .project-image img {
+        transform: scale(1.05);
+    }
+
+
+
+    @keyframes slide {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
+    }
+
+    .project-content {
+        padding: 2rem;
+    }
+
+    .project-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+    }
+
+    .project-title {
+        font-size: 1.4rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: var(--text-primary);
+        line-height: 1.3;
+    }
+
+    .project-date {
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        white-space: nowrap;
+    }
+
+    .project-description {
+        color: var(--text-secondary);
+        margin-bottom: 1.5rem;
+        line-height: 1.6;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .project-tech {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .tech-tag {
+        background: var(--bg-tertiary);
+        color: var(--text-secondary);
+        padding: 0.3rem 0.8rem;
+        border-radius: 1rem;
+        font-size: 0.8rem;
+        border: 1px solid var(--border-color);
+        transition: var(--transition);
+    }
+
+    .project-card:hover .tech-tag {
+        background: var(--accent-light);
+        color: var(--accent-primary);
+        border-color: var(--accent-primary);
+    }
+
+    .project-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .project-links {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .project-link {
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 1.1rem;
+        transition: var(--transition);
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+    }
+
+    .project-link:hover {
+        color: var(--accent-primary);
+        background: var(--bg-tertiary);
+    }
+
+    .view-details {
+        color: var(--accent-primary);
+        text-decoration: none;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: var(--transition);
+    }
+
+    .view-details:hover {
+        color: var(--accent-hover);
+        transform: translateX(5px);
+    }
+
+    /* Pagination */
+    .pagination-wrapper {
+        display: flex;
+        justify-content: center;
+        margin-top: 3rem;
+    }
+
+    .pagination {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .pagination a,
+    .pagination span {
+        padding: 0.75rem 1rem;
+        border: 1px solid var(--border-color);
+        border-radius: 0.5rem;
+        text-decoration: none;
+        color: var(--text-secondary);
+        transition: var(--transition);
+        min-width: 44px;
+        text-align: center;
+    }
+
+    .pagination a:hover {
+        background: var(--accent-primary);
+        color: white;
+        border-color: var(--accent-primary);
+    }
+
+    .pagination .current {
+        background: var(--accent-primary);
+        color: white;
+        border-color: var(--accent-primary);
+    }
+
+    .pagination .disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    /* Stats Section */
+    .stats-section {
+        background: var(--bg-secondary);
+        padding: 3rem 0;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 2rem;
+        text-align: center;
+    }
+
+    .stat-item {
+        padding: 1.5rem;
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--accent-primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: var(--text-secondary);
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        color: var(--text-muted);
+    }
+
+    .empty-state h3 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        color: var(--text-primary);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .projects-grid {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        .filters-container {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .filter-tags {
+            justify-content: center;
+        }
+
+        .project-header {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .project-date {
+            align-self: flex-start;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    /* Animation Classes */
+    .fade-in-up {
+        opacity: 0;
+        transform: translateY(30px);
+        animation: fadeInUp 0.6s ease-out forwards;
+    }
+
+    @keyframes fadeInUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .stagger-1 { animation-delay: 0.1s; }
+    .stagger-2 { animation-delay: 0.2s; }
+    .stagger-3 { animation-delay: 0.3s; }
+    .stagger-4 { animation-delay: 0.4s; }
+    .stagger-5 { animation-delay: 0.5s; }
+    .stagger-6 { animation-delay: 0.6s; }
+</style>
+{% endblock %}
 
 {% block content %}
+<!-- Page Header -->
 <section class="page-header">
     <div class="container">
-        <h1>{% trans "My Projects" %}</h1>
-        <p>{% trans "A collection of my work and contributions" %}</p>
+        <div class="page-header-content fade-in-up">
+            <h1 class="page-title">
+                {% if LANGUAGE_CODE == 'fa' %}
+                    پروژه‌های من
+                {% else %}
+                    My Projects
+                {% endif %}
+            </h1>
+            <p class="page-subtitle">
+                {% if LANGUAGE_CODE == 'fa' %}
+                    مجموعه‌ای از پروژه‌هایی که با عشق و دقت توسعه داده‌ام
+                {% else %}
+                    A collection of projects I've developed with passion and precision
+                {% endif %}
+            </p>
+        </div>
     </div>
 </section>
 
+<!-- Filters Section -->
+<!---<section class="filters-section">
+    <div class="container">
+        <div class="filters-container fade-in-up stagger-1">
+            <div class="filter-tags">
+                <span style="color: var(--text-secondary); margin-right: 1rem;">
+                    {% if LANGUAGE_CODE == 'fa' %}
+                        فیلتر بر اساس:
+                    {% else %}
+                        Filter by:
+                    {% endif %}
+                </span>
+                <a href="{% url 'project_list' %}" class="filter-tag active">
+                    {% if LANGUAGE_CODE == 'fa' %}
+                        همه
+                    {% else %}
+                        All
+                    {% endif %}
+                </a>
+                <a href="#" class="filter-tag">Django</a>
+                <a href="#" class="filter-tag">Python</a>
+                <a href="#" class="filter-tag">React</a>
+                <a href="#" class="filter-tag">PostgreSQL</a>
+            </div>
+
+            <div class="sort-dropdown">
+                <label for="sort" style="color: var(--text-secondary);">
+                    {% if LANGUAGE_CODE == 'fa' %}
+                        مرتب‌سازی:
+                    {% else %}
+                        Sort by:
+                    {% endif %}
+                </label>
+                <select id="sort" class="sort-select">
+                    <option value="newest">
+                        {% if LANGUAGE_CODE == 'fa' %}
+                            جدیدترین
+                        {% else %}
+                            Newest
+                        {% endif %}
+                    </option>
+                    <option value="oldest">
+                        {% if LANGUAGE_CODE == 'fa' %}
+                            قدیمی‌ترین
+                        {% else %}
+                            Oldest
+                        {% endif %}
+                    </option>
+                    <option value="name">
+                        {% if LANGUAGE_CODE == 'fa' %}
+                            نام
+                        {% else %}
+                            Name
+                        {% endif %}
+                    </option>
+                </select>
+            </div>
+        </div>
+    </div>
+</section>--->
+
+<!-- Projects Section -->
 <section class="projects-section">
     <div class="container">
-        <div class="projects-grid">
-            {% for project in projects %}
-            <div class="project-card">
-                {% if project.image %}
-                <div class="project-image">
-                    <img src="{{ project.image.url }}" alt="{{ project.title }}">
-                </div>
-                {% endif %}
-                <div class="project-content">
-                    <h3>{{ project.title }}</h3>
-                    <p>{{ project.short_description }}</p>
-                    <div class="project-tech">
-                        {% for tech in project.technologies.all %}
-                        <span class="tech-tag">{{ tech.name }}</span>
-                        {% endfor %}
-                    </div>
-                    <div class="project-links">
-                        <a href="{% url 'project_detail' project.pk %}" class="btn btn-small">View Details</a>
-                        {% if project.live_url %}
-                        <a href="{{ project.live_url }}" class="btn btn-small btn-secondary" target="_blank">
-                            <i class="fas fa-external-link-alt"></i> Live Demo
-                        </a>
+        {% if projects %}
+            <div class="projects-grid">
+                {% for project in projects %}
+                <article class="project-card fade-in-up stagger-{{ forloop.counter|add:1 }}" onclick="window.location.href='{{ project.get_absolute_url }}'">
+                    <div class="project-image">
+                        {% if project.image %}
+                            <img src="{{ project.image.url }}" alt="{{ project.title }}">
                         {% endif %}
                     </div>
+
+                    <div class="project-content">
+                        <div class="project-header">
+                            <div>
+                                <h3 class="project-title">{{ project.title }}</h3>
+                                <div class="project-date">
+                                    {{ project.created_date|date:"M d, Y" }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <p class="project-description">
+                            {{ project.short_description|default:project.description|truncatewords:25 }}
+                        </p>
+
+                        <div class="project-tech">
+                            {% for tech in project.technologies.all %}
+                            <span class="tech-tag">{{ tech.name }}</span>
+                            {% endfor %}
+                        </div>
+
+                        <div class="project-footer">
+                            <div class="project-links">
+                                {% if project.github_url %}
+                                <a href="{{ project.github_url }}" class="project-link" target="_blank" title="{% trans 'View Code' %}" onclick="event.stopPropagation();">
+                                    <i class="fab fa-github"></i>
+                                </a>
+                                {% endif %}
+                                {% if project.live_url %}
+                                <a href="{{ project.live_url }}" class="project-link" target="_blank" title="{% trans 'Live Demo' %}" onclick="event.stopPropagation();">
+                                    <i class="fas fa-external-link-alt"></i>
+                                </a>
+                                {% endif %}
+                            </div>
+
+                            <a href="{{ project.get_absolute_url }}" class="view-details">
+                                {% if LANGUAGE_CODE == 'fa' %}
+                                    جزئیات بیشتر
+                                {% else %}
+                                    View Details
+                                {% endif %}
+                                <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if is_paginated %}
+            <div class="pagination-wrapper fade-in-up">
+                <div class="pagination">
+                    {% if page_obj.has_previous %}
+                        <a href="?page=1" title="{% trans 'First page' %}">
+                            <i class="fas fa-angle-double-left"></i>
+                        </a>
+                        <a href="?page={{ page_obj.previous_page_number }}" title="{% trans 'Previous page' %}">
+                            <i class="fas fa-angle-left"></i>
+                        </a>
+                    {% else %}
+                        <span class="disabled">
+                            <i class="fas fa-angle-double-left"></i>
+                        </span>
+                        <span class="disabled">
+                            <i class="fas fa-angle-left"></i>
+                        </span>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <span class="current">{{ num }}</span>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <a href="?page={{ num }}">{{ num }}</a>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}" title="{% trans 'Next page' %}">
+                            <i class="fas fa-angle-right"></i>
+                        </a>
+                        <a href="?page={{ page_obj.paginator.num_pages }}" title="{% trans 'Last page' %}">
+                            <i class="fas fa-angle-double-right"></i>
+                        </a>
+                    {% else %}
+                        <span class="disabled">
+                            <i class="fas fa-angle-right"></i>
+                        </span>
+                        <span class="disabled">
+                            <i class="fas fa-angle-double-right"></i>
+                        </span>
+                    {% endif %}
                 </div>
             </div>
-            {% empty %}
-            <p class="no-content">No projects yet. Add some through the admin panel!</p>
-            {% endfor %}
-        </div>
-
-        {% if is_paginated %}
-        <div class="pagination">
-            {% if page_obj.has_previous %}
-                <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-small">&larr; Previous</a>
             {% endif %}
 
-            <span class="page-info">
-                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
-            </span>
-
-            {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}" class="btn btn-small">Next &rarr;</a>
-            {% endif %}
-        </div>
+        {% else %}
+            <!-- Empty State -->
+            <div class="empty-state fade-in-up">
+                <i class="fas fa-folder-open"></i>
+                <h3>
+                    {% if LANGUAGE_CODE == 'fa' %}
+                        هنوز پروژه‌ای اضافه نشده
+                    {% else %}
+                        No Projects Yet
+                    {% endif %}
+                </h3>
+                <p>
+                    {% if LANGUAGE_CODE == 'fa' %}
+                        به زودی پروژه‌های جالب و جدید اضافه خواهند شد.
+                    {% else %}
+                        Exciting new projects will be added soon.
+                    {% endif %}
+                </p>
+            </div>
         {% endif %}
     </div>
 </section>
+
+<!-- Stats Section -->
+<section class="stats-section">
+    <div class="container">
+        <div class="stats-grid fade-in-up">
+            <div class="stat-item">
+                <div class="stat-number">{{ projects|length|default:"0" }}</div>
+                <div class="stat-label">
+                    {% if LANGUAGE_CODE == 'fa' %}
+                        پروژه تکمیل شده
+                    {% else %}
+                        Completed Projects
+                    {% endif %}
+                </div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">5+</div>
+                <div class="stat-label">
+                    {% if LANGUAGE_CODE == 'fa' %}
+                        تکنولوژی مختلف
+                    {% else %}
+                        Technologies
+                    {% endif %}
+                </div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">100%</div>
+                <div class="stat-label">
+                    {% if LANGUAGE_CODE == 'fa' %}
+                        رضایت مشتری
+                    {% else %}
+                        Client Satisfaction
+                    {% endif %}
+                </div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">24/7</div>
+                <div class="stat-label">
+                    {% if LANGUAGE_CODE == 'fa' %}
+                        پشتیبانی
+                    {% else %}
+                        Support
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Animation Observer
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                entry.target.style.animationPlayState = 'running';
+                observer.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+
+    // Observe all animation elements
+    document.querySelectorAll('.fade-in-up').forEach(el => {
+        el.style.animationPlayState = 'paused';
+        observer.observe(el);
+    });
+
+    // Filter functionality (basic implementation)
+    document.querySelectorAll('.filter-tag').forEach(tag => {
+        tag.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            // Remove active class from all tags
+            document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
+
+            // Add active class to clicked tag
+            this.classList.add('active');
+
+            // Here you can implement actual filtering logic
+            // For now, it's just visual feedback
+        });
+    });
+
+    // Sort functionality
+    document.getElementById('sort').addEventListener('change', function() {
+        // Here you can implement actual sorting logic
+        console.log('Sort by:', this.value);
+    });
+
+    // Project card click handling
+    document.querySelectorAll('.project-card').forEach(card => {
+        card.addEventListener('click', function(e) {
+            // Only navigate if not clicking on links
+            if (!e.target.closest('a')) {
+                const url = this.getAttribute('onclick').match(/'([^']+)'/)[1];
+                window.location.href = url;
+            }
+        });
+    });
+
+    // Smooth animations on scroll
+    let ticking = false;
+
+    function updateAnimations() {
+        const scrollTop = window.pageYOffset;
+
+        // Parallax effect for header
+        const header = document.querySelector('.page-header');
+        if (header) {
+            header.style.transform = `translateY(${scrollTop * 0.5}px)`;
+        }
+
+        ticking = false;
+    }
+
+    function requestTick() {
+        if (!ticking) {
+            requestAnimationFrame(updateAnimations);
+            ticking = true;
+        }
+    }
+
+    window.addEventListener('scroll', requestTick);
+</script>
 {% endblock %}

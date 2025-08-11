@@ -12,6 +12,7 @@ class HomeView(TemplateView):
         context = super().get_context_data(**kwargs)
         context['featured_projects'] = Project.objects.filter(featured=True)[:3]
         context['recent_posts'] = BlogPost.objects.filter(published=True)[:3]
+        context['code_samples'] = CodeSample.objects.filter(featured=True)[:3]
         return context
 
 class AboutView(TemplateView):
