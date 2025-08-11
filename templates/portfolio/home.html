@@ -653,84 +653,7 @@
                     {% trans "View Details" %} <i class="fas fa-arrow-right"></i>
                 </a>
             </div>
-            {% empty %}
-            <!-- Fallback content when no code samples exist -->
-            <div class="code-sample-card fade-in-up">
-                <div class="code-header">
-                    <h3 class="code-title">Django REST API Authentication</h3>
-                    <span class="code-language">Python</span>
-                </div>
-                <p class="code-description">
-                    {% if LANGUAGE_CODE == 'fa' %}
-                        پیاده‌سازی سیستم احراز هویت امن با JWT برای API های Django REST Framework
-                    {% else %}
-                        Secure JWT authentication system for Django REST Framework APIs
-                    {% endif %}
-                </p>
-                <div class="code-preview">
-<pre><code>from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def protected_view(request):
-    return Response({'message': 'Hello, authenticated user!'})</code></pre>
-                </div>
-                <a href="{% url 'code_sample_list' %}" class="btn btn-secondary btn-sm">
-                    {% trans "View Details" %} <i class="fas fa-arrow-right"></i>
-                </a>
-            </div>
-
-            <div class="code-sample-card fade-in-up">
-                <div class="code-header">
-                    <h3 class="code-title">Database Optimization</h3>
-                    <span class="code-language">Django</span>
-                </div>
-                <p class="code-description">
-                    {% if LANGUAGE_CODE == 'fa' %}
-                        بهینه‌سازی کوئری‌های دیتابیس با استفاده از select_related و prefetch_related
-                    {% else %}
-                        Database query optimization using select_related and prefetch_related
-                    {% endif %}
-                </p>
-                <div class="code-preview">
-<pre><code>class ProjectListView(ListView):
-    queryset = Project.objects.select_related('category')\
-                             .prefetch_related('technologies')\
-                             .filter(featured=True)</code></pre>
-                </div>
-                <a href="{% url 'code_sample_list' %}" class="btn btn-secondary btn-sm">
-                    {% trans "View Details" %} <i class="fas fa-arrow-right"></i>
-                </a>
-            </div>
-
-            <div class="code-sample-card fade-in-up">
-                <div class="code-header">
-                    <h3 class="code-title">Async Task Processing</h3>
-                    <span class="code-language">Python</span>
-                </div>
-                <p class="code-description">
-                    {% if LANGUAGE_CODE == 'fa' %}
-                        پردازش ناهمزمان تسک‌ها با Celery برای بهبود عملکرد اپلیکیشن
-                    {% else %}
-                        Asynchronous task processing with Celery for improved performance
-                    {% endif %}
-                </p>
-                <div class="code-preview">
-<pre><code>from celery import shared_task
-from django.core.mail import send_mail
-
-@shared_task
-def send_welcome_email(user_id):
-    user = User.objects.get(id=user_id)
-    send_mail('Welcome!', 'Welcome message',
-              'from@example.com', [user.email])</code></pre>
-                </div>
-                <a href="{% url 'code_sample_list' %}" class="btn btn-secondary btn-sm">
-                    {% trans "View Details" %} <i class="fas fa-arrow-right"></i>
-                </a>
-            </div>
             {% endfor %}
         </div>
 
@@ -869,7 +792,7 @@ def send_welcome_email(user_id):
                 <div class="skill-list">
                     <span class="skill-item">Python</span>
                     <!---<span class="skill-item">JavaScript</span>--->
-                    <span class="skill-item">SQL</span>
+                    <!---<span class="skill-item">SQL</span>--->
                     <span class="skill-item">HTML/CSS</span>
                 </div>
             </div>
@@ -888,8 +811,8 @@ def send_welcome_email(user_id):
                 <div class="skill-list">
                     <span class="skill-item">Django</span>
                     <span class="skill-item">Django REST</span>
-                    <span class="skill-item">Flask</span>
-                    <span class="skill-item">React</span>
+                    <!--<span class="skill-item">Flask</span>
+                    <span class="skill-item">React</span>-->
                 </div>
             </div>
 

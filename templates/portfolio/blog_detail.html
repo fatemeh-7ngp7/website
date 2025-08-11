@@ -419,7 +419,7 @@
     }
 
     [dir="rtl"] .nav-btn i {
-        transform: rotate(180deg);
+        transform: none;
     }
 
     /* Responsive Design */
@@ -469,7 +469,7 @@
         }
 
         .nav-btn {
-            width: 100%;
+            width: 50%;
             justify-content: center;
         }
     }
@@ -592,7 +592,7 @@
                     {% trans "Share this article" %}
                 {% endif %}
             </h3>
-            <div class="share-buttons">
+            <!--<div class="share-buttons">
                 <a href="https://twitter.com/intent/tweet?text={{ post.title|urlencode }}&url={{ request.build_absolute_uri }}"
                    target="_blank"
                    rel="noopener noreferrer"
@@ -618,7 +618,7 @@
                    aria-label="{% trans 'Share on LinkedIn' %}">
                     <i class="fab fa-linkedin-in"></i>
                     {% if LANGUAGE_CODE == 'fa' %}لینکدین{% else %}LinkedIn{% endif %}
-                </a>
+                </a>-->
 
                 <a href="https://t.me/share/url?url={{ request.build_absolute_uri }}&text={{ post.title|urlencode }}"
                    target="_blank"
