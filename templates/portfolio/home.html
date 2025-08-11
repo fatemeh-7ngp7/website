@@ -200,7 +200,7 @@
     /* Code Samples Section */
     .code-samples-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
         gap: 2.5rem;
         margin-bottom: 3rem;
     }
@@ -208,7 +208,6 @@
     .code-sample-card {
         background: var(--bg-secondary);
         border-radius: 1.5rem;
-        padding: 2rem;
         border: 1px solid var(--border-color);
         transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         position: relative;
@@ -238,56 +237,265 @@
         transform: scaleX(1);
     }
 
-    .code-header {
+    .code-card-header {
+        background: #1a202c;
+        padding: 1rem 1.5rem;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 1rem;
+        border-bottom: 1px solid #4a5568;
+        direction: ltr !important;
+        text-align: left !important;
     }
 
+    .code-header-left {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        direction: ltr !important;
+    }
+
+    .code-dots {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+    }
+
+    .dot.red { background: #ff5f57; }
+    .dot.yellow { background: #ffbd2e; }
+    .dot.green { background: #28ca42; }
+
     .code-title {
-        font-size: 1.2rem;
+        font-size: 1.1rem;
         font-weight: 600;
-        color: var(--text-primary);
+        color: #e2e8f0;
+        margin: 0;
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        direction: ltr !important;
+        text-align: left !important;
     }
 
     .code-language {
-        background: linear-gradient(135deg, var(--accent-light), var(--accent-primary));
+        background: linear-gradient(135deg, var(--accent-primary), #8b5cf6);
         color: white;
-        padding: 0.4rem 1rem;
-        border-radius: 25px;
-        font-size: 0.85rem;
+        padding: 0.4rem 0.8rem;
+        border-radius: 15px;
+        font-size: 0.8rem;
         font-weight: 600;
         text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
     }
 
     .code-description {
         color: var(--text-secondary);
-        margin-bottom: 1rem;
+        margin: 1.5rem;
         line-height: 1.6;
+        font-size: 0.95rem;
+    }
+
+    .code-preview-container {
+    margin: 0 1.5rem 1.5rem;
+    background: var(--bg-tertiary);
+    border-radius: 1rem;
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    direction: ltr !important;
+}
+
+    .code-preview-header {
+        background: #2d3748;
+        padding: 0.75rem 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #4a5568;
+        direction: ltr !important;
+    }
+
+    .code-filename {
+        color: #a0aec0;
+        font-size: 0.8rem;
+        font-weight: 500;
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        direction: ltr !important;
+    }
+
+    .code-preview-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .code-action-btn {
+        background: none;
+        border: none;
+        color: #a0aec0;
+        cursor: pointer;
+        padding: 0.4rem;
+        border-radius: 0.25rem;
+        transition: var(--transition);
+        font-size: 0.8rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .code-action-btn:hover {
+        color: var(--accent-primary);
+        background: rgba(59, 130, 246, 0.1);
     }
 
     .code-preview {
-        background: var(--bg-tertiary);
-        border-radius: 1rem;
-        padding: 1.5rem;
-        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-        font-size: 0.9rem;
-        overflow-x: auto;
-        margin-bottom: 1.5rem;
-        border: 1px solid var(--border-color);
+        background: #2d3748;
         position: relative;
-        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+        direction: ltr !important;
+        text-align: left !important;
     }
 
-    .code-preview::before {
-        content: '● ● ●';
-        position: absolute;
-        top: 0.75rem;
-        right: 1rem;
+    .code-preview pre {
+        margin: 0 !important;
+        background: transparent !important;
+        padding: 1.5rem !important;
+        border-radius: 0 !important;
+        overflow-x: auto;
+        font-size: 0.85rem !important;
+        line-height: 1.5 !important;
+        direction: ltr !important;
+        text-align: left !important;
+    }
+
+    .code-preview code {
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace !important;
+        color: #e2e8f0 !important;
+        direction: ltr !important;
+        text-align: left !important;
+        unicode-bidi: bidi-override !important;
+    }
+
+    /* Force LTR for all code-related elements */
+    .code-preview-container,
+    .code-preview,
+    .code-preview pre,
+    .code-preview code,
+    .code-filename,
+    .code-card-header,
+    .code-header-left,
+    .code-preview-actions,
+    pre[class*="language-"],
+    code[class*="language-"] {
+        direction: ltr !important;
+        text-align: left !important;
+        unicode-bidi: embed !important;
+    }
+
+    /* Ensure code blocks are not affected by page RTL */
+    [dir="rtl"] .code-preview-container,
+    [dir="rtl"] .code-preview,
+    [dir="rtl"] .code-preview pre,
+    [dir="rtl"] .code-preview code,
+    [dir="rtl"] .code-filename,
+    [dir="rtl"] .code-card-header,
+    [dir="rtl"] .code-header-left,
+    [dir="rtl"] .code-preview-actions,
+    [dir="rtl"] pre[class*="language-"],
+    [dir="rtl"] code[class*="language-"] {
+        direction: ltr !important;
+        text-align: left !important;
+        unicode-bidi: bidi-override !important;
+    }
+
+    .code-card-footer {
+        padding: 1rem 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: var(--bg-tertiary);
+        border-top: 1px solid var(--border-color);
+    }
+
+    .code-meta {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .meta-info {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
         color: var(--text-muted);
-        font-size: 0.7rem;
-        letter-spacing: 0.2rem;
+        font-size: 0.8rem;
+    }
+
+    .meta-info i {
+        color: var(--accent-primary);
+        font-size: 0.75rem;
+    }
+
+    /* Custom scrollbar for code preview */
+    .code-preview pre::-webkit-scrollbar {
+        height: 6px;
+    }
+
+    .code-preview pre::-webkit-scrollbar-track {
+        background: #1a202c;
+    }
+
+    .code-preview pre::-webkit-scrollbar-thumb {
+        background: var(--accent-primary);
+        border-radius: 3px;
+    }
+
+    .code-preview pre::-webkit-scrollbar-thumb:hover {
+        background: var(--accent-hover);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .code-samples-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .code-card-header {
+            flex-direction: column;
+            gap: 0.75rem;
+            align-items: flex-start;
+        }
+
+        .code-card-footer {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .code-preview pre {
+            font-size: 0.8rem !important;
+        }
+    }
+
+    /* Animation enhancements */
+    .code-sample-card .code-preview {
+        opacity: 0.9;
+        transition: opacity 0.3s ease;
+    }
+
+    .code-sample-card:hover .code-preview {
+        opacity: 1;
+    }
+
+    /* Loading state for syntax highlighting */
+    .code-preview code:not([class*="language-"]) {
+        color: #a0aec0 !important;
+    }
+
+    /* Ensure proper text direction inheritance prevention */
+    .code-preview *,
+    .code-preview-container *,
+    .code-card-header * {
+        direction: ltr !important;
+        text-align: left !important;
     }
 
     /* Projects Section */
@@ -639,21 +847,58 @@
             <!-- Dynamic code samples from admin -->
             {% for sample in code_samples %}
             <div class="code-sample-card fade-in-up">
-                <div class="code-header">
-                    <h3 class="code-title">{{ sample.title }}</h3>
-                    <span class="code-language">{{ sample.language }}</span>
+                <div class="code-card-header">
+                    <div class="code-header-left">
+                        <div class="code-dots">
+                            <div class="dot red"></div>
+                            <div class="dot yellow"></div>
+                            <div class="dot green"></div>
+                        </div>
+                        <h3 class="code-title">{{ sample.title }}</h3>
+                    </div>
+                    <span class="code-language">{{ sample.get_language_display }}</span>
                 </div>
+
                 <p class="code-description">
                     {{ sample.description }}
                 </p>
-                <div class="code-preview">
-                    <pre><code>{{ sample.code|truncatechars:300 }}</code></pre>
-                </div>
-                <a href="{% url 'code_sample_detail' sample.pk %}" class="btn btn-secondary btn-sm">
-                    {% trans "View Details" %} <i class="fas fa-arrow-right"></i>
-                </a>
-            </div>
 
+                <div class="code-preview-container">
+                    <div class="code-preview-header">
+                        <span class="code-filename">
+                            {{ sample.filename|default:"code"|add:"."|add:sample.language }}
+                        </span>
+                        <div class="code-preview-actions">
+                            <button class="code-action-btn" onclick="copyCode(this)" title="Copy code">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="code-preview">
+                        <pre class="line-numbers"><code class="language-{{ sample.language|lower }}" dir="ltr">{{ sample.code|truncatechars:400 }}</code></pre>
+                    </div>
+                </div>
+
+                <div class="code-card-footer">
+                    <div class="code-meta">
+                        {% if sample.lines_of_code %}
+                        <span class="meta-info">
+                            <i class="fas fa-list-ol"></i>
+                            {{ sample.lines_of_code }} {% if LANGUAGE_CODE == 'fa' %}خط{% else %}lines{% endif %}
+                        </span>
+                        {% endif %}
+                        {% if sample.difficulty %}
+                        <span class="meta-info">
+                            <i class="fas fa-signal"></i>
+                            {{ sample.get_difficulty_display }}
+                        </span>
+                        {% endif %}
+                    </div>
+                    <a href="{% url 'code_sample_detail' sample.slug %}" class="btn btn-secondary btn-sm">
+                        {% trans "View Details" %} <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
             {% endfor %}
         </div>
 
@@ -1035,6 +1280,152 @@
 
 {% block extra_js %}
 <script>
+    // Copy code functionality for home page code samples
+    function copyCode(button) {
+        const codeContainer = button.closest('.code-preview-container');
+        const codeElement = codeContainer.querySelector('code');
+        const code = codeElement.textContent;
+
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(code).then(() => {
+                const icon = button.querySelector('i');
+                const originalClass = icon.className;
+
+                // Change button appearance
+                icon.className = 'fas fa-check';
+                button.style.color = '#10b981';
+
+                // Show success toast
+                showToast('{% if LANGUAGE_CODE == "fa" %}کد کپی شد!{% else %}Code copied!{% endif %}');
+
+                // Reset after 2 seconds
+                setTimeout(() => {
+                    icon.className = originalClass;
+                    button.style.color = '';
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy code: ', err);
+                showToast('{% if LANGUAGE_CODE == "fa" %}خطا در کپی کردن{% else %}Failed to copy{% endif %}', 'error');
+            });
+        }
+    }
+
+    // Toast notification function (if not already defined)
+    function showToast(message, type = 'success') {
+        // Remove existing toasts
+        const existingToasts = document.querySelectorAll('.code-toast');
+        existingToasts.forEach(toast => toast.remove());
+
+        const toast = document.createElement('div');
+        toast.className = 'code-toast';
+        toast.textContent = message;
+
+        const bgColor = type === 'error' ? '#ef4444' : '#10b981';
+
+        toast.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: ${bgColor};
+            color: white;
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.5rem;
+            z-index: 10001;
+            font-size: 0.85rem;
+            font-weight: 500;
+            opacity: 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            max-width: 250px;
+            word-wrap: break-word;
+        `;
+
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+            toast.style.opacity = '1';
+            toast.style.transform = 'translateY(0)';
+        }, 100);
+
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                if (document.body.contains(toast)) {
+                    document.body.removeChild(toast);
+                }
+            }, 300);
+        }, 2500);
+    }
+
+    // Force LTR direction for code elements
+    function forceCodeLTRHome() {
+        const codeElements = document.querySelectorAll(`
+            .code-preview-container,
+            .code-preview,
+            .code-preview pre,
+            .code-preview code,
+            .code-filename,
+            .code-card-header,
+            .code-header-left,
+            .code-preview-actions,
+            pre[class*="language-"],
+            code[class*="language-"]
+        `);
+
+        codeElements.forEach(element => {
+            element.style.direction = 'ltr';
+            element.style.textAlign = 'left';
+            element.style.unicodeBidi = 'bidi-override';
+            element.setAttribute('translate', 'no');
+           element.setAttribute('dir', 'ltr');
+        });
+    }
+
+    // Initialize when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        // Apply LTR direction to code elements
+        forceCodeLTRHome();
+
+        // Initialize syntax highlighting if Prism is available
+        if (typeof Prism !== 'undefined') {
+            Prism.highlightAll();
+            // Re-apply LTR after highlighting
+            setTimeout(forceCodeLTRHome, 100);
+        }
+
+        // Add hover effects to code cards
+        document.querySelectorAll('.code-sample-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-10px)';
+            });
+
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(-8px)';
+            });
+        });
+    });
+
+    // Mutation observer to maintain LTR direction
+    const codeObserverHome = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.type === 'childList' || mutation.type === 'attributes') {
+                setTimeout(forceCodeLTRHome, 50);
+            }
+        });
+    });
+
+    // Start observing the code samples section
+    const codeSamplesSection = document.getElementById('code-samples');
+    if (codeSamplesSection) {
+        codeObserverHome.observe(codeSamplesSection, {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            attributeFilter: ['dir', 'style', 'class']
+        });
+    }
+
     // Intersection Observer for animations
     const observerOptions = {
         threshold: 0.1,
@@ -1056,25 +1447,6 @@
     document.querySelectorAll('.fade-in-up').forEach(el => {
         observer.observe(el);
     });
-
-    // Typing effect for hero subtitle (optional enhancement)
-    const subtitle = document.querySelector('.hero-subtitle');
-    if (subtitle) {
-        const text = subtitle.textContent;
-        subtitle.textContent = '';
-        let i = 0;
-
-        function typeWriter() {
-            if (i < text.length) {
-                subtitle.textContent += text.charAt(i);
-                i++;
-                setTimeout(typeWriter, 50);
-            }
-        }
-
-        // Start typing effect after a delay
-        setTimeout(typeWriter, 1000);
-    }
 
     // Smooth scroll with offset for fixed navbar
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
