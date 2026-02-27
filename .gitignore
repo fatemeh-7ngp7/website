@@ -132,7 +132,6 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
 .venv
 env/
 venv/
@@ -269,3 +268,9 @@ pyrightconfig.json
 *.iml
 
 # End of https://www.toptal.com/developers/gitignore/api/python,djangoportfolio/migrations/*.py
+
+# Environment variables
+.env
+
+# Static files collected
+staticfiles/
