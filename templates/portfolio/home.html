@@ -1023,81 +1023,46 @@
         </div>
 
         <div class="skills-container">
-            <div class="skill-category fade-in-up">
+            {% for category, skills_in_category in skills.items %}
+            <div class="skill-category fade-in-up stagger-{{ forloop.counter }}">
                 <div class="skill-icon">
-                    <i class="fas fa-code"></i>
+                    {% if category == 'programming' %}
+                        <i class="fas fa-code"></i>
+                    {% elif category == 'framework' %}
+                        <i class="fas fa-layer-group"></i>
+                    {% elif category == 'database' %}
+                        <i class="fas fa-database"></i>
+                    {% elif category == 'tool' %}
+                        <i class="fas fa-tools"></i>
+                    {% else %}
+                        <i class="fas fa-star"></i>
+                    {% endif %}
                 </div>
                 <h3 class="skill-category-title">
-                    {% if LANGUAGE_CODE == 'fa' %}
-                        زبان‌های برنامه‌نویسی
+                    {% if category == 'programming' %}
+                        {% if LANGUAGE_CODE == 'fa' %}زبان‌های برنامه‌نویسی{% else %}Programming Languages{% endif %}
+                    {% elif category == 'framework' %}
+                        {% if LANGUAGE_CODE == 'fa' %}فریمورک‌ها{% else %}Frameworks{% endif %}
+                    {% elif category == 'database' %}
+                        {% if LANGUAGE_CODE == 'fa' %}پایگاه داده{% else %}Databases{% endif %}
+                    {% elif category == 'tool' %}
+                        {% if LANGUAGE_CODE == 'fa' %}ابزارها و تکنولوژی‌ها{% else %}Tools & Technologies{% endif %}
                     {% else %}
-                        Programming Languages
+                        {% if LANGUAGE_CODE == 'fa' %}سایر{% else %}Other{% endif %}
                     {% endif %}
                 </h3>
                 <div class="skill-list">
-                    <span class="skill-item">Python</span>
-                    <!---<span class="skill-item">JavaScript</span>--->
-                    <!---<span class="skill-item">SQL</span>--->
-                    <span class="skill-item">HTML/CSS</span>
+                    {% for skill in skills_in_category %}
+                        <span class="skill-item">
+                            {{ skill.name }}
+                            <span class="skill-level">{{ skill.get_level_display }}</span>
+                        </span>
+                    {% endfor %}
                 </div>
             </div>
-
-            <div class="skill-category fade-in-up">
-                <div class="skill-icon">
-                    <i class="fas fa-layer-group"></i>
-                </div>
-                <h3 class="skill-category-title">
-                    {% if LANGUAGE_CODE == 'fa' %}
-                        فریمورک‌ها
-                    {% else %}
-                        Frameworks
-                    {% endif %}
-                </h3>
-                <div class="skill-list">
-                    <span class="skill-item">Django</span>
-                    <span class="skill-item">Django REST</span>
-                    <!--<span class="skill-item">Flask</span>
-                    <span class="skill-item">React</span>-->
-                </div>
-            </div>
-
-            <div class="skill-category fade-in-up">
-                <div class="skill-icon">
-                    <i class="fas fa-database"></i>
-                </div>
-                <h3 class="skill-category-title">
-                    {% if LANGUAGE_CODE == 'fa' %}
-                        پایگاه داده
-                    {% else %}
-                        Databases
-                    {% endif %}
-                </h3>
-                <div class="skill-list">
-                    <span class="skill-item">PostgreSQL</span>
-                    <span class="skill-item">MySQL</span>
-                    <span class="skill-item">SQLite</span>
-                    <!---<span class="skill-item">Redis</span>--->
-                </div>
-            </div>
-
-            <div class="skill-category fade-in-up">
-                <div class="skill-icon">
-                    <i class="fas fa-tools"></i>
-                </div>
-                <h3 class="skill-category-title">
-                    {% if LANGUAGE_CODE == 'fa' %}
-                        ابزارها و تکنولوژی‌ها
-                    {% else %}
-                        Tools & Technologies
-                    {% endif %}
-                </h3>
-                <div class="skill-list">
-                    <span class="skill-item">Git</span>
-                    <span class="skill-item">Docker</span>
-                    <span class="skill-item">Linux</span>
-                    <!---<span class="skill-item">AWS</span>--->
-                </div>
-            </div>
+            {% empty %}
+                <p>No skills found.</p>
+            {% endfor %}
         </div>
     </div>
 </section>

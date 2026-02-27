@@ -2,13 +2,13 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-# 
+#
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-25 13:50+0000\n"
+"POT-Creation-Date: 2026-02-25 13:51+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,38 +16,38 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: portfolio_project/settings.py:119
 msgid "English"
-msgstr "انگلیسی"
+msgstr ""
 
 #: portfolio_project/settings.py:120
 msgid "Persian"
-msgstr "فارسی"
+msgstr ""
 
 #: templates/base.html:9 templates/portfolio/blog_detail.html:5
 #: templates/portfolio/blog_list.html:5 templates/portfolio/contact.html:5
 msgid "Portfolio"
-msgstr "نمونه کارها"
+msgstr ""
 
 #: templates/base.html:336 templates/portfolio/blog_detail.html:512
 msgid "Home"
-msgstr "خانه"
+msgstr ""
 
 #: templates/base.html:337
 msgid "Projects"
-msgstr "پروژه‌ها"
+msgstr ""
 
 #: templates/base.html:347 templates/portfolio/blog_detail.html:5
 #: templates/portfolio/blog_detail.html:520
 #: templates/portfolio/blog_list.html:5 templates/portfolio/blog_list.html:571
 msgid "Blog"
-msgstr "بلاگ"
+msgstr ""
 
 #: templates/base.html:348 templates/portfolio/contact.html:5
 msgid "Contact"
-msgstr "تماس"
+msgstr ""
 
 #: templates/base.html:353
 msgid "Toggle theme"
@@ -106,10 +106,8 @@ msgstr ""
 #: templates/portfolio/blog_list.html:701 templates/portfolio/home.html:1126
 #: templates/portfolio/home.html:1154 templates/portfolio/home.html:1181
 #: templates/portfolio/home.html:1208
-#, fuzzy
-#| msgid "View More"
 msgid "Read More"
-msgstr "مشاهده بیشتر"
+msgstr ""
 
 #: templates/portfolio/blog_list.html:727
 #: templates/portfolio/code_sample_list.html:980
@@ -170,26 +168,20 @@ msgid ""
 msgstr ""
 
 #: templates/portfolio/code_sample_detail.html:5
-#, fuzzy
-#| msgid "Code Samples"
 msgid "Code Sample"
-msgstr "بخشی از کدهای پروژه‌ها"
+msgstr ""
 
 #: templates/portfolio/contact.html:613
-#, fuzzy
-#| msgid "Contact"
 msgid "Contact Me"
-msgstr "تماس"
+msgstr ""
 
 #: templates/portfolio/contact.html:620
 msgid "Ready to collaborate on new projects and answer your questions"
 msgstr ""
 
 #: templates/portfolio/contact.html:651
-#, fuzzy
-#| msgid "Get In Touch"
 msgid "Get in Touch"
-msgstr "تماس با من"
+msgstr ""
 
 #: templates/portfolio/contact.html:658
 msgid ""
@@ -200,13 +192,11 @@ msgstr ""
 #: templates/portfolio/contact.html:731 templates/portfolio/contact.html:835
 #: templates/portfolio/home.html:1269
 msgid "Send Message"
-msgstr "ارسال پیام"
+msgstr ""
 
 #: templates/portfolio/contact.html:747
-#, fuzzy
-#| msgid "Name"
 msgid "Full Name"
-msgstr "نام"
+msgstr ""
 
 #: templates/portfolio/contact.html:766
 msgid "Email Address"
@@ -214,31 +204,27 @@ msgstr ""
 
 #: templates/portfolio/contact.html:784
 msgid "Subject"
-msgstr "موضوع"
+msgstr ""
 
 #: templates/portfolio/contact.html:802
-#, fuzzy
-#| msgid "Message"
 msgid "Your Message"
-msgstr "پیام"
+msgstr ""
 
 #: templates/portfolio/contact.html:822
 msgid "Your information is protected with SSL encryption"
 msgstr ""
 
 #: templates/portfolio/home.html:5
-#, fuzzy
-#| msgid "Fatemeh NGP - Portfolio"
 msgid "Fatemeh NGP - Python Django Developer"
-msgstr "فاطمه NGP - نمونه کار"
+msgstr ""
 
 #: templates/portfolio/home.html:818
 msgid "View My Work"
-msgstr "دیدن نمونه‌کارها"
+msgstr ""
 
 #: templates/portfolio/home.html:821
 msgid "About Me"
-msgstr "درباره من"
+msgstr ""
 
 #: templates/portfolio/home.html:826
 msgid "Scroll Down"
@@ -246,25 +232,23 @@ msgstr ""
 
 #: templates/portfolio/home.html:836
 msgid "Code Samples"
-msgstr "بخشی از کدهای پروژه‌ها"
+msgstr ""
 
 #: templates/portfolio/home.html:898
 msgid "View Details"
 msgstr ""
 
 #: templates/portfolio/home.html:907
-#, fuzzy
-#| msgid "Code Samples"
 msgid "View All Code Samples"
-msgstr "بخشی از کدهای پروژه‌ها"
+msgstr ""
 
 #: templates/portfolio/home.html:917
 msgid "Featured Projects"
-msgstr "پروژه های منتخب"
+msgstr ""
 
 #: templates/portfolio/home.html:946 templates/portfolio/home.html:986
 msgid "Code"
-msgstr "کد"
+msgstr ""
 
 #: templates/portfolio/home.html:951 templates/portfolio/home.html:989
 #: templates/portfolio/project_list.html:588
@@ -272,14 +256,12 @@ msgid "Live Demo"
 msgstr ""
 
 #: templates/portfolio/home.html:999
-#, fuzzy
-#| msgid "My Projects"
 msgid "View All Projects"
-msgstr "پروژه‌های من"
+msgstr ""
 
 #: templates/portfolio/home.html:1109
 msgid "Latest Blog Posts"
-msgstr "تازه‌ها در وبلاگ"
+msgstr ""
 
 #: templates/portfolio/home.html:1216
 msgid "View All Posts"
@@ -290,16 +272,12 @@ msgid "Download CV"
 msgstr ""
 
 #: templates/portfolio/project_detail.html:5
-#, fuzzy
-#| msgid "Projects"
 msgid "Project Details"
-msgstr "پروژه‌ها"
+msgstr ""
 
 #: templates/portfolio/project_list.html:583
-#, fuzzy
-#| msgid "View More"
 msgid "View Code"
-msgstr "مشاهده بیشتر"
+msgstr ""
 
 #: venv/lib/python3.12/site-packages/django/contrib/messages/apps.py:16
 msgid "Messages"
@@ -1545,143 +1523,3 @@ msgstr ""
 #: venv/lib/python3.12/site-packages/django/views/templates/default_urlconf.html:236
 msgid "Connect, get help, or contribute"
 msgstr ""
-
-#~ msgid "Backend developer portfolio showcasing projects and skills"
-#~ msgstr "نمونه کارهای توسعه‌دهنده بک اند به همراه پروژه‌ها و مهارت‌ها"
-
-#~ msgid "About"
-#~ msgstr "درباره من"
-
-#~ msgid "Skills"
-#~ msgstr "مهارت‌ها"
-
-#~ msgid "Connect"
-#~ msgstr "ارتباط"
-
-#~ msgid "All rights reserved."
-#~ msgstr "تمامی حقوق محفوظ است."
-
-#~ msgid "Get to know more about my background and skills"
-#~ msgstr "با سوابق و مهارت‌های من بیشتر آشنا شوید"
-
-#~ msgid "Hello! I'm Fatemeh Najafgholipour"
-#~ msgstr "سلام! من فاطمه نجفقلی پور هستم"
-
-#~ msgid ""
-#~ "I'm a passionate back-end developer with experience in building modern "
-#~ "web applications. I love creating solutions that combine great user "
-#~ "experience with clean, maintainable code."
-#~ msgstr ""
-#~ "من یک توسعه‌دهنده‌ی بک‌اند پرشور با تجربه در ساخت برنامه‌های وب مدرن هستم. من "
-#~ "عاشق ایجاد راه‌حل‌هایی هستم که تجربه‌ی کاربری عالی را با کد تمیز و قابل "
-#~ "نگهداری ترکیب می‌کنند."
-
-#~ msgid ""
-#~ "My journey in programming started when I met my husband. Since then, I've "
-#~ "worked on various projects ranging from small business websites to "
-#~ "complex web applications."
-#~ msgstr ""
-#~ "سفر من در برنامه‌نویسی از زمانی شروع شد که با همسرم آشنا شدم. از آن زمان، "
-#~ "روی پروژه‌های مختلفی از وب‌سایت‌های کسب‌وکارهای کوچک گرفته تا برنامه‌های "
-#~ "کاربردی وب پیچیده کار کرده‌ام."
-
-#~ msgid ""
-#~ "When I'm not coding, you can find me learning or travelling. I believe in "
-#~ "continuous learning and staying up-to-date with the latest technologies "
-#~ "and best practices."
-#~ msgstr ""
-#~ "وقتی کد نمی‌نویسم، می‌توانید من را در حال یادگیری یا سفر پیدا کنید. من به "
-#~ "یادگیری مداوم و به‌روز ماندن با جدیدترین فناوری‌ها و بهترین شیوه‌ها اعتقاد "
-#~ "دارم."
-
-#~ msgid "Technologies"
-#~ msgstr "تکنولوژی‌ها"
-
-#~ msgid "Years Experience"
-#~ msgstr "سابقه حرفه‌ای"
-
-#~ msgid "Projects Completed"
-#~ msgstr "پروژه‌های تکمیل‌شده"
-
-#~ msgid "Technical Skills"
-#~ msgstr "مهارت‌های فنی"
-
-#~ msgid "My Blog"
-#~ msgstr "نوشته‌های من"
-
-#~ msgid "Thoughts, tutorials, and insights on web development and technology"
-#~ msgstr "افکار، آموزش‌ها و بینش‌ها در مورد توسعه وب و فناوری"
-
-#~ msgid "A collection of code snippets, algorithms, and programming solutions"
-#~ msgstr "مجموعه‌ای از قطعه کدها، الگوریتم‌ها و راه‌حل‌های برنامه‌نویسی"
-
-#~ msgid "Let's discuss your next project or opportunity"
-#~ msgstr "اگه پروژه‌ای در ذهن دارین، خوشحال می‌شم باهم درباره‌ش صحبت کنیم."
-
-#~ msgid "Let's Connect"
-#~ msgstr "با من در ارتباط باشید"
-
-#~ msgid ""
-#~ "I'm always interested in hearing about new opportunities and interesting "
-#~ "projects. Whether you have a question or just want to say hi, feel free "
-#~ "to reach out!"
-#~ msgstr ""
-#~ "من همیشه به شنیدن درباره فرصت‌های جدید و پروژه‌های جالب علاقه‌مند هستم. اگر "
-#~ "سوالی دارید یا فقط می‌خواهید سلام کنید، خوشحال می‌شوم که با من تماس بگیرید!"
-
-#~ msgid "Email"
-#~ msgstr "ایمیل"
-
-#~ msgid "Location"
-#~ msgstr "موقعیت مکانی"
-
-#~ msgid "Tabriz, Iran"
-#~ msgstr "تبریز، ایران"
-
-#~ msgid "Response Time"
-#~ msgstr "زمان پاسخگویی"
-
-#~ msgid "Usually within 24 hours"
-#~ msgstr "معمولاً در عرض ۲۴ ساعت"
-
-#~ msgid "Hi, I'm <span class=\"highlight\">Fatemeh Najafgholipour</span>"
-#~ msgstr "سلام، من <span class=\"highlight\">فاطمه نجف‌قلی‌پور</span> هستم"
-
-#~ msgid "Backend Developer"
-#~ msgstr "توسعه‌دهنده بک‌اند"
-
-#~ msgid ""
-#~ "I build modern web applications with clean code and great user "
-#~ "experiences."
-#~ msgstr "من برنامه‌های وب مدرن را با کد تمیز و تجربه کاربری عالی توسعه می‌دهم."
-
-#~ msgid ""
-#~ "Passionate about Python, Django, Rest and creating solutions that matter."
-#~ msgstr "به پایتون، جنگو، رست و خلق راه‌حل‌های کاربردی علاقه‌مندم."
-
-#~ msgid "Let's Work Together"
-#~ msgstr "بیایید فرصت همکاری با هم را تجربه کنیم"
-
-#~ msgid "A collection of my work and contributions"
-#~ msgstr "مجموعه‌ای از آثار و دستاوردهای من"
-
-#~ msgid "Experience"
-#~ msgstr "تجربه"
-
-#~ msgid "Education"
-#~ msgstr "تحصیلات"
-
-#~ msgid "Testimonials"
-#~ msgstr "نظرات"
-
-#~ msgid "Services"
-#~ msgstr "خدمات"
-
-#~ msgid "Follow Me"
-#~ msgstr "دنبال کنید"
-
-#~ msgid "Submit"
-#~ msgstr "ارسال"
-
-#~ msgid "Cancel"
-#~ msgstr "لغو"

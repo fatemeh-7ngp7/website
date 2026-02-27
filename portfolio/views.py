@@ -4,6 +4,7 @@ from django.views.generic.edit import CreateView
 from django.contrib import messages
 from django.urls import reverse_lazy
 from .models import Project, CodeSample, BlogPost, Contact, Skill
+from collections import defaultdict
 
 class HomeView(TemplateView):
     template_name = 'portfolio/home.html'
@@ -13,6 +14,12 @@ class HomeView(TemplateView):
         context['featured_projects'] = Project.objects.filter(featured=True)[:3]
         context['recent_posts'] = BlogPost.objects.filter(published=True)[:3]
         context['code_samples'] = CodeSample.objects.filter(featured=True)[:3]
+        # Skills دسته‌بندی شده برای template
+        skills_by_category = defaultdict(list)
+        for skill in Skill.objects.all().order_by('category', 'name'):
+            skills_by_category[skill.category].append(skill)
+        context['skills'] = dict(skills_by_category)
+        
         return context
 
 class AboutView(TemplateView):
@@ -20,7 +27,11 @@ class AboutView(TemplateView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['skills'] = Skill.objects.all().order_by('category', 'name')
+        # دسته‌بندی مهارت‌ها
+        skills_by_category = defaultdict(list)
+        for skill in Skill.objects.all().order_by('category', 'name'):
+            skills_by_category[skill.category].append(skill)
+        context['skills'] = dict(skills_by_category)
         return context
 
 class ProjectListView(ListView):

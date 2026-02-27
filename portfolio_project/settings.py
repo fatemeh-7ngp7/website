@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-gp=dk3wdyo#hw#u^vp0@w7%b0j1w0d7xg#ct7gmjyfic=w+330'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["www.ngpdev.website", "ngpdev.website", "localhost", '127.0.0.1']
 
@@ -139,5 +139,5 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CSRF_TRUSTED_ORIGINS = ['https://www.ngpdev.website']
+#CSRF_TRUSTED_ORIGINS = ['https://www.ngpdev.website']
 
